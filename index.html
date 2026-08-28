@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LaserPrint - Inicio</title>
 
-  <!-- FAVICON DE LA PESTAÑA -->
   <link rel="icon" type="image/png" href="https://laserprint-api.onrender.com/uploads/fotos/LOGOTIPO.png">
 
-  <!-- Tipografías elegantes -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
@@ -17,14 +15,12 @@
 </head>
 <body>
 
-  <!-- NAVEGACIÓN GLASSMORPHISM -->
   <header class="glass-header">
     <nav class="nav-container">
       <a href="index.html" class="logo">
         <img src="https://laserprint-api.onrender.com/uploads/fotos/LOGOTIPO.png" alt="LaserPrint Logo" class="logo-img" onerror="this.onerror=null; this.src='https://via.placeholder.com/150x50/111/d4af37?text=LASERPRINT'">
       </a>
 
-      <!-- Botón de Menú Hamburguesa -->
       <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú">
         <span></span>
         <span></span>
@@ -44,7 +40,6 @@
     </nav>
   </header>
 
-  <!-- SECCIÓN HERO -->
   <section class="hero-section">
     <div class="hero-content">
       <h1 class="hero-title">Bienvenido a LaserPrint</h1>
@@ -52,17 +47,16 @@
     </div>
   </section>
 
-  <!-- VIDEO DE PRESENTACIÓN (REPRODUCCIÓN ÚNICA SIN LOOP) -->
   <section class="video-section">
     <div class="video-container glass-card" id="videoWrapper">
-      <video muted playsinline preload="metadata" id="introVideo">
-        <source src="https://laserprint-api.onrender.com/uploads/videos/presentacion.mp4" type="video/mp4">
-        Tu navegador no soporta el formato de video.
-      </video>
+      <img src="https://laserprint-api.onrender.com/uploads/videos/presentacion.gif" 
+           alt="Presentación LaserPrint" 
+           class="hero-gif-img" 
+           style="width: 100%; height: auto; display: block; border-radius: 12px;"
+           onerror="this.onerror=null; this.src='https://via.placeholder.com/800x450/111/d4af37?text=LaserPrint+Presentacion'">
     </div>
   </section>
 
-  <!-- CARRUSEL DESTACADO -->
   <section class="carousel-section">
     <h2 class="section-title">Nuestros Trabajos Destacados</h2>
     <div class="carousel-wrapper glass-card">
@@ -70,8 +64,7 @@
       
       <div class="carousel-track-container">
         <div class="carousel-track" id="carouselTrack">
-          <!-- Inyección dinámica desde index.js -->
-        </div>
+          </div>
       </div>
 
       <button class="carousel-btn next-btn ripple-btn" id="nextBtn" aria-label="Siguiente">&#10095;</button>
@@ -79,7 +72,6 @@
     <div class="carousel-dots" id="carouselDots"></div>
   </section>
 
-  <!-- SECCIÓN WHATSAPP & CÓDIGO QR -->
   <section class="contact-qr-section">
     <div class="contact-qr-card glass-card">
       <div class="contact-info">
@@ -97,7 +89,6 @@
     </div>
   </section>
 
-  <!-- FOOTER -->
   <footer class="glass-footer">
     <div class="footer-content">
       <p class="footer-rights">&copy; 2026 LaserPrint. Todos los derechos reservados.</p>
@@ -109,7 +100,6 @@
     </div>
   </footer>
 
-  <!-- MODAL VISOR -->
   <div id="imageModal" class="image-modal">
     <span class="image-modal-close" id="closeModal">&times;</span>
     <img class="image-modal-content" id="imgModalAmpliada" alt="Vista ampliada">
