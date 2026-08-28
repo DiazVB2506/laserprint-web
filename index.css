@@ -1,0 +1,485 @@
+/* ==========================================================================
+   VARIABLES Y ESTILOS GLOBALES - CLARO, ARENA & GLASSMORPHISM ELEGANTE
+   ========================================================================== */
+:root {
+  --bg-sand: #f4efe6;            /* Fondo suave tono arena / crema */
+  --bg-card: rgba(255, 255, 255, 0.45);
+  --glass-border: rgba(212, 175, 55, 0.25); /* Bordes refinados en oro cálido */
+  --glass-bg: rgba(255, 253, 248, 0.65);    /* Cristal blanco crema traslúcido */
+  --accent-gold: #b8860b;        /* Oro oscuro de alto contraste */
+  --accent-gold-light: #d4af37;  /* Oro cálido para degradados */
+  --text-main: #2b2621;          /* Marrón-grafito oscuro, alto contraste */
+  --text-muted: #6e6458;         /* Tono topo suave para subtítulos */
+  --font-serif: 'Cinzel', serif;
+  --font-sans: 'Plus Jakarta Sans', sans-serif;
+  --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1); /* Transición sedosa desacelerada */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-sand);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   COMPONENTES GLASSMORPHISM (FONDO CLARO)
+   ========================================================================== */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(184, 134, 11, 0.08), 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+/* ==========================================================================
+   MENÚ DE NAVEGACIÓN Y BOTONES ELEGANTES
+   ========================================================================== */
+.glass-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background: rgba(244, 239, 230, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
+  padding: 15px 40px;
+}
+
+.nav-container {
+  max-width: 1300px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-main);
+  text-decoration: none;
+  letter-spacing: 2px;
+}
+
+.logo span {
+  color: var(--accent-gold);
+}
+
+.logo-img {
+  height: 45px;
+  width: auto;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 12px;
+}
+
+/* Interacción sedosa y fluida para los botones de navegación */
+.nav-btn {
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid transparent;
+  transition: color 0.5s ease, background-color 0.5s ease, border-color 0.5s ease, transform 0.4s var(--transition-smooth);
+}
+
+/* Capa de destello suave (velo de luz sedosa) */
+.nav-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg, 
+    transparent 0%, 
+    rgba(184, 134, 11, 0.12) 50%, 
+    transparent 100%
+  );
+  transition: transform 0.8s var(--transition-smooth);
+  pointer-events: none;
+}
+
+.nav-btn:hover, 
+.nav-btn.active {
+  color: var(--text-main);
+  background-color: rgba(255, 255, 255, 0.55);
+  border-color: rgba(184, 134, 11, 0.35);
+  transform: translateY(-1px);
+}
+
+.nav-btn:hover::before {
+  transform: translateX(200%);
+}
+
+/* BOTÓN ADMIN DESTACADO CON HOVER FLUIDO */
+.btn-admin {
+  background: rgba(235, 77, 75, 0.08) !important;
+  color: #d63031 !important;
+  border: 1px solid rgba(214, 48, 49, 0.3) !important;
+}
+
+.btn-admin:hover {
+  background: #d63031 !important;
+  color: #ffffff !important;
+  border-color: #d63031 !important;
+  box-shadow: 0 4px 15px rgba(214, 48, 49, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Desactivación del efecto ripple para evitar sobresaltos */
+.ripple-btn {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ripple-effect {
+  display: none !important;
+}
+
+/* ==========================================================================
+   SECCIÓN HERO / BIENVENIDA
+   ========================================================================== */
+.hero-section {
+  padding-top: 160px;
+  padding-bottom: 40px;
+  text-align: center;
+}
+
+.hero-content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.hero-title {
+  font-family: var(--font-serif);
+  font-size: 3.2rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  background: linear-gradient(135deg, #2b2621 0%, var(--accent-gold) 60%, var(--accent-gold-light) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 15px;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  letter-spacing: 1px;
+}
+
+/* ==========================================================================
+   SECCIÓN VIDEO DE PRESENTACIÓN
+   ========================================================================== */
+.video-section {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.video-container {
+  overflow: hidden;
+  position: relative;
+  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+}
+
+.video-container video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   CARRUSEL HORIZONTAL
+   ========================================================================== */
+.carousel-section {
+  max-width: 1100px;
+  margin: 70px auto;
+  padding: 0 20px;
+}
+
+.section-title {
+  font-family: var(--font-serif);
+  text-align: center;
+  font-size: 1.8rem;
+  color: var(--text-main);
+  margin-bottom: 30px;
+  letter-spacing: 2px;
+}
+
+.carousel-wrapper {
+  position: relative;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.carousel-track-container {
+  overflow: hidden;
+  width: 100%;
+  border-radius: 12px;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.6s var(--transition-smooth);
+}
+
+.carousel-slide {
+  min-width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.carousel-slide img {
+  width: 100%;
+  max-height: 480px;
+  object-fit: cover;
+  border-radius: 12px;
+  cursor: zoom-in;
+  transition: transform 0.5s var(--transition-smooth);
+}
+
+.carousel-slide img:hover {
+  transform: scale(1.01);
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 253, 248, 0.85);
+  border: 1px solid var(--glass-border);
+  color: var(--text-main);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease, transform 0.4s var(--transition-smooth);
+}
+
+.carousel-btn:hover {
+  background-color: var(--accent-gold);
+  color: #ffffff;
+  border-color: var(--accent-gold);
+  transform: translateY(-50%) scale(1.04);
+  box-shadow: 0 6px 18px rgba(184, 134, 11, 0.22);
+}
+
+.prev-btn { left: 35px; }
+.next-btn { right: 35px; }
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(184, 134, 11, 0.25);
+  cursor: pointer;
+  transition: all 0.4s var(--transition-smooth);
+}
+
+.dot.active {
+  background: var(--accent-gold);
+  width: 25px;
+  border-radius: 10px;
+}
+
+/* ==========================================================================
+   SECCIÓN WHATSAPP Y QR
+   ========================================================================== */
+.contact-qr-section {
+  max-width: 900px;
+  margin: 70px auto 100px;
+  padding: 0 20px;
+}
+
+.contact-qr-card {
+  padding: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+}
+
+.contact-info {
+  flex: 1;
+}
+
+.whatsapp-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: #128c7e;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 14px 28px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1.05rem;
+  transition: transform 0.4s var(--transition-smooth), box-shadow 0.4s var(--transition-smooth);
+  box-shadow: 0 4px 15px rgba(18, 140, 126, 0.25);
+}
+
+.whatsapp-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(18, 140, 126, 0.35);
+}
+
+.whatsapp-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.whatsapp-subtext {
+  margin-top: 15px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.qr-container {
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.qr-image {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+.glass-footer {
+  background: rgba(244, 239, 230, 0.95);
+  border-top: 1px solid var(--glass-border);
+  padding: 30px 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.footer-contact {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.footer-separator {
+  color: var(--glass-border);
+}
+
+/* ==========================================================================
+   MODAL VISOR DE IMÁGENES (LIGHTBOX)
+   ========================================================================== */
+.image-modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(43, 38, 33, 0.85);
+  backdrop-filter: blur(12px);
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.image-modal-content {
+  max-width: 90%;
+  max-height: 80vh;
+  border-radius: 12px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+  object-fit: contain;
+}
+
+.image-modal-caption {
+  margin-top: 15px;
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.image-modal-close {
+  position: absolute;
+  top: 25px;
+  right: 35px;
+  color: #fff;
+  font-size: 40px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.image-modal-close:hover {
+  color: var(--accent-gold-light);
+}
+
+/* RESPONSIVO */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .hero-title { font-size: 2.2rem; }
+  .contact-qr-card { flex-direction: column; text-align: center; }
+}

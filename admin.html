@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>LaserPrint - Panel Admin</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f9; }
+    header { background: #18181c; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+    .container { padding: 30px; max-width: 900px; margin: 0 auto; }
+    .form-box { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-weight: bold; margin-bottom: 5px; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 8px; box-sizing: border-box; }
+    .btn-save { background: #2ed573; color: white; border: none; padding: 12px; width: 100%; font-weight: bold; cursor: pointer; border-radius: 4px; font-size: 16px; }
+    table { width: 100%; border-collapse: collapse; background: white; }
+    th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+    th { background: #2f3542; color: white; }
+    .btn-del { background: #ff4757; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Panel de Administración</h1>
+    <div>
+      <a href="dtf.html" style="color:white; margin-right: 15px;">Ver Sitio Web</a>
+      <button onclick="localStorage.removeItem('adminAutenticado'); window.location.href='login.html';">Salir</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="form-box">
+      <h2>Nueva Publicación</h2>
+      <br>
+      <form id="uploadForm">
+        <div class="form-group">
+          <label>Nombre del Producto / Servicio:</label>
+          <input type="text" id="nombre" name="nombre" required maxlength="120">
+        </div>
+        
+        <div class="form-group">
+          <label>Descripción:</label>
+          <textarea id="descripcion" name="descripcion" required maxlength="1000"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Precio en Pesos Mexicanos (Opcional):</label>
+          <input type="number" id="precio" name="precio" step="0.01" min="0" placeholder="Ejemplo: 250.00">
+        </div>
+
+        <div class="form-group">
+          <label>Página donde se publicará:</label>
+          <select id="categoria" name="categoria" required>
+            <option value="DTF TEXTIL / UV">DTF TEXTIL / UV</option>
+            <option value="SUBLIMACION">SUBLIMACION</option>
+            <option value="LONA">LONA</option>
+            <option value="COROPLAST">COROPLAST</option>
+            <option value="CORTE LASER">CORTE LASER</option>
+            <option value="VINIL">VINIL</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Seleccionar Archivo (Imagen, Video o PDF):</label>
+          <input type="file" id="archivo" name="archivo" accept="image/jpeg,image/png,image/webp,video/mp4,application/pdf" required>
+        </div>
+
+        <button type="submit" class="btn-save">Subir y Publicar</button>
+      </form>
+    </div>
+
+    <h2>Publicaciones Activas</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Sección</th>
+          <th>Precio (MXN)</th>
+          <th>Tipo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tabla"></tbody>
+    </table>
+  </div>
+
+  <script>
+    if (localStorage.getItem('adminAutenticado') !== 'true') {
+      window.location.href = 'login.html';
+    }
+
+    const formatoMXN = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+
+    async function cargarTabla() {
+      try {
+        const res = await fetch('http://localhost:5000/api/productos?limit=100');
+        const data = await res.json();
+        const productos = data.productos || [];
+        const tbody = document.getElementById('tabla');
+        tbody.innerHTML = '';
+
+        if (productos.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay publicaciones disponibles.</td></tr>';
+          return;
+        }
+
+        productos.forEach(p => {
+          const precioTexto = (p.precio !== null && p.precio !== undefined) ? `${formatoMXN.format(p.precio)} MXN` : 'N/A';
+
+          tbody.innerHTML += `
+            <tr>
+              <td><b>${p.nombre}</b></td>
+              <td>${p.categoria}</td>
+              <td><b style="color:#2ed573;">${precioTexto}</b></td>
+              <td>${p.tipoArchivo ? p.tipoArchivo.toUpperCase() : 'N/A'}</td>
+              <td>
+                <button class="btn-del" onclick="eliminar('${p._id}')">Eliminar</button>
+              </td>
+            </tr>
+          `;
+        });
+      } catch (err) {
+        console.error('Error al cargar tabla:', err);
+      }
+    }
+
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData();
+      formData.append('nombre', document.getElementById('nombre').value);
+      formData.append('descripcion', document.getElementById('descripcion').value);
+      formData.append('precio', document.getElementById('precio').value);
+      formData.append('categoria', document.getElementById('categoria').value);
+      formData.append('archivo', document.getElementById('archivo').files[0]);
+
+      try {
+        const res = await fetch('http://localhost:5000/api/productos', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (res.ok) {
+          alert('¡Publicado con éxito!');
+          document.getElementById('uploadForm').reset();
+          cargarTabla();
+        } else {
+          const errData = await res.json();
+          alert('Error al subir: ' + (errData.error || 'Verifica los datos'));
+        }
+      } catch (err) {
+        alert('Error de conexión con el servidor');
+      }
+    });
+
+    async function eliminar(id) {
+      if (confirm('¿Eliminar esta publicación de la base de datos?')) {
+        try {
+          const res = await fetch(`http://localhost:5000/api/productos/${id}`, { method: 'DELETE' });
+          if (res.ok) {
+            cargarTabla();
+          } else {
+            alert('No se pudo eliminar el registro.');
+          }
+        } catch (err) {
+          alert('Error al intentar eliminar el registro.');
+        }
+      }
+    }
+
+    cargarTabla();
+  </script>
+</body>
+</html>

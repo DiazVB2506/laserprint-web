@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>LaserPrint - Login Admin</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #121212; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .card { background: #1e1e1e; padding: 40px; border-radius: 8px; width: 320px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); text-align: center; }
+    input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #333; background: #2a2a2a; color: white; border-radius: 4px; box-sizing: border-box; }
+    button { width: 100%; padding: 12px; background: #ff4757; color: white; border: none; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+    .error { color: #ff6b6b; font-size: 0.9em; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Acceso Admin</h2>
+    <form id="loginForm">
+      <input type="text" id="usuario" placeholder="Usuario" required>
+      <input type="password" id="password" placeholder="Contraseña" required>
+      <button type="submit">Ingresar</button>
+    </form>
+    <p id="errorMsg" class="error"></p>
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const userVal = document.getElementById('usuario').value;
+      const passVal = document.getElementById('password').value;
+
+      // Validación con las nuevas credenciales
+      if (userVal === '2025' && passVal === 'LaserPrint01') {
+        localStorage.setItem('adminAutenticado', 'true');
+        window.location.href = 'admin.html';
+      } else {
+        document.getElementById('errorMsg').innerText = 'Usuario o contraseña incorrectos.';
+      }
+    });
+  </script>
+</body>
+</html>

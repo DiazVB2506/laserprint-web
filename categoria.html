@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>LaserPrint - Sección</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f9; }
+    header { background: #111; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+    nav { background: #222; padding: 10px; display: flex; gap: 15px; }
+    nav a { color: white; text-decoration: none; padding: 8px 12px; border-radius: 4px; }
+    nav a:hover, nav a.active { background: #007bff; }
+    .container { padding: 30px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    .card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .card img, .card video { width: 100%; height: 200px; object-fit: cover; border-radius: 4px; }
+    .price { color: #27ae60; font-weight: bold; font-size: 1.2em; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>LaserPrint</h1>
+    <a href="login.html" style="background:#e74c3c; color:white; padding:8px 15px; text-decoration:none; border-radius:4px; font-weight:bold;">Iniciar Sesión Admin</a>
+  </header>
+
+  <nav>
+    <a href="index.html">Inicio</a>
+    <a href="categoria.html?cat=DTF TEXTIL / UV">DTF TEXTIL / UV</a>
+    <a href="categoria.html?cat=SUBLIMACION">SUBLIMACION</a>
+    <a href="categoria.html?cat=LONA">LONA</a>
+    <a href="categoria.html?cat=COROPLAST">COROPLAST</a>
+    <a href="categoria.html?cat=CORTE LASER">CORTE LASER</a>
+    <a href="categoria.html?cat=VINIL">VINIL</a>
+  </nav>
+
+  <div class="container">
+    <h2 id="tituloArea">Cargando área...</h2>
+    <div id="gridArea" class="grid"></div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const categoria = urlParams.get('cat');
+
+    document.getElementById('tituloArea').innerText = `Sección: ${categoria}`;
+
+    async function cargarContenido() {
+      const res = await fetch(`http://localhost:5000/api/productos?categoria=${encodeURIComponent(categoria)}`);
+      const productos = await res.json();
+      const grid = document.getElementById('gridArea');
+      grid.innerHTML = '';
+
+      if (productos.length === 0) {
+        grid.innerHTML = '<p>No hay publicaciones en esta área por el momento.</p>';
+        return;
+      }
+
+      productos.forEach(p => {
+        let media = '';
+        if (p.tipoArchivo === 'imagen') media = `<img src="${p.archivoUrl}">`;
+        else if (p.tipoArchivo === 'video') media = `<video controls src="${p.archivoUrl}"></video>`;
+        else if (p.tipoArchivo === 'pdf') media = `<a href="${p.archivoUrl}" target="_blank">📄 Ver Documento PDF</a>`;
+
+        grid.innerHTML += `
+          <div class="card">
+            ${media}
+            <h3>${p.nombre}</h3>
+            <p>${p.descripcion}</p>
+            ${p.precio ? `<p class="price">$${p.precio}</p>` : ''}
+          </div>
+        `;
+      });
+    }
+
+    cargarContenido();
+  </script>
+</body>
+</html>
