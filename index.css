@@ -2,14 +2,14 @@
    VARIABLES Y ESTILOS GLOBALES - CLARO, ARENA & GLASSMORPHISM ELEGANTE
    ========================================================================== */
 :root {
-  --bg-sand: #f4efe6;             /* Fondo suave tono arena / crema */
+  --bg-sand: #f4efe6;              /* Fondo suave tono arena / crema */
   --bg-card: rgba(255, 255, 255, 0.45);
   --glass-border: rgba(212, 175, 55, 0.25); /* Bordes refinados en oro cálido */
   --glass-bg: rgba(255, 253, 248, 0.65);    /* Cristal blanco crema traslúcido */
   --accent-gold: #b8860b;        /* Oro oscuro de alto contraste */
   --accent-gold-light: #d4af37;  /* Oro cálido para degradados */
   --text-main: #2b2621;          /* Marrón-grafito oscuro, alto contraste */
-  --text-muted: #6e6458;         /* Tono topo suave para subtítulos */
+  --text-muted: #6e6458;          /* Tono topo suave para subtítulos */
   --font-serif: 'Cinzel', serif;
   --font-sans: 'Plus Jakarta Sans', sans-serif;
   --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1); /* Transición sedosa desacelerada */
@@ -146,19 +146,35 @@ body {
 .mobile-menu-btn {
   display: none;
   flex-direction: column;
-  gap: 5px;
+  justify-content: space-between;
+  width: 32px;
+  height: 22px;
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 5px;
+  padding: 0;
+  z-index: 1002;
 }
 
 .mobile-menu-btn span {
-  width: 25px;
-  height: 3px;
-  background: var(--text-main);
-  border-radius: 2px;
+  width: 100%;
+  height: 3.5px;
+  background-color: var(--text-main);
+  border-radius: 4px;
   transition: all 0.3s ease;
+}
+
+/* Transformación del icono a X al abrir el menú */
+.mobile-menu-btn.open span:nth-child(1) {
+  transform: translateY(9px) rotate(45deg);
+}
+
+.mobile-menu-btn.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.mobile-menu-btn.open span:nth-child(3) {
+  transform: translateY(-9px) rotate(-45deg);
 }
 
 /* ==========================================================================
@@ -481,19 +497,17 @@ body {
 /* ==========================================================================
    REGLAS RESPONSIVAS (MÓVILES, TABLETS Y MONITORES MEDIANOS)
    ========================================================================== */
-@media (max-width: 992px) {
-  .hero-title { font-size: 2.5rem; }
-  .video-container { height: 55vh; }
-  .carousel-slide { height: 360px; }
-  .contact-qr-card { flex-direction: column; text-align: center; }
-}
+@media (max-width: 1024px) {
+  .glass-header { 
+    padding: 10px 20px; 
+  }
 
-@media (max-width: 768px) {
-  .glass-header { padding: 12px 20px; }
-  .mobile-menu-btn { display: flex; }
-  
+  .mobile-menu-btn { 
+    display: flex !important; 
+  }
+
   .nav-links {
-    display: none;
+    display: flex !important;
     position: absolute;
     top: 100%;
     left: 0;
@@ -505,18 +519,37 @@ body {
     flex-direction: column;
     padding: 20px;
     gap: 10px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+    
+    /* Estado oculto responsivo con transición fluida */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+    pointer-events: none;
   }
 
   .nav-links.active {
-    display: flex;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
   }
 
   .nav-btn {
     width: 100%;
     text-align: center;
+    padding: 12px;
+    font-size: 0.95rem;
   }
 
+  .hero-title { font-size: 2.5rem; }
+  .video-container { height: 55vh; }
+  .carousel-slide { height: 360px; }
+  .contact-qr-card { flex-direction: column; text-align: center; }
+}
+
+@media (max-width: 768px) {
   .hero-section { padding-top: 110px; }
   .hero-title { font-size: 1.9rem; }
   .hero-subtitle { font-size: 1rem; }
