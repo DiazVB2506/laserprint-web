@@ -19,7 +19,7 @@
     .pdf-link { display: block; padding: 40px 20px; background: #eccc68; color: black; text-align: center; text-decoration: none; font-weight: bold; border-radius: 6px; }
   </style>
 </head>
-<body>
+<body data-categoria="CORTE LASER">
 
   <header>
     <img src="https://laserprint-api.onrender.com/uploads/fotos/logo.png" alt="LaserPrint Logo" class="logo-img" onerror="this.style.display='none'; this.after('LaserPrint')">
@@ -40,47 +40,6 @@
     <div id="gridProductos" class="grid"></div>
   </div>
 
-  <script>
-    const AREA_ACTUAL = 'CORTE LASER';
-    const API_URL = 'https://laserprint-api.onrender.com/api/productos';
-    const formatoMXN = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
-
-    async function cargarContenido() {
-      try {
-        const res = await fetch(`${API_URL}?categoria=${encodeURIComponent(AREA_ACTUAL)}`);
-        const data = await res.json();
-        const productos = data.productos || [];
-        const grid = document.getElementById('gridProductos');
-        grid.innerHTML = '';
-
-        if (productos.length === 0) {
-          grid.innerHTML = '<p>No hay publicaciones registradas en esta área.</p>';
-          return;
-        }
-
-        productos.forEach(p => {
-          let elemento = '';
-          if (p.tipoArchivo === 'imagen') elemento = `<img src="${p.archivoUrl}">`;
-          else if (p.tipoArchivo === 'video') elemento = `<video controls src="${p.archivoUrl}"></video>`;
-          else if (p.tipoArchivo === 'pdf') elemento = `<a href="${p.archivoUrl}" target="_blank" class="pdf-link">📄 Ver Documento PDF</a>`;
-
-          const precioHTML = p.precio !== null && p.precio !== undefined ? `<p class="price">${formatoMXN.format(p.precio)} MXN</p>` : '';
-
-          grid.innerHTML += `
-            <div class="card">
-              ${elemento}
-              <h3 style="margin-top:10px;">${p.nombre}</h3>
-              <p style="color:#666; margin-top:5px;">${p.descripcion}</p>
-              ${precioHTML}
-            </div>
-          `;
-        });
-      } catch (err) {
-        console.error('Error al cargar datos desde Render:', err);
-      }
-    }
-
-    cargarContenido();
-  </script>
+  <script src="categoria.js"></script>
 </body>
 </html>
