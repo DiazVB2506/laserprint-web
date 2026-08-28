@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LaserPrint - Inicio</title>
 
-  <!-- LOGO EN LA PESTAÑA DE LA PÁGINA (FAVICON) -->
+  <!-- Favicon para la pestaña del navegador -->
   <link rel="icon" type="image/png" href="https://laserprint-api.onrender.com/uploads/fotos/LOGOTIPO.png">
 
   <!-- Tipografías elegantes -->
@@ -52,17 +52,17 @@
     </div>
   </section>
 
-  <!-- VIDEO DE PRESENTACIÓN (PANTALLA CASI COMPLETA) -->
+  <!-- VIDEO DE PRESENTACIÓN (CON PRELOAD OPTIMIZADO PARA EVITAR NAVEGADOR EN BUCLE) -->
   <section class="video-section">
     <div class="video-container glass-card" id="videoWrapper">
-      <video autoplay loop muted playsinline id="introVideo">
+      <video autoplay loop muted playsinline preload="metadata" id="introVideo">
         <source src="https://laserprint-api.onrender.com/uploads/videos/presentacion.mp4" type="video/mp4">
         Tu navegador no soporta el formato de video.
       </video>
     </div>
   </section>
 
-  <!-- CARRUSEL DESTACADO -->
+  <!-- CARRUSEL DESTACADO (LAS IMÁGENES SE INYECTAN DINÁMICAMENTE CON INDEX.JS) -->
   <section class="carousel-section">
     <h2 class="section-title">Nuestros Trabajos Destacados</h2>
     <div class="carousel-wrapper glass-card">
@@ -70,9 +70,7 @@
       
       <div class="carousel-track-container">
         <div class="carousel-track" id="carouselTrack">
-          <div class="carousel-slide"><img src="https://laserprint-api.onrender.com/uploads/fotos/slide1.jpg" alt="Trabajo 1" onerror="this.src='https://via.placeholder.com/800x450/111/d4af37?text=LaserPrint+1'"></div>
-          <div class="carousel-slide"><img src="https://laserprint-api.onrender.com/uploads/fotos/slide2.jpg" alt="Trabajo 2" onerror="this.src='https://via.placeholder.com/800x450/111/d4af37?text=LaserPrint+2'"></div>
-          <div class="carousel-slide"><img src="https://laserprint-api.onrender.com/uploads/fotos/slide3.jpg" alt="Trabajo 3" onerror="this.src='https://via.placeholder.com/800x450/111/d4af37?text=LaserPrint+3'"></div>
+          <!-- Inyección dinámica desde index.js (slide1.jpg a slide5.jpg) -->
         </div>
       </div>
 
@@ -85,7 +83,7 @@
   <section class="contact-qr-section">
     <div class="contact-qr-card glass-card">
       <div class="contact-info">
-        <a href="https://wa.me/5210000000000" target="_blank" class="whatsapp-link ripple-btn">
+        <a href="https://wa.me/5210000000000" target="_blank" rel="noopener noreferrer" class="whatsapp-link ripple-btn">
           <svg class="whatsapp-icon" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.763.459 3.483 1.33 5.001l-1.413 5.161 5.281-1.385c1.464.798 3.117 1.22 4.79 1.22h.004c5.505 0 9.988-4.478 9.989-9.985 0-2.668-1.038-5.176-2.926-7.065-1.889-1.888-4.398-2.934-7.065-2.934zm5.834 14.162c-.246.692-1.223 1.318-1.706 1.387-.457.065-1.041.1-3.037-.682-2.553-1.002-4.183-3.608-4.31-3.777-.127-.17-1.026-1.365-1.026-2.604 0-1.239.648-1.848.88-2.091.233-.243.508-.304.677-.304.169 0 .339.002.487.009.157.007.368-.06.575.438.212.508.72 1.758.783 1.886.064.127.106.276.021.445-.085.17-.127.276-.254.423-.127.148-.268.33-.382.443-.127.127-.26.265-.112.519.148.254.658 1.087 1.412 1.76 0.97.866 1.788 1.135 2.042 1.262.254.127.402.106.551-.064.148-.17.635-.741.805-.995.17-.254.339-.212.571-.127.233.085 1.482.698 1.736.825.254.127.423.191.487.297.064.106.064.614-.182 1.306z"/>
           </svg>
