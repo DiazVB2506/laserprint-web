@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
   initMobileMenu();
-  initVideoPlayer();
   cargarCarruselDinamico();
   initLightbox();
 });
@@ -36,36 +35,14 @@ function initMobileMenu() {
 }
 
 /* ==========================================================================
-   2. CONTROL DE VIDEO (REPRODUCCIÓN ÚNICA AL CARGAR)
-   ========================================================================== */
-function initVideoPlayer() {
-  const video = document.getElementById('introVideo');
-  if (!video) return;
-
-  video.muted = true;
-
-  // Intenta reproducir al cargar la página
-  const playPromise = video.play();
-  if (playPromise !== undefined) {
-    playPromise.catch(() => {
-      console.log('Autoplay restringido por el navegador.');
-    });
-  }
-
-  // Al finalizar la reproducción, se detiene y cierra el stream de red
-  video.addEventListener('ended', () => {
-    video.pause();
-  });
-}
-
-/* ==========================================================================
-   3. CARRUSEL HORIZONTAL FLUIDO (5 IMÁGENES FIJAS)
+   2. CARRUSEL HORIZONTAL FLUIDO (5 IMÁGENES FIJAS - RUTA LOCAL)
    ========================================================================== */
 function cargarCarruselDinamico() {
   const track = document.getElementById('carouselTrack');
   if (!track) return;
 
-  const BASE_URL = 'https://laserprint-api.onrender.com/uploads/fotos/';
+  // Ruta relativa al repositorio local en GitHub Pages
+  const BASE_URL = 'uploads/fotos/';
 
   const imagenesFotos = [
     { url: `${BASE_URL}slide1.jpg`, alt: 'LaserPrint - Trabajo Destacado 1' },
@@ -179,7 +156,7 @@ function initCarousel() {
 }
 
 /* ==========================================================================
-   4. VISOR DE IMÁGENES AMPLIADAS (LIGHTBOX)
+   3. VISOR DE IMÁGENES AMPLIADAS (LIGHTBOX)
    ========================================================================== */
 function initLightbox() {
   const modal = document.getElementById('imageModal');
