@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ==========================================================================
-   1. CONTROL DEL MENÚ MÓVIL (HAMBURGUESA)
+   1. CONTROL DEL MENÚ MÓVIL
    ========================================================================== */
 function initMobileMenu() {
   const menuBtn = document.getElementById('mobileMenuBtn');
@@ -35,13 +35,12 @@ function initMobileMenu() {
 }
 
 /* ==========================================================================
-   2. CARRUSEL HORIZONTAL FLUIDO (5 IMÁGENES FIJAS - RUTA LOCAL)
+   2. CARRUSEL CON EFECTO Y PERSPECTIVA 3D
    ========================================================================== */
 function cargarCarruselDinamico() {
   const track = document.getElementById('carouselTrack');
   if (!track) return;
 
-  // Ruta relativa al repositorio local en GitHub Pages
   const BASE_URL = 'uploads/fotos/';
 
   const imagenesFotos = [
@@ -53,17 +52,18 @@ function cargarCarruselDinamico() {
   ];
 
   track.innerHTML = imagenesFotos.map((item, index) => `
-    <div class="carousel-slide">
+    <div class="carousel-slide-3d" data-index="${index}">
       <img src="${item.url}" 
            alt="${item.alt}" 
+           loading="lazy"
            onerror="this.onerror=null; this.src='https://via.placeholder.com/800x450/111/d4af37?text=LaserPrint+${index + 1}'">
     </div>
   `).join('');
 
-  initCarousel();
+  initCarousel3D();
 }
 
-function initCarousel() {
+function initCarousel3D() {
   const track = document.getElementById('carouselTrack');
   const prevBtn = document.getElementById('prevBtn');
   const nextBtn = document.getElementById('nextBtn');
@@ -93,21 +93,40 @@ function initCarousel() {
 
   const dots = dotsContainer ? Array.from(dotsContainer.children) : [];
 
+  function update3DSlides() {
+    slides.forEach((slide, index) => {
+      slide.className = 'carousel-slide-3d';
+      
+      const offset = index - currentIndex;
+      
+      if (offset === 0) {
+        slide.classList.add('active');
+      } else if (offset === 1 || (offset === -(slides.length - 1))) {
+        slide.classList.add('next');
+      } else if (offset === -1 || (offset === slides.length - 1)) {
+        slide.classList.add('prev');
+      } else {
+        slide.classList.add('hidden');
+      }
+    });
+
+    dots.forEach((dot, index) => {
+      dot.classList.toggle('active', index === currentIndex);
+    });
+  }
+
   function moveToSlide(index) {
     if (index < 0) index = slides.length - 1;
     if (index >= slides.length) index = 0;
 
-    track.style.transform = `translateX(-${index * 100}%)`;
-    dots.forEach(dot => dot.classList.remove('active'));
-    if (dots[index]) dots[index].classList.add('active');
-    
     currentIndex = index;
+    update3DSlides();
   }
 
   function startAutoplay() {
     autoplayTimer = setInterval(() => {
       moveToSlide(currentIndex + 1);
-    }, 5000);
+    }, 4000);
   }
 
   function resetAutoplay() {
@@ -138,20 +157,16 @@ function initCarousel() {
 
   track.addEventListener('touchend', (e) => {
     touchEndX = e.changedTouches[0].screenX;
-    handleSwipe();
-  }, { passive: true });
-
-  function handleSwipe() {
-    const swipeThreshold = 40;
-    if (touchStartX - touchEndX > swipeThreshold) {
+    if (touchStartX - touchEndX > 40) {
       moveToSlide(currentIndex + 1);
       resetAutoplay();
-    } else if (touchEndX - touchStartX > swipeThreshold) {
+    } else if (touchEndX - touchStartX > 40) {
       moveToSlide(currentIndex - 1);
       resetAutoplay();
     }
-  }
+  }, { passive: true });
 
+  update3DSlides();
   startAutoplay();
 }
 
@@ -167,7 +182,7 @@ function initLightbox() {
   if (!modal || !modalImg) return;
 
   document.body.addEventListener('click', (e) => {
-    if (e.target.matches('.carousel-slide img')) {
+    if (e.target.matches('.carousel-slide-3d img')) {
       const img = e.target;
       modal.style.display = 'flex';
       modalImg.src = img.src;
