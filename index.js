@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   initVideoPlayer();
-  initCarousel();
+  cargarCarruselDinamico();
   initLightbox();
 });
 
@@ -12,7 +12,6 @@ function initVideoPlayer() {
   if (video) {
     video.muted = true;
     
-    // Intento de reproducción automática sin forzar bucles infinitos en el hilo
     const playPromise = video.play();
     if (playPromise !== undefined) {
       playPromise.catch(() => {
@@ -20,7 +19,6 @@ function initVideoPlayer() {
       });
     }
 
-    // Reanudar suavemente solo si la pausa no fue intencional
     video.addEventListener('pause', () => {
       if (!video.ended) {
         video.play().catch(() => {});
@@ -30,8 +28,38 @@ function initVideoPlayer() {
 }
 
 /* ==========================================================================
-   2. CARRUSEL HORIZONTAL FLUIDO
+   2. CARRUSEL HORIZONTAL FLUIDO CON DATOS DESDE RENDER
    ========================================================================== */
+async function cargarCarruselDinamico() {
+  const API_URL = 'https://laserprint-api.onrender.com/api/productos';
+  const track = document.getElementById('carouselTrack');
+  if (!track) return;
+
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    const productos = data.productos || [];
+
+    // Filtrar solo las imágenes publicadas para mostrar en el carrusel de inicio
+    const imagenes = productos.filter(p => p.tipoArchivo === 'imagen');
+
+    if (imagenes.length > 0) {
+      track.innerHTML = '';
+      imagenes.slice(0, 5).forEach(prod => {
+        track.innerHTML += `
+          <div class="carousel-slide">
+            <img src="${prod.archivoUrl}" alt="${prod.nombre}">
+          </div>
+        `;
+      });
+    }
+  } catch (err) {
+    console.error('Cargando imágenes estáticas de respaldo:', err);
+  } finally {
+    initCarousel();
+  }
+}
+
 function initCarousel() {
   const track = document.getElementById('carouselTrack');
   const prevBtn = document.getElementById('prevBtn');
@@ -41,10 +69,11 @@ function initCarousel() {
   if (!track) return;
 
   const slides = Array.from(track.children);
+  if (slides.length === 0) return;
+
   let currentIndex = 0;
   let autoplayTimer = null;
 
-  // Limpiar e inicializar puntos indicadores
   if (dotsContainer) {
     dotsContainer.innerHTML = '';
     slides.forEach((_, index) => {
@@ -84,20 +113,19 @@ function initCarousel() {
   }
 
   if (nextBtn) {
-    nextBtn.addEventListener('click', () => {
+    nextBtn.onclick = () => {
       moveToSlide(currentIndex + 1);
       resetAutoplay();
-    });
+    };
   }
 
   if (prevBtn) {
-    prevBtn.addEventListener('click', () => {
+    prevBtn.onclick = () => {
       moveToSlide(currentIndex - 1);
       resetAutoplay();
-    });
+    };
   }
 
-  // Iniciar la transición automática
   startAutoplay();
 }
 
@@ -112,17 +140,17 @@ function initLightbox() {
 
   if (!modal || !modalImg) return;
 
-  // Apertura al hacer clic en cualquier imagen del carrusel
-  document.querySelectorAll('.carousel-slide img').forEach(img => {
-    img.addEventListener('click', () => {
+  // Event Delegation para soportar imágenes cargadas dinámicamente
+  document.body.addEventListener('click', (e) => {
+    if (e.target.matches('.carousel-slide img')) {
+      const img = e.target;
       modal.style.display = 'flex';
       modalImg.src = img.src;
       captionText.textContent = img.alt || 'LaserPrint - Trabajo Destacado';
       document.body.style.overflow = 'hidden';
-    });
+    }
   });
 
-  // Funciones de cierre
   const hideModal = () => {
     modal.style.display = 'none';
     document.body.style.overflow = 'auto';
@@ -133,12 +161,9 @@ function initLightbox() {
   }
 
   window.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      hideModal();
-    }
+    if (e.target === modal) hideModal();
   });
 
-  // Cierre opcional con la tecla Escape para mayor usabilidad
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && modal.style.display === 'flex') {
       hideModal();
