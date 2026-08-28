@@ -47,7 +47,7 @@ function initMobileMenu() {
 }
 
 /* ==========================================================================
-   3. CARRUSEL 3D INFINITO (SOPORTA N IMÁGENES)
+   3. CARRUSEL 3D INFINITO
    ========================================================================== */
 function cargarCarruselDinamico() {
   const track = document.getElementById('carouselTrack');
@@ -107,18 +107,15 @@ function initCarousel3D() {
 
   function update3DSlides() {
     slides.forEach((slide, index) => {
-      slide.className = 'carousel-slide-3d';
+      slide.classList.remove('active', 'prev', 'next', 'hidden');
       
       let offset = (index - currentIndex + totalSlides) % totalSlides;
-      if (offset > totalSlides / 2) {
-        offset -= totalSlides;
-      }
       
       if (offset === 0) {
         slide.classList.add('active');
-      } else if (offset === 1) {
+      } else if (offset === 1 || offset === -(totalSlides - 1)) {
         slide.classList.add('next');
-      } else if (offset === -1) {
+      } else if (offset === totalSlides - 1 || offset === -1) {
         slide.classList.add('prev');
       } else {
         slide.classList.add('hidden');
