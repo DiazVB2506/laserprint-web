@@ -1,11 +1,24 @@
 document.addEventListener('DOMContentLoaded', () => {
   initMobileMenu();
+  initGifPlayback();
   cargarCarruselDinamico();
   initLightbox();
 });
 
 /* ==========================================================================
-   1. CONTROL DEL MENÚ MÓVIL
+   1. CONTROL DE REPRODUCCIÓN DE GIF EN RECARGA
+   ========================================================================== */
+function initGifPlayback() {
+  const gifImg = document.getElementById('gifPresentacion');
+  if (gifImg) {
+    // Forzar lectura limpia del archivo en cada recarga de página sin caché en bucle constante
+    const timestamp = new Date().getTime();
+    gifImg.src = `uploads/videos/presentacion.gif?v=${timestamp}`;
+  }
+}
+
+/* ==========================================================================
+   2. MENÚ MÓVIL
    ========================================================================== */
 function initMobileMenu() {
   const menuBtn = document.getElementById('mobileMenuBtn');
@@ -35,7 +48,7 @@ function initMobileMenu() {
 }
 
 /* ==========================================================================
-   2. CARRUSEL CON EFECTO Y PERSPECTIVA 3D
+   3. CARRUSEL 3D AMPLIO CONTROLADO POR FLECHAS
    ========================================================================== */
 function cargarCarruselDinamico() {
   const track = document.getElementById('carouselTrack');
@@ -55,8 +68,7 @@ function cargarCarruselDinamico() {
     <div class="carousel-slide-3d" data-index="${index}">
       <img src="${item.url}" 
            alt="${item.alt}" 
-           loading="lazy"
-           onerror="this.onerror=null; this.src='https://via.placeholder.com/800x450/111/d4af37?text=LaserPrint+${index + 1}'">
+           onerror="this.onerror=null; this.src='https://via.placeholder.com/900x550/111/d4af37?text=LaserPrint+${index + 1}'">
     </div>
   `).join('');
 
@@ -126,7 +138,7 @@ function initCarousel3D() {
   function startAutoplay() {
     autoplayTimer = setInterval(() => {
       moveToSlide(currentIndex + 1);
-    }, 4000);
+    }, 5000);
   }
 
   function resetAutoplay() {
@@ -135,14 +147,16 @@ function initCarousel3D() {
   }
 
   if (nextBtn) {
-    nextBtn.onclick = () => {
+    nextBtn.onclick = (e) => {
+      e.stopPropagation();
       moveToSlide(currentIndex + 1);
       resetAutoplay();
     };
   }
 
   if (prevBtn) {
-    prevBtn.onclick = () => {
+    prevBtn.onclick = (e) => {
+      e.stopPropagation();
       moveToSlide(currentIndex - 1);
       resetAutoplay();
     };
@@ -171,7 +185,7 @@ function initCarousel3D() {
 }
 
 /* ==========================================================================
-   3. VISOR DE IMÁGENES AMPLIADAS (LIGHTBOX)
+   4. VISOR DE IMÁGENES AMPLIADAS (LIGHTBOX)
    ========================================================================== */
 function initLightbox() {
   const modal = document.getElementById('imageModal');
