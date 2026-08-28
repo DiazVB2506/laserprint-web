@@ -62,35 +62,35 @@ function initVideoPlayer() {
 }
 
 /* ==========================================================================
-   3. CARRUSEL HORIZONTAL FLUIDO CON TOUCH SWIPE Y DATOS DE API
+   3. CARRUSEL HORIZONTAL FLUIDO (5 IMÁGENES FIJAS DE LA CARPETA FOTOS)
    ========================================================================== */
-async function cargarCarruselDinamico() {
-  const API_URL = 'https://laserprint-api.onrender.com/api/productos';
+function cargarCarruselDinamico() {
   const track = document.getElementById('carouselTrack');
   if (!track) return;
 
-  try {
-    const res = await fetch(API_URL);
-    const data = await res.json();
-    const productos = data.productos || [];
+  // Ruta base hacia tu servidor Render
+  const BASE_URL = 'https://laserprint-api.onrender.com/uploads/fotos/';
 
-    const imagenes = productos.filter(p => p.tipoArchivo === 'imagen');
+  // Definición de las 5 imágenes fijas almacenadas en tu servidor
+  const imagenesFotos = [
+    { url: `${BASE_URL}slide1.jpg`, alt: 'LaserPrint - Trabajo Destacado 1' },
+    { url: `${BASE_URL}slide2.jpg`, alt: 'LaserPrint - Trabajo Destacado 2' },
+    { url: `${BASE_URL}slide3.jpg`, alt: 'LaserPrint - Trabajo Destacado 3' },
+    { url: `${BASE_URL}slide4.jpg`, alt: 'LaserPrint - Trabajo Destacado 4' },
+    { url: `${BASE_URL}slide5.jpg`, alt: 'LaserPrint - Trabajo Destacado 5' }
+  ];
 
-    if (imagenes.length > 0) {
-      track.innerHTML = '';
-      imagenes.slice(0, 5).forEach(prod => {
-        track.innerHTML += `
-          <div class="carousel-slide">
-            <img src="${prod.archivoUrl}" alt="${prod.nombre}">
-          </div>
-        `;
-      });
-    }
-  } catch (err) {
-    console.error('Cargando imágenes estáticas de respaldo:', err);
-  } finally {
-    initCarousel();
-  }
+  // Inyección del HTML de las 5 imágenes en el carrusel
+  track.innerHTML = imagenesFotos.map((item, index) => `
+    <div class="carousel-slide">
+      <img src="${item.url}" 
+           alt="${item.alt}" 
+           onerror="this.onerror=null; this.src='https://via.placeholder.com/800x450/111/d4af37?text=LaserPrint+${index + 1}'">
+    </div>
+  `).join('');
+
+  // Inicialización de la lógica interactiva
+  initCarousel();
 }
 
 function initCarousel() {
@@ -107,7 +107,7 @@ function initCarousel() {
   let currentIndex = 0;
   let autoplayTimer = null;
 
-  // Generación de indicadores (puntos)
+  // Generación de indicadores (puntos) para las 5 diapositivas
   if (dotsContainer) {
     dotsContainer.innerHTML = '';
     slides.forEach((_, index) => {
