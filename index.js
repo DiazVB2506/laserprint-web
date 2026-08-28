@@ -36,33 +36,30 @@ function initMobileMenu() {
 }
 
 /* ==========================================================================
-   2. CONTROL DE VIDEO (AUTOPLAY CONTINUO)
+   2. CONTROL DE VIDEO (CARGA ASÍNCRONA SIN BLOQUEO)
    ========================================================================== */
 function initVideoPlayer() {
   const video = document.getElementById('introVideo');
-  if (video) {
-    video.muted = true;
-    
-    // Forzamos la carga sin bloquear la pestaña del navegador
-    video.load();
+  if (!video) return;
 
-    const playPromise = video.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(() => {
-        console.log('Autoplay restringido por el navegador.');
-      });
-    }
+  video.muted = true;
 
-    video.addEventListener('pause', () => {
-      if (!video.ended) {
-        video.play().catch(() => {});
-      }
+  // Se inicia el video sólo cuando la ventana haya finalizado su carga completa
+  window.addEventListener('load', () => {
+    video.play().catch(() => {
+      console.log('Autoplay prevenido por el navegador.');
     });
-  }
+  });
+
+  video.addEventListener('pause', () => {
+    if (!video.ended) {
+      video.play().catch(() => {});
+    }
+  });
 }
 
 /* ==========================================================================
-   3. CARRUSEL HORIZONTAL FLUIDO (5 IMÁGENES FIJAS DE LA CARPETA FOTOS)
+   3. CARRUSEL HORIZONTAL FLUIDO (5 IMÁGENES FIJAS)
    ========================================================================== */
 function cargarCarruselDinamico() {
   const track = document.getElementById('carouselTrack');
