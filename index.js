@@ -36,7 +36,7 @@ function initMobileMenu() {
 }
 
 /* ==========================================================================
-   2. CONTROL DE VIDEO (CARGA ASÍNCRONA SIN BLOQUEO)
+   2. CONTROL DE VIDEO (REPRODUCCIÓN ÚNICA AL CARGAR)
    ========================================================================== */
 function initVideoPlayer() {
   const video = document.getElementById('introVideo');
@@ -44,17 +44,17 @@ function initVideoPlayer() {
 
   video.muted = true;
 
-  // Se inicia el video sólo cuando la ventana haya finalizado su carga completa
-  window.addEventListener('load', () => {
-    video.play().catch(() => {
-      console.log('Autoplay prevenido por el navegador.');
+  // Intenta reproducir al cargar la página
+  const playPromise = video.play();
+  if (playPromise !== undefined) {
+    playPromise.catch(() => {
+      console.log('Autoplay restringido por el navegador.');
     });
-  });
+  }
 
-  video.addEventListener('pause', () => {
-    if (!video.ended) {
-      video.play().catch(() => {});
-    }
+  // Al finalizar la reproducción, se detiene y cierra el stream de red
+  video.addEventListener('ended', () => {
+    video.pause();
   });
 }
 
