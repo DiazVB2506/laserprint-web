@@ -9,26 +9,33 @@
     input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #333; background: #2a2a2a; color: white; border-radius: 4px; box-sizing: border-box; }
     button { width: 100%; padding: 12px; background: #ff4757; color: white; border: none; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 10px; }
     .error { color: #ff6b6b; font-size: 0.9em; margin-top: 10px; }
+    .back-link { display: inline-block; margin-top: 15px; color: #888; text-decoration: none; font-size: 0.85em; }
+    .back-link:hover { color: #fff; }
   </style>
 </head>
 <body>
   <div class="card">
     <h2>Acceso Admin</h2>
     <form id="loginForm">
-      <input type="text" id="usuario" placeholder="Usuario" required>
-      <input type="password" id="password" placeholder="Contraseña" required>
+      <input type="text" id="usuario" placeholder="Usuario" autocomplete="username" required>
+      <input type="password" id="password" placeholder="Contraseña" autocomplete="current-password" required>
       <button type="submit">Ingresar</button>
     </form>
     <p id="errorMsg" class="error"></p>
+    <a href="index.html" class="back-link">← Volver al inicio</a>
   </div>
 
   <script>
+    // Redirigir si ya existe una sesión activa
+    if (localStorage.getItem('adminAutenticado') === 'true') {
+      window.location.href = 'admin.html';
+    }
+
     document.getElementById('loginForm').addEventListener('submit', (e) => {
       e.preventDefault();
-      const userVal = document.getElementById('usuario').value;
-      const passVal = document.getElementById('password').value;
+      const userVal = document.getElementById('usuario').value.trim();
+      const passVal = document.getElementById('password').value.trim();
 
-      // Validación con las nuevas credenciales
       if (userVal === '2025' && passVal === 'LaserPrint01') {
         localStorage.setItem('adminAutenticado', 'true');
         window.location.href = 'admin.html';
