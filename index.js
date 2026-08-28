@@ -13,7 +13,7 @@ function initGifPlayback() {
   if (gifImg) {
     // Forzar lectura limpia del archivo en cada recarga de página para reproducir desde el inicio
     const timestamp = new Date().getTime();
-    gifImg.src = `uploads/videos/presentacion.gif?v=${timestamp}`;
+    gifImg.src = `uploads/videos/presentacionreal.gif?v=${timestamp}`;
   }
 }
 
