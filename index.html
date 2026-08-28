@@ -18,7 +18,7 @@
   <header class="glass-header">
     <nav class="nav-container">
       <a href="index.html" class="logo">
-        <img src="uploads/fotos/LOGOTIPO.png" alt="LaserPrint Logo" class="logo-img" onerror="this.onerror=null; this.src='https://via.placeholder.com/150x50/111/d4af37?text=LASERPRINT'">
+        <img src="uploads/fotos/LOGOTIPO.png" alt="LaserPrint Logo" class="logo-img" onerror="this.onerror=null; this.src='https://via.placeholder.com/200x80/111/d4af37?text=LASERPRINT'">
       </a>
 
       <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú">
@@ -49,17 +49,17 @@
 
   <section class="video-section">
     <div class="video-container glass-card" id="videoWrapper">
-      <img src="uploads/videos/presentacion.gif" 
+      <img id="gifPresentacion" 
+           src="uploads/videos/presentacion.gif" 
            alt="Presentación LaserPrint" 
            class="hero-gif-img" 
-           style="width: 100%; height: auto; display: block; border-radius: 12px;"
-           onerror="this.onerror=null; this.src='https://via.placeholder.com/800x450/111/d4af37?text=LaserPrint+Presentacion'">
+           onerror="this.onerror=null; this.src='https://via.placeholder.com/1200x675/111/d4af37?text=LaserPrint+Presentacion'">
     </div>
   </section>
 
   <section class="carousel-section">
     <h2 class="section-title">Nuestros Trabajos Destacados</h2>
-    <div class="carousel-wrapper glass-card 3d-container">
+    <div class="carousel-wrapper glass-card">
       <button class="carousel-btn prev-btn ripple-btn" id="prevBtn" aria-label="Anterior">&#10094;</button>
       
       <div class="carousel-track-container">
@@ -93,16 +93,21 @@
     <h2 class="section-title">Nuestra Ubicación</h2>
     <div class="location-card glass-card">
       <p class="location-address">📍 Calz. S. Mateo 27-A, San Juan Bosco 1, 52946 Cdad. López Mateos, Méx.</p>
+      
       <div class="map-container">
         <iframe 
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.370331003666!2d-99.2435728!3d19.5686861!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d21c3b1e333333%3A0x1111111111111111!2sCalz.%20San%20Mateo%2027-A%2C%20San%20Juan%20Bosco%201%2C%2052946%20Cdad.%20L%C3%B3pez%20Mateos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1700000000000!5m2!1ses!2smx" 
+          src="https://maps.google.com/maps?q=Calz.+S.+Mateo+27-A,+San+Juan+Bosco+1,+52946+Cdad.+L%C3%B3pez+Mateos,+M%C3%A9x.&t=&z=16&ie=UTF8&iwloc=&output=embed" 
           width="100%" 
-          height="350" 
-          style="border:0; border-radius: 12px;" 
+          height="400" 
+          style="border:0;" 
           allowfullscreen="" 
           loading="lazy" 
           referrerpolicy="no-referrer-when-downgrade">
         </iframe>
+      </div>
+
+      <div class="streetview-note">
+        ⚠️ <b>Nota importante:</b> La fachada en Google Maps / Street View aún no se encuentra actualizada. Si giras la vista de la calle, la fachada aparecerá registrada anteriormente como local de hules.
       </div>
     </div>
   </section>
