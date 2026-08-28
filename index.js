@@ -6,12 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ==========================================================================
-   1. CONTROL DE REPRODUCCIÓN DE GIF EN RECARGA (GIF REAL)
+   1. CONTROL DE REPRODUCCIÓN DE GIF EN RECARGA
    ========================================================================== */
 function initGifPlayback() {
   const gifImg = document.getElementById('gifPresentacion');
   if (gifImg) {
-    // Forzar lectura limpia con el nuevo archivo presentacionreal.gif
+    // Lectura limpia con el nuevo archivo para omitir caché previa
     const timestamp = new Date().getTime();
     gifImg.src = `uploads/videos/presentacionreal.gif?v=${timestamp}`;
   }
@@ -48,7 +48,7 @@ function initMobileMenu() {
 }
 
 /* ==========================================================================
-   3. CARRUSEL 3D CON SOPORTE TÁCTIL Y AUTO-PLAY
+   3. CARRUSEL 3D (RUTAS CORREGIDAS A .PNG)
    ========================================================================== */
 function cargarCarruselDinamico() {
   const track = document.getElementById('carouselTrack');
@@ -56,12 +56,13 @@ function cargarCarruselDinamico() {
 
   const BASE_URL = 'uploads/fotos/';
 
+  // Extensiones ajustadas a .png para coincidir con GitHub
   const imagenesFotos = [
-    { url: `${BASE_URL}slide1.jpg`, alt: 'Diseño Laser Print - Trabajo Destacado 1' },
-    { url: `${BASE_URL}slide2.jpg`, alt: 'Diseño Laser Print - Trabajo Destacado 2' },
-    { url: `${BASE_URL}slide3.jpg`, alt: 'Diseño Laser Print - Trabajo Destacado 3' },
-    { url: `${BASE_URL}slide4.jpg`, alt: 'Diseño Laser Print - Trabajo Destacado 4' },
-    { url: `${BASE_URL}slide5.jpg`, alt: 'Diseño Laser Print - Trabajo Destacado 5' }
+    { url: `${BASE_URL}slide1.png`, alt: 'Diseño Laser Print - Trabajo Destacado 1' },
+    { url: `${BASE_URL}slide2.png`, alt: 'Diseño Laser Print - Trabajo Destacado 2' },
+    { url: `${BASE_URL}slide3.png`, alt: 'Diseño Laser Print - Trabajo Destacado 3' },
+    { url: `${BASE_URL}slide4.png`, alt: 'Diseño Laser Print - Trabajo Destacado 4' },
+    { url: `${BASE_URL}slide5.png`, alt: 'Diseño Laser Print - Trabajo Destacado 5' }
   ];
 
   track.innerHTML = imagenesFotos.map((item, index) => `
