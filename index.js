@@ -6,12 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ==========================================================================
-   1. CONTROL DE REPRODUCCIÓN DE GIF EN RECARGA
+   1. CONTROL DE REPRODUCCIÓN DE GIF EN RECARGA (GIF REAL)
    ========================================================================== */
 function initGifPlayback() {
   const gifImg = document.getElementById('gifPresentacion');
   if (gifImg) {
-    // Forzar lectura limpia del archivo en cada recarga de página para reproducir desde el inicio
+    // Forzar lectura limpia con el nuevo archivo presentacionreal.gif
     const timestamp = new Date().getTime();
     gifImg.src = `uploads/videos/presentacionreal.gif?v=${timestamp}`;
   }
@@ -48,7 +48,7 @@ function initMobileMenu() {
 }
 
 /* ==========================================================================
-   3. CARRUSEL 3D CON SOPORTE TÁCTIL Y NAVEGACIÓN
+   3. CARRUSEL 3D CON SOPORTE TÁCTIL Y AUTO-PLAY
    ========================================================================== */
 function cargarCarruselDinamico() {
   const track = document.getElementById('carouselTrack');
