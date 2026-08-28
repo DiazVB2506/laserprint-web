@@ -142,7 +142,7 @@ body {
   transform: translateY(-1px);
 }
 
-/* Botón Menú Móvil (Hamburguesa) */
+/* Botón Menú Móvil */
 .mobile-menu-btn {
   display: none;
   flex-direction: column;
@@ -164,7 +164,6 @@ body {
   transition: all 0.3s ease;
 }
 
-/* Transformación del icono a X al abrir el menú */
 .mobile-menu-btn.open span:nth-child(1) {
   transform: translateY(9px) rotate(45deg);
 }
@@ -212,7 +211,7 @@ body {
 }
 
 /* ==========================================================================
-   SECCIÓN VIDEO DE PRESENTACIÓN (AMPLIADO CASI PANTALLA COMPLETA)
+   SECCIÓN PRESENTACIÓN GIF
    ========================================================================== */
 .video-section {
   max-width: 1350px;
@@ -238,7 +237,7 @@ body {
 }
 
 /* ==========================================================================
-   CARRUSEL HORIZONTAL
+   CARRUSEL PERSPECTIVA 3D
    ========================================================================== */
 .carousel-section {
   max-width: 1200px;
@@ -257,42 +256,84 @@ body {
 
 .carousel-wrapper {
   position: relative;
-  padding: 20px;
+  padding: 30px 20px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .carousel-track-container {
-  overflow: hidden;
+  perspective: 1000px;
+  position: relative;
   width: 100%;
-  border-radius: 12px;
+  height: 420px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .carousel-track {
-  display: flex;
-  transition: transform 0.6s var(--transition-smooth);
-}
-
-.carousel-slide {
-  min-width: 100%;
-  height: 480px;
+  position: relative;
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
+  align-items: center;
+  transform-style: preserve-3d;
 }
 
-.carousel-slide img {
+/* Estructura 3D de diapositiva */
+.carousel-slide-3d {
+  position: absolute;
+  width: 60%;
+  max-width: 580px;
+  height: 380px;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s ease;
+  cursor: pointer;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  pointer-events: none;
+  border: 1px solid var(--glass-border);
+}
+
+.carousel-slide-3d img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 12px;
-  cursor: zoom-in;
-  transition: transform 0.5s var(--transition-smooth);
+  display: block;
+  border-radius: 16px;
 }
 
-.carousel-slide img:hover {
-  transform: scale(1.01);
+/* Estados de Perspectiva 3D */
+.carousel-slide-3d.active {
+  transform: translate3d(0, 0, 0) scale(1);
+  z-index: 3;
+  opacity: 1;
+  pointer-events: auto;
 }
 
+.carousel-slide-3d.prev {
+  transform: translate3d(-45%, 0, -120px) rotateY(20deg) scale(0.82);
+  z-index: 2;
+  opacity: 0.65;
+}
+
+.carousel-slide-3d.next {
+  transform: translate3d(45%, 0, -120px) rotateY(-20deg) scale(0.82);
+  z-index: 2;
+  opacity: 0.65;
+}
+
+.carousel-slide-3d.hidden {
+  transform: translate3d(0, 0, -300px) scale(0.5);
+  z-index: 1;
+  opacity: 0;
+}
+
+/* Botones de navegación */
 .carousel-btn {
   position: absolute;
   top: 50%;
@@ -321,8 +362,8 @@ body {
   box-shadow: 0 6px 18px rgba(184, 134, 11, 0.22);
 }
 
-.prev-btn { left: 30px; }
-.next-btn { right: 30px; }
+.prev-btn { left: 20px; }
+.next-btn { right: 20px; }
 
 .carousel-dots {
   display: flex;
@@ -351,7 +392,7 @@ body {
    ========================================================================== */
 .contact-qr-section {
   max-width: 900px;
-  margin: 70px auto 100px;
+  margin: 70px auto 40px;
   padding: 0 20px;
 }
 
@@ -413,6 +454,35 @@ body {
   width: 160px;
   height: 160px;
   object-fit: contain;
+}
+
+/* ==========================================================================
+   SECCIÓN UBICACIÓN GOOGLE MAPS
+   ========================================================================== */
+.location-section {
+  max-width: 900px;
+  margin: 40px auto 100px;
+  padding: 0 20px;
+}
+
+.location-card {
+  padding: 30px;
+  text-align: center;
+}
+
+.location-address {
+  font-size: 1.05rem;
+  color: var(--text-main);
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.map-container {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--glass-border);
 }
 
 /* ==========================================================================
@@ -495,7 +565,7 @@ body {
 }
 
 /* ==========================================================================
-   REGLAS RESPONSIVAS (MÓVILES, TABLETS Y MONITORES MEDIANOS)
+   REGLAS RESPONSIVAS
    ========================================================================== */
 @media (max-width: 1024px) {
   .glass-header { 
@@ -520,8 +590,6 @@ body {
     padding: 20px;
     gap: 10px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
-    
-    /* Estado oculto responsivo con transición fluida */
     opacity: 0;
     visibility: hidden;
     transform: translateY(-10px);
@@ -545,7 +613,8 @@ body {
 
   .hero-title { font-size: 2.5rem; }
   .video-container { height: 55vh; }
-  .carousel-slide { height: 360px; }
+  .carousel-slide-3d { width: 75%; height: 320px; }
+  .carousel-track-container { height: 350px; }
   .contact-qr-card { flex-direction: column; text-align: center; }
 }
 
@@ -554,8 +623,11 @@ body {
   .hero-title { font-size: 1.9rem; }
   .hero-subtitle { font-size: 1rem; }
   .video-container { height: 42vh; border-radius: 12px; }
-  .carousel-slide { height: 260px; }
+  .carousel-slide-3d { width: 85%; height: 250px; }
+  .carousel-slide-3d.prev { transform: translate3d(-25%, 0, -100px) rotateY(15deg) scale(0.8); }
+  .carousel-slide-3d.next { transform: translate3d(25%, 0, -100px) rotateY(-15deg) scale(0.8); }
+  .carousel-track-container { height: 280px; }
   .carousel-btn { width: 38px; height: 38px; font-size: 1rem; }
-  .prev-btn { left: 15px; }
-  .next-btn { right: 15px; }
+  .prev-btn { left: 5px; }
+  .next-btn { right: 5px; }
 }
