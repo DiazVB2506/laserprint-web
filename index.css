@@ -42,7 +42,7 @@ body {
 }
 
 /* ==========================================================================
-   MENÚ DE NAVEGACIÓN Y BOTONES ELEGANTES
+   HEADER Y LOGOTIPO AMPLIADO
    ========================================================================== */
 .glass-header {
   position: fixed;
@@ -50,15 +50,15 @@ body {
   left: 0;
   width: 100%;
   z-index: 1000;
-  background: rgba(244, 239, 230, 0.88);
+  background: rgba(244, 239, 230, 0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--glass-border);
-  padding: 12px 40px;
+  padding: 10px 40px;
 }
 
 .nav-container {
-  max-width: 1400px;
+  max-width: 1500px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
@@ -72,9 +72,14 @@ body {
 }
 
 .logo-img {
-  height: 50px;
+  height: 80px;
   width: auto;
   object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.logo-img:hover {
+  transform: scale(1.03);
 }
 
 .nav-links {
@@ -87,9 +92,9 @@ body {
 .nav-btn {
   color: var(--text-muted);
   text-decoration: none;
-  padding: 8px 16px;
+  padding: 10px 18px;
   border-radius: 30px;
-  font-size: 0.88rem;
+  font-size: 0.92rem;
   font-weight: 600;
   display: inline-block;
   position: relative;
@@ -119,7 +124,7 @@ body {
 .nav-btn:hover, 
 .nav-btn.active {
   color: var(--text-main);
-  background-color: rgba(255, 255, 255, 0.75);
+  background-color: rgba(255, 255, 255, 0.85);
   border-color: rgba(184, 134, 11, 0.35);
   transform: translateY(-1px);
 }
@@ -142,7 +147,6 @@ body {
   transform: translateY(-1px);
 }
 
-/* Botón Menú Móvil */
 .mobile-menu-btn {
   display: none;
   flex-direction: column;
@@ -164,36 +168,28 @@ body {
   transition: all 0.3s ease;
 }
 
-.mobile-menu-btn.open span:nth-child(1) {
-  transform: translateY(9px) rotate(45deg);
-}
-
-.mobile-menu-btn.open span:nth-child(2) {
-  opacity: 0;
-}
-
-.mobile-menu-btn.open span:nth-child(3) {
-  transform: translateY(-9px) rotate(-45deg);
-}
+.mobile-menu-btn.open span:nth-child(1) { transform: translateY(9px) rotate(45deg); }
+.mobile-menu-btn.open span:nth-child(2) { opacity: 0; }
+.mobile-menu-btn.open span:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
 
 /* ==========================================================================
    SECCIÓN HERO / BIENVENIDA
    ========================================================================== */
 .hero-section {
-  padding-top: 130px;
+  padding-top: 155px;
   padding-bottom: 20px;
   text-align: center;
 }
 
 .hero-content {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
 .hero-title {
   font-family: var(--font-serif);
-  font-size: 3.2rem;
+  font-size: 3.5rem;
   font-weight: 700;
   letter-spacing: 2px;
   background: linear-gradient(135deg, #2b2621 0%, var(--accent-gold) 60%, var(--accent-gold-light) 100%);
@@ -204,31 +200,30 @@ body {
 }
 
 .hero-subtitle {
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   color: var(--text-muted);
   font-weight: 400;
   letter-spacing: 1px;
 }
 
 /* ==========================================================================
-   SECCIÓN PRESENTACIÓN GIF
+   GIF DE PRESENTACIÓN GRANDE PANTALLA COMPLETA
    ========================================================================== */
 .video-section {
-  max-width: 1350px;
-  margin: 30px auto 60px;
+  max-width: 1600px;
+  margin: 30px auto 70px;
   padding: 0 20px;
 }
 
 .video-container {
   width: 100%;
-  height: 78vh;
-  border-radius: 20px;
+  height: 88vh;
+  border-radius: 24px;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 15px 35px rgba(184, 134, 11, 0.12);
+  box-shadow: 0 20px 45px rgba(184, 134, 11, 0.15);
 }
 
-.video-container video, 
 .video-container img {
   width: 100%;
   height: 100%;
@@ -237,26 +232,26 @@ body {
 }
 
 /* ==========================================================================
-   CARRUSEL PERSPECTIVA 3D
+   CARRUSEL 3D CON IMÁGENES MAXIMIZADAS
    ========================================================================== */
 .carousel-section {
-  max-width: 1200px;
-  margin: 70px auto;
+  max-width: 1500px;
+  margin: 80px auto;
   padding: 0 20px;
 }
 
 .section-title {
   font-family: var(--font-serif);
   text-align: center;
-  font-size: 2rem;
+  font-size: 2.2rem;
   color: var(--text-main);
-  margin-bottom: 30px;
+  margin-bottom: 35px;
   letter-spacing: 2px;
 }
 
 .carousel-wrapper {
   position: relative;
-  padding: 30px 20px;
+  padding: 40px 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -264,10 +259,10 @@ body {
 }
 
 .carousel-track-container {
-  perspective: 1000px;
+  perspective: 1200px;
   position: relative;
   width: 100%;
-  height: 420px;
+  height: 520px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -283,17 +278,16 @@ body {
   transform-style: preserve-3d;
 }
 
-/* Estructura 3D de diapositiva */
 .carousel-slide-3d {
   position: absolute;
-  width: 60%;
-  max-width: 580px;
-  height: 380px;
+  width: 75%;
+  max-width: 850px;
+  height: 480px;
   transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s ease;
   cursor: pointer;
-  border-radius: 16px;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.22);
   opacity: 0;
   pointer-events: none;
   border: 1px solid var(--glass-border);
@@ -304,10 +298,9 @@ body {
   height: 100%;
   object-fit: cover;
   display: block;
-  border-radius: 16px;
+  border-radius: 20px;
 }
 
-/* Estados de Perspectiva 3D */
 .carousel-slide-3d.active {
   transform: translate3d(0, 0, 0) scale(1);
   z-index: 3;
@@ -316,15 +309,15 @@ body {
 }
 
 .carousel-slide-3d.prev {
-  transform: translate3d(-45%, 0, -120px) rotateY(20deg) scale(0.82);
+  transform: translate3d(-38%, 0, -140px) rotateY(18deg) scale(0.85);
   z-index: 2;
-  opacity: 0.65;
+  opacity: 0.7;
 }
 
 .carousel-slide-3d.next {
-  transform: translate3d(45%, 0, -120px) rotateY(-20deg) scale(0.82);
+  transform: translate3d(38%, 0, -140px) rotateY(-18deg) scale(0.85);
   z-index: 2;
-  opacity: 0.65;
+  opacity: 0.7;
 }
 
 .carousel-slide-3d.hidden {
@@ -333,23 +326,22 @@ body {
   opacity: 0;
 }
 
-/* Botones de navegación */
 .carousel-btn {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(255, 253, 248, 0.85);
+  background: rgba(255, 253, 248, 0.95);
   border: 1px solid var(--glass-border);
   color: var(--text-main);
-  width: 48px;
-  height: 48px;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
   cursor: pointer;
   transition: all 0.4s var(--transition-smooth);
 }
@@ -358,23 +350,23 @@ body {
   background-color: var(--accent-gold);
   color: #ffffff;
   border-color: var(--accent-gold);
-  transform: translateY(-50%) scale(1.05);
-  box-shadow: 0 6px 18px rgba(184, 134, 11, 0.22);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 8px 24px rgba(184, 134, 11, 0.3);
 }
 
-.prev-btn { left: 20px; }
-.next-btn { right: 20px; }
+.prev-btn { left: 25px; }
+.next-btn { right: 25px; }
 
 .carousel-dots {
   display: flex;
   justify-content: center;
-  gap: 10px;
-  margin-top: 20px;
+  gap: 12px;
+  margin-top: 25px;
 }
 
 .dot {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: rgba(184, 134, 11, 0.25);
   cursor: pointer;
@@ -383,7 +375,7 @@ body {
 
 .dot.active {
   background: var(--accent-gold);
-  width: 25px;
+  width: 30px;
   border-radius: 10px;
 }
 
@@ -391,7 +383,7 @@ body {
    SECCIÓN WHATSAPP Y QR
    ========================================================================== */
 .contact-qr-section {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 70px auto 40px;
   padding: 0 20px;
 }
@@ -404,9 +396,7 @@ body {
   gap: 30px;
 }
 
-.contact-info {
-  flex: 1;
-}
+.contact-info { flex: 1; }
 
 .whatsapp-link {
   display: inline-flex;
@@ -415,12 +405,12 @@ body {
   background: #128c7e;
   color: #ffffff;
   text-decoration: none;
-  padding: 14px 28px;
+  padding: 16px 32px;
   border-radius: 50px;
   font-weight: 600;
-  font-size: 1.05rem;
-  transition: transform 0.4s var(--transition-smooth), box-shadow 0.4s var(--transition-smooth);
+  font-size: 1.1rem;
   box-shadow: 0 4px 15px rgba(18, 140, 126, 0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .whatsapp-link:hover {
@@ -428,50 +418,40 @@ body {
   box-shadow: 0 6px 22px rgba(18, 140, 126, 0.35);
 }
 
-.whatsapp-icon {
-  width: 24px;
-  height: 24px;
-}
+.whatsapp-icon { width: 26px; height: 26px; }
 
 .whatsapp-subtext {
   margin-top: 15px;
   color: var(--text-muted);
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 .qr-container {
   background: #ffffff;
-  padding: 12px;
+  padding: 14px;
   border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   border: 1px solid var(--glass-border);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-.qr-image {
-  width: 160px;
-  height: 160px;
-  object-fit: contain;
-}
+.qr-image { width: 170px; height: 170px; object-fit: contain; }
 
 /* ==========================================================================
-   SECCIÓN UBICACIÓN GOOGLE MAPS
+   SECCIÓN UBICACIÓN Y AVISO DE STREET VIEW
    ========================================================================== */
 .location-section {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 40px auto 100px;
   padding: 0 20px;
 }
 
 .location-card {
-  padding: 30px;
+  padding: 35px;
   text-align: center;
 }
 
 .location-address {
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   color: var(--text-main);
   font-weight: 600;
   margin-bottom: 20px;
@@ -479,22 +459,34 @@ body {
 
 .map-container {
   width: 100%;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
   border: 1px solid var(--glass-border);
 }
 
+.streetview-note {
+  margin-top: 20px;
+  padding: 15px 20px;
+  background: rgba(236, 204, 104, 0.25);
+  border: 1px solid #eccc68;
+  border-radius: 12px;
+  color: #574b90;
+  font-size: 0.95rem;
+  text-align: left;
+  line-height: 1.5;
+}
+
 /* ==========================================================================
-   FOOTER
+   FOOTER & MODAL LIGHTBOX
    ========================================================================== */
 .glass-footer {
   background: rgba(244, 239, 230, 0.95);
   border-top: 1px solid var(--glass-border);
-  padding: 30px 20px;
+  padding: 35px 20px;
   text-align: center;
   color: var(--text-muted);
-  font-size: 0.9rem;
+  font-size: 0.92rem;
 }
 
 .footer-content {
@@ -502,7 +494,7 @@ body {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
 }
 
@@ -513,13 +505,8 @@ body {
   justify-content: center;
 }
 
-.footer-separator {
-  color: var(--glass-border);
-}
+.footer-separator { color: var(--glass-border); }
 
-/* ==========================================================================
-   MODAL VISOR DE IMÁGENES (LIGHTBOX)
-   ========================================================================== */
 .image-modal {
   display: none;
   position: fixed;
@@ -528,7 +515,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(43, 38, 33, 0.85);
+  background-color: rgba(43, 38, 33, 0.88);
   backdrop-filter: blur(12px);
   justify-content: center;
   align-items: center;
@@ -536,9 +523,9 @@ body {
 }
 
 .image-modal-content {
-  max-width: 90%;
-  max-height: 80vh;
-  border-radius: 12px;
+  max-width: 92%;
+  max-height: 85vh;
+  border-radius: 14px;
   box-shadow: 0 15px 40px rgba(0,0,0,0.4);
   object-fit: contain;
 }
@@ -546,7 +533,7 @@ body {
 .image-modal-caption {
   margin-top: 15px;
   color: #ffffff;
-  font-size: 1rem;
+  font-size: 1.1rem;
 }
 
 .image-modal-close {
@@ -554,7 +541,7 @@ body {
   top: 25px;
   right: 35px;
   color: #fff;
-  font-size: 40px;
+  font-size: 42px;
   font-weight: bold;
   cursor: pointer;
   transition: color 0.3s ease;
@@ -568,13 +555,8 @@ body {
    REGLAS RESPONSIVAS
    ========================================================================== */
 @media (max-width: 1024px) {
-  .glass-header { 
-    padding: 10px 20px; 
-  }
-
-  .mobile-menu-btn { 
-    display: flex !important; 
-  }
+  .logo-img { height: 60px; }
+  .mobile-menu-btn { display: flex !important; }
 
   .nav-links {
     display: flex !important;
@@ -604,30 +586,25 @@ body {
     pointer-events: auto;
   }
 
-  .nav-btn {
-    width: 100%;
-    text-align: center;
-    padding: 12px;
-    font-size: 0.95rem;
-  }
-
-  .hero-title { font-size: 2.5rem; }
-  .video-container { height: 55vh; }
-  .carousel-slide-3d { width: 75%; height: 320px; }
-  .carousel-track-container { height: 350px; }
+  .nav-btn { width: 100%; text-align: center; padding: 12px; font-size: 0.95rem; }
+  .hero-title { font-size: 2.6rem; }
+  .video-container { height: 60vh; }
+  .carousel-slide-3d { width: 85%; height: 380px; }
+  .carousel-track-container { height: 420px; }
   .contact-qr-card { flex-direction: column; text-align: center; }
 }
 
 @media (max-width: 768px) {
-  .hero-section { padding-top: 110px; }
-  .hero-title { font-size: 1.9rem; }
+  .logo-img { height: 50px; }
+  .hero-section { padding-top: 125px; }
+  .hero-title { font-size: 2.1rem; }
   .hero-subtitle { font-size: 1rem; }
-  .video-container { height: 42vh; border-radius: 12px; }
-  .carousel-slide-3d { width: 85%; height: 250px; }
-  .carousel-slide-3d.prev { transform: translate3d(-25%, 0, -100px) rotateY(15deg) scale(0.8); }
-  .carousel-slide-3d.next { transform: translate3d(25%, 0, -100px) rotateY(-15deg) scale(0.8); }
-  .carousel-track-container { height: 280px; }
-  .carousel-btn { width: 38px; height: 38px; font-size: 1rem; }
-  .prev-btn { left: 5px; }
-  .next-btn { right: 5px; }
+  .video-container { height: 48vh; border-radius: 16px; }
+  .carousel-slide-3d { width: 92%; height: 280px; }
+  .carousel-slide-3d.prev { transform: translate3d(-15%, 0, -80px) scale(0.85); }
+  .carousel-slide-3d.next { transform: translate3d(15%, 0, -80px) scale(0.85); }
+  .carousel-track-container { height: 310px; }
+  .carousel-btn { width: 44px; height: 44px; font-size: 1.2rem; }
+  .prev-btn { left: 10px; }
+  .next-btn { right: 10px; }
 }
