@@ -12,6 +12,7 @@
     .form-group label { display: block; font-weight: bold; margin-bottom: 5px; }
     .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 8px; box-sizing: border-box; }
     .btn-save { background: #2ed573; color: white; border: none; padding: 12px; width: 100%; font-weight: bold; cursor: pointer; border-radius: 4px; font-size: 16px; }
+    .btn-save:disabled { background: #a4b0be; cursor: not-allowed; }
     table { width: 100%; border-collapse: collapse; background: white; }
     th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
     th { background: #2f3542; color: white; }
@@ -22,7 +23,7 @@
   <header>
     <h1>Panel de Administración</h1>
     <div>
-      <a href="dtf.html" style="color:white; margin-right: 15px;">Ver Sitio Web</a>
+      <a href="index.html" style="color:white; margin-right: 15px;">Ver Sitio Web</a>
       <button onclick="localStorage.removeItem('adminAutenticado'); window.location.href='login.html';">Salir</button>
     </div>
   </header>
@@ -64,7 +65,7 @@
           <input type="file" id="archivo" name="archivo" accept="image/jpeg,image/png,image/webp,video/mp4,application/pdf" required>
         </div>
 
-        <button type="submit" class="btn-save">Subir y Publicar</button>
+        <button type="submit" id="btnSubmit" class="btn-save">Subir y Publicar</button>
       </form>
     </div>
 
@@ -88,11 +89,12 @@
       window.location.href = 'login.html';
     }
 
+    const API_URL = 'https://laserprint-api.onrender.com/api/productos';
     const formatoMXN = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
 
     async function cargarTabla() {
       try {
-        const res = await fetch('http://localhost:5000/api/productos?limit=100');
+        const res = await fetch(`${API_URL}?limit=100`);
         const data = await res.json();
         const productos = data.productos || [];
         const tbody = document.getElementById('tabla');
@@ -119,13 +121,17 @@
           `;
         });
       } catch (err) {
-        console.error('Error al cargar tabla:', err);
+        console.error('Error al cargar tabla desde Render:', err);
       }
     }
 
     document.getElementById('uploadForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
+      const btnSubmit = document.getElementById('btnSubmit');
+      btnSubmit.disabled = true;
+      btnSubmit.innerText = 'Subiendo...';
+
       const formData = new FormData();
       formData.append('nombre', document.getElementById('nombre').value);
       formData.append('descripcion', document.getElementById('descripcion').value);
@@ -134,7 +140,7 @@
       formData.append('archivo', document.getElementById('archivo').files[0]);
 
       try {
-        const res = await fetch('http://localhost:5000/api/productos', {
+        const res = await fetch(API_URL, {
           method: 'POST',
           body: formData
         });
@@ -148,14 +154,17 @@
           alert('Error al subir: ' + (errData.error || 'Verifica los datos'));
         }
       } catch (err) {
-        alert('Error de conexión con el servidor');
+        alert('Error de conexión con el servidor en Render');
+      } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.innerText = 'Subir y Publicar';
       }
     });
 
     async function eliminar(id) {
       if (confirm('¿Eliminar esta publicación de la base de datos?')) {
         try {
-          const res = await fetch(`http://localhost:5000/api/productos/${id}`, { method: 'DELETE' });
+          const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
           if (res.ok) {
             cargarTabla();
           } else {
