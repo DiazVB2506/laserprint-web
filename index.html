@@ -7,7 +7,6 @@
 
   <link rel="icon" type="image/png" href="uploads/fotos/LOGOTIPO.png">
 
-  <!-- FUENTES PREMIUM Y DIVERTIDAS: Syne para títulos imponentes + Outfit para lectura -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
@@ -16,13 +15,11 @@
 </head>
 <body>
 
-  <!-- Glows decorativos de fondo interactivos -->
   <div class="bg-glow ambient-cyan"></div>
   <div class="bg-glow ambient-magenta"></div>
 
   <header class="glass-header">
     <nav class="nav-container">
-      <!-- LOGO MÁS GRANDE Y VISIBLE CON EFECTO DE GLOW -->
       <a href="index.html" class="logo">
         <img src="uploads/fotos/LOGOTIPO.png" alt="Diseño Laser Print Logo" class="logo-img" onerror="this.onerror=null; this.src='https://via.placeholder.com/260x100/111/00f0ff?text=DISE%C3%91O+LASERPRINT'">
       </a>
@@ -48,13 +45,11 @@
 
   <section class="hero-section">
     <div class="hero-content">
-      <!-- TÍTULO CORREGIDO E IMPACTANTE CON DEGRADADO CMYK Y ANIMACIÓN -->
       <h1 class="hero-title">Bienvenidos a <span class="text-gradient">Diseño Laser Print</span></h1>
       <p class="hero-subtitle">Imprenta digital, corte de alta precisión y soluciones visuales de otro nivel.</p>
     </div>
   </section>
 
-  <!-- SECCIÓN DE PRESENTACIÓN (GIF GRANDE) -->
   <section class="video-section">
     <div class="video-container glass-card" id="videoWrapper">
       <img id="gifPresentacion" 
@@ -65,24 +60,24 @@
     </div>
   </section>
 
-  <!-- CARRUSEL 3D CON INTERACCIÓN AL PASAR EL MOUSE -->
   <section class="carousel-section">
     <h2 class="section-title">Nuestros Trabajos Destacados</h2>
+    
+    <p class="carousel-hint">💡 <i>Haz clic en cualquier imagen para verla en pantalla completa.</i></p>
+
     <div class="carousel-wrapper glass-card">
-      <button class="carousel-btn prev-btn" id="prevBtn" aria-label="Anterior">&#10094;</button>
+      <button class="carousel-btn prev-btn" id="prevBtn" aria-label="Anterior">❮</button>
       
       <div class="carousel-track-container">
         <div class="carousel-track" id="carouselTrack">
-          <!-- Diapositivas cargadas dinámicamente -->
-        </div>
+          </div>
       </div>
 
-      <button class="carousel-btn next-btn" id="nextBtn" aria-label="Siguiente">&#10095;</button>
+      <button class="carousel-btn next-btn" id="nextBtn" aria-label="Siguiente">❯</button>
     </div>
     <div class="carousel-dots" id="carouselDots"></div>
   </section>
 
-  <!-- UBICACIÓN Y AVISO DE STREET VIEW -->
   <section class="location-section">
     <h2 class="section-title">Nuestra Ubicación</h2>
     <div class="location-card glass-card">
@@ -108,7 +103,7 @@
 
   <footer class="glass-footer">
     <div class="footer-content">
-      <p class="footer-rights">&copy; 2026 Diseño Laser Print. Todos los derechos reservados.</p>
+      <p class="footer-rights">© 2026 Diseño Laser Print. Todos los derechos reservados.</p>
       <div class="footer-contact">
         <span>📞 Teléfono: +52 55 9878 8857</span>
         <span class="footer-separator">|</span>
@@ -118,7 +113,7 @@
   </footer>
 
   <div id="imageModal" class="image-modal">
-    <span class="image-modal-close" id="closeModal">&times;</span>
+    <span class="image-modal-close" id="closeModal">×</span>
     <img class="image-modal-content" id="imgModalAmpliada" alt="Vista ampliada">
     <div id="captionModal" class="image-modal-caption"></div>
   </div>
