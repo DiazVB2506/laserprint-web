@@ -1,11 +1,42 @@
 document.addEventListener('DOMContentLoaded', () => {
+  initMobileMenu();
   initVideoPlayer();
   cargarCarruselDinamico();
   initLightbox();
 });
 
 /* ==========================================================================
-   1. CONTROL DE VIDEO (REPRODUCCIÓN CONTINUA Y AUTOPLAY CUIDADOSO)
+   1. CONTROL DEL MENÚ MÓVIL (HAMBURGUESA)
+   ========================================================================== */
+function initMobileMenu() {
+  const menuBtn = document.getElementById('mobileMenuBtn');
+  const navLinks = document.getElementById('navLinks');
+
+  if (!menuBtn || !navLinks) return;
+
+  // Alternar el menú desplegable
+  menuBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    navLinks.classList.toggle('active');
+  });
+
+  // Cerrar el menú al hacer clic en cualquier enlace
+  navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      navLinks.classList.remove('active');
+    });
+  });
+
+  // Cerrar el menú si se hace clic fuera de él
+  document.addEventListener('click', (e) => {
+    if (!navLinks.contains(e.target) && !menuBtn.contains(e.target)) {
+      navLinks.classList.remove('active');
+    }
+  });
+}
+
+/* ==========================================================================
+   2. CONTROL DE VIDEO (REPRODUCCIÓN CONTINUA Y AUTOPLAY CUIDADOSO)
    ========================================================================== */
 function initVideoPlayer() {
   const video = document.getElementById('introVideo');
@@ -28,7 +59,7 @@ function initVideoPlayer() {
 }
 
 /* ==========================================================================
-   2. CARRUSEL HORIZONTAL FLUIDO CON DATOS DESDE RENDER
+   3. CARRUSEL HORIZONTAL FLUIDO CON DATOS DESDE RENDER
    ========================================================================== */
 async function cargarCarruselDinamico() {
   const API_URL = 'https://laserprint-api.onrender.com/api/productos';
@@ -130,7 +161,7 @@ function initCarousel() {
 }
 
 /* ==========================================================================
-   3. VISOR DE IMÁGENES AMPLIADAS (LIGHTBOX)
+   4. VISOR DE IMÁGENES AMPLIADAS (LIGHTBOX)
    ========================================================================== */
 function initLightbox() {
   const modal = document.getElementById('imageModal');
