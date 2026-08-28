@@ -22,7 +22,7 @@
 <body>
 
   <header>
-    <img src="http://localhost:5000/uploads/fotos/logo.png" alt="LaserPrint Logo" class="logo-img" onerror="this.replaceWith('LaserPrint')">
+    <img src="https://laserprint-api.onrender.com/uploads/fotos/logo.png" alt="LaserPrint Logo" class="logo-img" onerror="this.style.display='none'; this.after('LaserPrint')">
     <nav>
       <a href="index.html">Inicio</a>
       <a href="dtf.html">DTF TEXTIL / UV</a>
@@ -42,11 +42,12 @@
 
   <script>
     const AREA_ACTUAL = 'SUBLIMACION';
+    const API_URL = 'https://laserprint-api.onrender.com/api/productos';
     const formatoMXN = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
 
     async function cargarContenido() {
       try {
-        const res = await fetch('http://localhost:5000/api/productos?categoria=' + encodeURIComponent(AREA_ACTUAL));
+        const res = await fetch(`${API_URL}?categoria=${encodeURIComponent(AREA_ACTUAL)}`);
         const data = await res.json();
         const productos = data.productos || [];
         const grid = document.getElementById('gridProductos');
@@ -75,7 +76,7 @@
           `;
         });
       } catch (err) {
-        console.error('Error al cargar datos:', err);
+        console.error('Error al cargar datos desde Render:', err);
       }
     }
 
