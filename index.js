@@ -1,227 +1,605 @@
-document.addEventListener('DOMContentLoaded', () => {
-  initMobileMenu();
-  initGifPlayback();
-  cargarCarruselDinamico();
-  initLightbox();
-});
-
 /* ==========================================================================
-   1. CONTROL DE REPRODUCCIÓN DE GIF EN RECARGA
+   PALETA DE COLORES "IMPRENTA CREATIVA & ELEGANTE" (DARK GLASS)
    ========================================================================== */
-function initGifPlayback() {
-  const gifImg = document.getElementById('gifPresentacion');
-  if (gifImg) {
-    // Lectura limpia con el nuevo archivo para omitir caché previa
-    const timestamp = new Date().getTime();
-    gifImg.src = `uploads/videos/presentacionreal.gif?v=${timestamp}`;
-  }
+:root {
+  --bg-dark: #0c0d10;                    /* Negro azabache profundo */
+  --glass-bg: rgba(22, 25, 35, 0.65);     /* Cristal oscuro pulido */
+  --glass-border: rgba(255, 255, 255, 0.12);
+  
+  /* Colores Tinta de Imprenta Neón Elegante */
+  --cmyk-cyan: #00f0ff;
+  --cmyk-magenta: #ff007f;
+  --cmyk-yellow: #ffb703;
+  
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  
+  --font-display: 'Syne', sans-serif;
+  --font-sans: 'Outfit', sans-serif;
+  --transition-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  line-height: 1.6;
+  position: relative;
+}
+
+/* Luces de ambiente en segundo plano */
+.bg-glow {
+  position: fixed;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  filter: blur(140px);
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.35;
+}
+.ambient-cyan { top: -100px; left: -100px; background: var(--cmyk-cyan); }
+.ambient-magenta { top: 40%; right: -150px; background: var(--cmyk-magenta); }
+
+/* Card Glassmorphism con borde brillante */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 /* ==========================================================================
-   2. MENÚ MÓVIL INTERACTIVO
+   HEADER Y LOGO
    ========================================================================== */
-function initMobileMenu() {
-  const menuBtn = document.getElementById('mobileMenuBtn');
-  const navLinks = document.getElementById('navLinks');
+.glass-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background: rgba(12, 13, 16, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
+  padding: 12px 40px;
+}
 
-  if (!menuBtn || !navLinks) return;
+.nav-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-  menuBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    navLinks.classList.toggle('active');
-    menuBtn.classList.toggle('open');
-  });
+.logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  padding: 4px 0;
+}
 
-  navLinks.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => {
-      navLinks.classList.remove('active');
-      menuBtn.classList.remove('open');
-    });
-  });
+.logo-img {
+  height: 110px;
+  max-height: 110px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.35));
+  transition: transform 0.4s var(--transition-bounce), filter 0.4s ease;
+}
 
-  document.addEventListener('click', (e) => {
-    if (!navLinks.contains(e.target) && !menuBtn.contains(e.target)) {
-      navLinks.classList.remove('active');
-      menuBtn.classList.remove('open');
-    }
-  });
+.logo:hover .logo-img {
+  transform: scale(1.08) rotate(-1deg);
+  filter: drop-shadow(0 0 20px rgba(255, 0, 127, 0.6));
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 10px;
+  align-items: center;
+}
+
+.nav-btn {
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  position: relative;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.nav-btn:hover, 
+.nav-btn.active {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+}
+
+.btn-admin {
+  background: rgba(255, 0, 127, 0.15) !important;
+  color: var(--cmyk-magenta) !important;
+  border: 1px solid rgba(255, 0, 127, 0.4) !important;
+}
+
+.btn-admin:hover {
+  background: var(--cmyk-magenta) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 25px rgba(255, 0, 127, 0.6) !important;
+}
+
+/* Menu Móvil */
+.mobile-menu-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 32px;
+  height: 22px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1002;
+}
+
+.mobile-menu-btn span {
+  width: 100%;
+  height: 3.5px;
+  background-color: var(--text-main);
+  border-radius: 4px;
 }
 
 /* ==========================================================================
-   3. CARRUSEL 3D (RUTAS CORREGIDAS A .PNG)
+   HERO SECTION
    ========================================================================== */
-function cargarCarruselDinamico() {
-  const track = document.getElementById('carouselTrack');
-  if (!track) return;
-
-  const BASE_URL = 'uploads/fotos/';
-
-  // Extensiones ajustadas a .png para coincidir con GitHub
-  const imagenesFotos = [
-    { url: `${BASE_URL}slide1.png`, alt: 'Diseño Laser Print - Trabajo Destacado 1' },
-    { url: `${BASE_URL}slide2.png`, alt: 'Diseño Laser Print - Trabajo Destacado 2' },
-    { url: `${BASE_URL}slide3.png`, alt: 'Diseño Laser Print - Trabajo Destacado 3' },
-    { url: `${BASE_URL}slide4.png`, alt: 'Diseño Laser Print - Trabajo Destacado 4' },
-    { url: `${BASE_URL}slide5.png`, alt: 'Diseño Laser Print - Trabajo Destacado 5' }
-  ];
-
-  track.innerHTML = imagenesFotos.map((item, index) => `
-    <div class="carousel-slide-3d" data-index="${index}">
-      <img src="${item.url}" 
-           alt="${item.alt}" 
-           onerror="this.onerror=null; this.src='https://via.placeholder.com/900x550/0c0d10/00f0ff?text=Dise%C3%B1o+LaserPrint+${index + 1}'">
-    </div>
-  `).join('');
-
-  initCarousel3D();
+.hero-section {
+  padding-top: 190px;
+  padding-bottom: 30px;
+  text-align: center;
 }
 
-function initCarousel3D() {
-  const track = document.getElementById('carouselTrack');
-  const prevBtn = document.getElementById('prevBtn');
-  const nextBtn = document.getElementById('nextBtn');
-  const dotsContainer = document.getElementById('carouselDots');
+.hero-content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
 
-  if (!track) return;
+.hero-title {
+  font-family: var(--font-display);
+  font-size: 4rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1.15;
+  margin-bottom: 18px;
+}
 
-  const slides = Array.from(track.children);
-  if (slides.length === 0) return;
+.text-gradient {
+  background: linear-gradient(135deg, var(--cmyk-cyan) 0%, var(--cmyk-magenta) 50%, var(--cmyk-yellow) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+}
 
-  let currentIndex = 0;
-  let autoplayTimer = null;
-
-  if (dotsContainer) {
-    dotsContainer.innerHTML = '';
-    slides.forEach((_, index) => {
-      const dot = document.createElement('div');
-      dot.classList.add('dot');
-      if (index === 0) dot.classList.add('active');
-      dot.addEventListener('click', () => {
-        moveToSlide(index);
-        resetAutoplay();
-      });
-      dotsContainer.appendChild(dot);
-    });
-  }
-
-  const dots = dotsContainer ? Array.from(dotsContainer.children) : [];
-
-  function update3DSlides() {
-    slides.forEach((slide, index) => {
-      slide.className = 'carousel-slide-3d';
-      
-      const offset = index - currentIndex;
-      
-      if (offset === 0) {
-        slide.classList.add('active');
-      } else if (offset === 1 || (offset === -(slides.length - 1))) {
-        slide.classList.add('next');
-      } else if (offset === -1 || (offset === slides.length - 1)) {
-        slide.classList.add('prev');
-      } else {
-        slide.classList.add('hidden');
-      }
-    });
-
-    dots.forEach((dot, index) => {
-      dot.classList.toggle('active', index === currentIndex);
-    });
-  }
-
-  function moveToSlide(index) {
-    if (index < 0) index = slides.length - 1;
-    if (index >= slides.length) index = 0;
-
-    currentIndex = index;
-    update3DSlides();
-  }
-
-  function startAutoplay() {
-    autoplayTimer = setInterval(() => {
-      moveToSlide(currentIndex + 1);
-    }, 5000);
-  }
-
-  function resetAutoplay() {
-    clearInterval(autoplayTimer);
-    startAutoplay();
-  }
-
-  if (nextBtn) {
-    nextBtn.onclick = (e) => {
-      e.stopPropagation();
-      moveToSlide(currentIndex + 1);
-      resetAutoplay();
-    };
-  }
-
-  if (prevBtn) {
-    prevBtn.onclick = (e) => {
-      e.stopPropagation();
-      moveToSlide(currentIndex - 1);
-      resetAutoplay();
-    };
-  }
-
-  let touchStartX = 0;
-  let touchEndX = 0;
-
-  track.addEventListener('touchstart', (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-  }, { passive: true });
-
-  track.addEventListener('touchend', (e) => {
-    touchEndX = e.changedTouches[0].screenX;
-    if (touchStartX - touchEndX > 40) {
-      moveToSlide(currentIndex + 1);
-      resetAutoplay();
-    } else if (touchEndX - touchStartX > 40) {
-      moveToSlide(currentIndex - 1);
-      resetAutoplay();
-    }
-  }, { passive: true });
-
-  update3DSlides();
-  startAutoplay();
+.hero-subtitle {
+  font-size: 1.3rem;
+  color: var(--text-muted);
+  font-weight: 300;
+  max-width: 750px;
+  margin: 0 auto;
 }
 
 /* ==========================================================================
-   4. VISOR DE IMÁGENES AMPLIADAS (LIGHTBOX)
+   GIF INTERACTIVO
    ========================================================================== */
-function initLightbox() {
-  const modal = document.getElementById('imageModal');
-  const modalImg = document.getElementById('imgModalAmpliada');
-  const captionText = document.getElementById('captionModal');
-  const closeModal = document.getElementById('closeModal');
+.video-section {
+  max-width: 1600px;
+  margin: 40px auto 80px;
+  padding: 0 20px;
+}
 
-  if (!modal || !modalImg) return;
+.video-container {
+  width: 100%;
+  height: 85vh;
+  border-radius: 28px;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+}
 
-  document.body.addEventListener('click', (e) => {
-    if (e.target.matches('.carousel-slide-3d img')) {
-      const img = e.target;
-      modal.style.display = 'flex';
-      modalImg.src = img.src;
-      captionText.textContent = img.alt || 'Diseño Laser Print - Trabajo Destacado';
-      document.body.style.overflow = 'hidden';
-    }
-  });
+.video-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 25px 60px rgba(0, 240, 255, 0.2);
+}
 
-  const hideModal = () => {
-    modal.style.display = 'none';
-    document.body.style.overflow = 'auto';
-  };
+.video-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 
-  if (closeModal) {
-    closeModal.addEventListener('click', hideModal);
+/* ==========================================================================
+   CARRUSEL 3D INTERACTIVO
+   ========================================================================== */
+.carousel-section {
+  max-width: 1600px;
+  margin: 90px auto;
+  padding: 0 20px;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  text-align: center;
+  font-size: 2.8rem;
+  color: var(--text-main);
+  margin-bottom: 10px;
+}
+
+.carousel-hint {
+  text-align: center;
+  color: var(--cmyk-cyan);
+  font-size: 1rem;
+  margin-bottom: 25px;
+  opacity: 0.9;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+}
+
+.carousel-wrapper {
+  position: relative;
+  padding: 50px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-track-container {
+  perspective: 1400px;
+  position: relative;
+  width: 100%;
+  height: 540px;
+}
+
+.carousel-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform-style: preserve-3d;
+}
+
+.carousel-slide-3d {
+  position: absolute;
+  width: 75%;
+  max-width: 900px;
+  height: 500px;
+  transition: all 0.6s var(--transition-bounce);
+  cursor: pointer;
+  border-radius: 24px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  border: 1px solid var(--glass-border);
+}
+
+.carousel-slide-3d img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.carousel-slide-3d:hover img {
+  transform: scale(1.05);
+}
+
+.carousel-slide-3d.active {
+  transform: translate3d(0, 0, 0) scale(1);
+  z-index: 3;
+  opacity: 1;
+  pointer-events: auto;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 240, 255, 0.25);
+}
+
+.carousel-slide-3d.prev {
+  transform: translate3d(-38%, 0, -160px) rotateY(20deg) scale(0.82);
+  z-index: 2;
+  opacity: 0.6;
+}
+
+.carousel-slide-3d.next {
+  transform: translate3d(38%, 0, -160px) rotateY(-20deg) scale(0.82);
+  z-index: 2;
+  opacity: 0.6;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
+  color: #fff;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  font-size: 1.8rem;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.carousel-btn:hover {
+  background: var(--cmyk-cyan);
+  color: #000;
+  box-shadow: 0 0 30px var(--cmyk-cyan);
+  transform: translateY(-50%) scale(1.15);
+}
+
+.prev-btn { left: 30px; }
+.next-btn { right: 30px; }
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.4s ease;
+}
+
+.dot.active {
+  background: var(--cmyk-cyan);
+  width: 35px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px var(--cmyk-cyan);
+}
+
+/* ==========================================================================
+   UBICACIÓN Y AVISO DE STREET VIEW
+   ========================================================================== */
+.location-section {
+  max-width: 1100px;
+  margin: 60px auto 100px;
+  padding: 0 20px;
+}
+
+.location-card {
+  padding: 40px;
+  text-align: center;
+}
+
+.location-address {
+  font-size: 1.2rem;
+  color: var(--text-main);
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+.map-container {
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+}
+
+.streetview-note {
+  margin-top: 25px;
+  padding: 18px 24px;
+  background: rgba(255, 183, 3, 0.1);
+  border: 1px solid rgba(255, 183, 3, 0.4);
+  border-radius: 16px;
+  color: #ffd000;
+  font-size: 0.98rem;
+  text-align: left;
+}
+
+/* ==========================================================================
+   SECCIÓN DE WHATSAPP Y CÓDIGO QR
+   ========================================================================== */
+.whatsapp-section {
+  max-width: 1100px;
+  margin: 40px auto 80px;
+  padding: 0 20px;
+}
+
+.whatsapp-card {
+  padding: 35px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  background: linear-gradient(135deg, rgba(22, 25, 35, 0.85) 0%, rgba(37, 211, 102, 0.12) 100%);
+  border: 1px solid rgba(37, 211, 102, 0.35);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(37, 211, 102, 0.15);
+}
+
+.whatsapp-info h3 {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  color: #25d366;
+  margin-bottom: 8px;
+  text-shadow: 0 0 12px rgba(37, 211, 102, 0.3);
+}
+
+.whatsapp-info p {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  margin-bottom: 20px;
+}
+
+.whatsapp-btn {
+  display: inline-block;
+  background: #25d366;
+  color: #000;
+  font-weight: 700;
+  padding: 12px 28px;
+  border-radius: 30px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 20px rgba(37, 211, 102, 0.4);
+}
+
+.whatsapp-btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 0 30px rgba(37, 211, 102, 0.7);
+  background: #20ba5a;
+}
+
+.whatsapp-qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.whatsapp-qr {
+  width: 150px;
+  height: 150px;
+  border-radius: 16px;
+  border: 2px solid rgba(37, 211, 102, 0.5);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  object-fit: cover;
+}
+
+.qr-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   FOOTER & MODAL
+   ========================================================================== */
+.glass-footer {
+  background: rgba(12, 13, 16, 0.95);
+  border-top: 1px solid var(--glass-border);
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.footer-contact {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.image-modal {
+  display: none;
+  position: fixed;
+  z-index: 3000;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(15px);
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.image-modal-content {
+  max-width: 90%;
+  max-height: 85vh;
+  border-radius: 16px;
+  box-shadow: 0 0 50px rgba(0, 240, 255, 0.3);
+}
+
+.image-modal-caption {
+  margin-top: 15px;
+  color: var(--text-main);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.image-modal-close {
+  position: absolute;
+  top: 30px;
+  right: 40px;
+  color: #fff;
+  font-size: 45px;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   RESPONSIVO
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .logo-img { height: 80px; }
+  .hero-title { font-size: 3rem; }
+  .mobile-menu-btn { display: flex !important; }
+
+  .nav-links {
+    display: flex !important;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: rgba(12, 13, 16, 0.98);
+    backdrop-filter: blur(25px);
+    border-bottom: 1px solid var(--glass-border);
+    flex-direction: column;
+    padding: 25px;
+    gap: 12px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
   }
 
-  window.addEventListener('click', (e) => {
-    if (e.target === modal) hideModal();
-  });
+  .nav-links.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+}
 
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal.style.display === 'flex') {
-      hideModal();
-    }
-  });
+@media (max-width: 768px) {
+  .logo-img { height: 65px; }
+  .hero-title { font-size: 2.2rem; }
+  .video-container { height: 50vh; }
+  .carousel-slide-3d { width: 92%; height: 300px; }
+  .carousel-track-container { height: 330px; }
+  .whatsapp-card {
+    flex-direction: column;
+    text-align: center;
+  }
 }
