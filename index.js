@@ -11,14 +11,14 @@ document.addEventListener('DOMContentLoaded', () => {
 function initGifPlayback() {
   const gifImg = document.getElementById('gifPresentacion');
   if (gifImg) {
-    // Forzar lectura limpia del archivo en cada recarga de página sin caché en bucle constante
+    // Forzar lectura limpia del archivo en cada recarga de página para reproducir desde el inicio
     const timestamp = new Date().getTime();
     gifImg.src = `uploads/videos/presentacion.gif?v=${timestamp}`;
   }
 }
 
 /* ==========================================================================
-   2. MENÚ MÓVIL
+   2. MENÚ MÓVIL INTERACTIVO
    ========================================================================== */
 function initMobileMenu() {
   const menuBtn = document.getElementById('mobileMenuBtn');
@@ -48,7 +48,7 @@ function initMobileMenu() {
 }
 
 /* ==========================================================================
-   3. CARRUSEL 3D AMPLIO CONTROLADO POR FLECHAS
+   3. CARRUSEL 3D CON SOPORTE TÁCTIL Y NAVEGACIÓN
    ========================================================================== */
 function cargarCarruselDinamico() {
   const track = document.getElementById('carouselTrack');
@@ -57,18 +57,18 @@ function cargarCarruselDinamico() {
   const BASE_URL = 'uploads/fotos/';
 
   const imagenesFotos = [
-    { url: `${BASE_URL}slide1.jpg`, alt: 'LaserPrint - Trabajo Destacado 1' },
-    { url: `${BASE_URL}slide2.jpg`, alt: 'LaserPrint - Trabajo Destacado 2' },
-    { url: `${BASE_URL}slide3.jpg`, alt: 'LaserPrint - Trabajo Destacado 3' },
-    { url: `${BASE_URL}slide4.jpg`, alt: 'LaserPrint - Trabajo Destacado 4' },
-    { url: `${BASE_URL}slide5.jpg`, alt: 'LaserPrint - Trabajo Destacado 5' }
+    { url: `${BASE_URL}slide1.jpg`, alt: 'Diseño Laser Print - Trabajo Destacado 1' },
+    { url: `${BASE_URL}slide2.jpg`, alt: 'Diseño Laser Print - Trabajo Destacado 2' },
+    { url: `${BASE_URL}slide3.jpg`, alt: 'Diseño Laser Print - Trabajo Destacado 3' },
+    { url: `${BASE_URL}slide4.jpg`, alt: 'Diseño Laser Print - Trabajo Destacado 4' },
+    { url: `${BASE_URL}slide5.jpg`, alt: 'Diseño Laser Print - Trabajo Destacado 5' }
   ];
 
   track.innerHTML = imagenesFotos.map((item, index) => `
     <div class="carousel-slide-3d" data-index="${index}">
       <img src="${item.url}" 
            alt="${item.alt}" 
-           onerror="this.onerror=null; this.src='https://via.placeholder.com/900x550/111/d4af37?text=LaserPrint+${index + 1}'">
+           onerror="this.onerror=null; this.src='https://via.placeholder.com/900x550/0c0d10/00f0ff?text=Dise%C3%B1o+LaserPrint+${index + 1}'">
     </div>
   `).join('');
 
@@ -200,7 +200,7 @@ function initLightbox() {
       const img = e.target;
       modal.style.display = 'flex';
       modalImg.src = img.src;
-      captionText.textContent = img.alt || 'LaserPrint - Trabajo Destacado';
+      captionText.textContent = img.alt || 'Diseño Laser Print - Trabajo Destacado';
       document.body.style.overflow = 'hidden';
     }
   });
