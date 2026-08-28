@@ -14,29 +14,32 @@ function initMobileMenu() {
 
   if (!menuBtn || !navLinks) return;
 
-  // Alternar el menú desplegable
+  // Toggle para abrir/cerrar menú y animar el icono hamburguesa
   menuBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     navLinks.classList.toggle('active');
+    menuBtn.classList.toggle('open');
   });
 
   // Cerrar el menú al hacer clic en cualquier enlace
   navLinks.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
       navLinks.classList.remove('active');
+      menuBtn.classList.remove('open');
     });
   });
 
-  // Cerrar el menú si se hace clic fuera de él
+  // Cerrar el menú al hacer clic fuera
   document.addEventListener('click', (e) => {
     if (!navLinks.contains(e.target) && !menuBtn.contains(e.target)) {
       navLinks.classList.remove('active');
+      menuBtn.classList.remove('open');
     }
   });
 }
 
 /* ==========================================================================
-   2. CONTROL DE VIDEO (REPRODUCCIÓN CONTINUA Y AUTOPLAY CUIDADOSO)
+   2. CONTROL DE VIDEO (AUTOPLAY CONTINUO)
    ========================================================================== */
 function initVideoPlayer() {
   const video = document.getElementById('introVideo');
@@ -59,7 +62,7 @@ function initVideoPlayer() {
 }
 
 /* ==========================================================================
-   3. CARRUSEL HORIZONTAL FLUIDO CON DATOS DESDE RENDER
+   3. CARRUSEL HORIZONTAL FLUIDO CON TOUCH SWIPE Y DATOS DE API
    ========================================================================== */
 async function cargarCarruselDinamico() {
   const API_URL = 'https://laserprint-api.onrender.com/api/productos';
@@ -71,7 +74,6 @@ async function cargarCarruselDinamico() {
     const data = await res.json();
     const productos = data.productos || [];
 
-    // Filtrar solo las imágenes publicadas para mostrar en el carrusel de inicio
     const imagenes = productos.filter(p => p.tipoArchivo === 'imagen');
 
     if (imagenes.length > 0) {
@@ -105,6 +107,7 @@ function initCarousel() {
   let currentIndex = 0;
   let autoplayTimer = null;
 
+  // Generación de indicadores (puntos)
   if (dotsContainer) {
     dotsContainer.innerHTML = '';
     slides.forEach((_, index) => {
@@ -157,6 +160,30 @@ function initCarousel() {
     };
   }
 
+  // Soporte para gestos de deslizar en celulares (Touch Swipe)
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  track.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  track.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  }, { passive: true });
+
+  function handleSwipe() {
+    const swipeThreshold = 40;
+    if (touchStartX - touchEndX > swipeThreshold) {
+      moveToSlide(currentIndex + 1);
+      resetAutoplay();
+    } else if (touchEndX - touchStartX > swipeThreshold) {
+      moveToSlide(currentIndex - 1);
+      resetAutoplay();
+    }
+  }
+
   startAutoplay();
 }
 
@@ -171,7 +198,6 @@ function initLightbox() {
 
   if (!modal || !modalImg) return;
 
-  // Event Delegation para soportar imágenes cargadas dinámicamente
   document.body.addEventListener('click', (e) => {
     if (e.target.matches('.carousel-slide img')) {
       const img = e.target;
