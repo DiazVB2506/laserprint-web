@@ -14,14 +14,12 @@ function initMobileMenu() {
 
   if (!menuBtn || !navLinks) return;
 
-  // Toggle para abrir/cerrar menú y animar el icono hamburguesa
   menuBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     navLinks.classList.toggle('active');
     menuBtn.classList.toggle('open');
   });
 
-  // Cerrar el menú al hacer clic en cualquier enlace
   navLinks.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
       navLinks.classList.remove('active');
@@ -29,7 +27,6 @@ function initMobileMenu() {
     });
   });
 
-  // Cerrar el menú al hacer clic fuera
   document.addEventListener('click', (e) => {
     if (!navLinks.contains(e.target) && !menuBtn.contains(e.target)) {
       navLinks.classList.remove('active');
@@ -46,6 +43,9 @@ function initVideoPlayer() {
   if (video) {
     video.muted = true;
     
+    // Forzamos la carga sin bloquear la pestaña del navegador
+    video.load();
+
     const playPromise = video.play();
     if (playPromise !== undefined) {
       playPromise.catch(() => {
@@ -68,10 +68,8 @@ function cargarCarruselDinamico() {
   const track = document.getElementById('carouselTrack');
   if (!track) return;
 
-  // Ruta base hacia tu servidor Render
   const BASE_URL = 'https://laserprint-api.onrender.com/uploads/fotos/';
 
-  // Definición de las 5 imágenes fijas almacenadas en tu servidor
   const imagenesFotos = [
     { url: `${BASE_URL}slide1.jpg`, alt: 'LaserPrint - Trabajo Destacado 1' },
     { url: `${BASE_URL}slide2.jpg`, alt: 'LaserPrint - Trabajo Destacado 2' },
@@ -80,7 +78,6 @@ function cargarCarruselDinamico() {
     { url: `${BASE_URL}slide5.jpg`, alt: 'LaserPrint - Trabajo Destacado 5' }
   ];
 
-  // Inyección del HTML de las 5 imágenes en el carrusel
   track.innerHTML = imagenesFotos.map((item, index) => `
     <div class="carousel-slide">
       <img src="${item.url}" 
@@ -89,7 +86,6 @@ function cargarCarruselDinamico() {
     </div>
   `).join('');
 
-  // Inicialización de la lógica interactiva
   initCarousel();
 }
 
@@ -107,7 +103,6 @@ function initCarousel() {
   let currentIndex = 0;
   let autoplayTimer = null;
 
-  // Generación de indicadores (puntos) para las 5 diapositivas
   if (dotsContainer) {
     dotsContainer.innerHTML = '';
     slides.forEach((_, index) => {
@@ -160,7 +155,6 @@ function initCarousel() {
     };
   }
 
-  // Soporte para gestos de deslizar en celulares (Touch Swipe)
   let touchStartX = 0;
   let touchEndX = 0;
 
