@@ -9,7 +9,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="index.css">
 </head>
@@ -21,7 +21,7 @@
   <header class="glass-header">
     <nav class="nav-container">
       <a href="index.html" class="logo">
-        <img src="uploads/fotos/LOGOTIPO.png" alt="Diseño Laser Print Logo" class="logo-img" onerror="this.onerror=null; this.src='https://via.placeholder.com/260x100/111/00f0ff?text=DISE%C3%91O+LASERPRINT'">
+        <img src="uploads/fotos/LOGOTIPO.png" alt="Diseño Laser Print Logo" class="logo-img" onerror="this.onerror=null; this.src='https://via.placeholder.com/260x100/111/00f0ff?text=DISE%C3%B1O+LASERPRINT';">
       </a>
 
       <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú">
@@ -56,7 +56,7 @@
            src="uploads/videos/presentacionreal.gif" 
            alt="Presentación Diseño Laser Print" 
            class="hero-gif-img" 
-           onerror="this.onerror=null; this.src='https://via.placeholder.com/1200x675/111/00f0ff?text=Dise%C3%B1o+LaserPrint+Presentacion'">
+           onerror="this.onerror=null; this.src='https://via.placeholder.com/1200x675/111/00f0ff?text=Dise%C3%B1o+LaserPrint+Presentacion';">
     </div>
   </section>
 
@@ -106,17 +106,16 @@
       <div class="whatsapp-info">
         <h3>💬 ¡Contáctanos por WhatsApp!</h3>
         <p>Cotiza tus proyectos de imprenta, corte láser o vinil al instante.</p>
-        <a href="https://wa.me/525598788857" target="_blank" class="whatsapp-btn">
+        <a href="https://wa.me/525598788857" target="_blank" rel="noopener noreferrer" class="whatsapp-btn">
           <span>Abrir Chat de WhatsApp</span>
         </a>
       </div>
       
       <div class="whatsapp-qr-container">
-        <!-- Revisa la carpeta en GitHub y añade fallback secundario -->
-        <img src="uploads/fotos/qr.png" 
+        <img src="uploads/fotos/qr-whatsapp.png" 
              alt="Código QR WhatsApp Diseño Laser Print" 
              class="whatsapp-qr"
-             onerror="this.onerror=null; this.src='uploads/qr.png';">
+             onerror="this.onerror=null; this.src='https://via.placeholder.com/180x180/111/00f0ff?text=QR+WhatsApp';">
         <span class="qr-label">Escanea para enviar mensaje</span>
       </div>
     </div>
@@ -128,7 +127,7 @@
       <div class="footer-contact">
         <span>📞 Teléfono: +52 55 9878 8857</span>
         <span class="footer-separator">|</span>
-        <span>✉️ Correo: contacto@laserprint.com</span>
+        <span>✉️ Correo: laserprint678@gmail.com</span>
       </div>
     </div>
   </footer>
@@ -137,6 +136,47 @@
     <span class="image-modal-close" id="closeModal">×</span>
     <img class="image-modal-content" id="imgModalAmpliada" alt="Vista ampliada">
     <div id="captionModal" class="image-modal-caption"></div>
+  </div>
+
+  <button id="pixelToggleBtn" class="pixel-toggle-btn" aria-label="Hablar con PIXEL IA">
+    <div class="pixel-avatar-icon">👾</div>
+    <span class="pixel-pulse-badge">ONLINE</span>
+  </button>
+
+  <div id="pixelChatWidget" class="pixel-chat-widget">
+    <div class="pixel-chat-header">
+      <div class="pixel-header-info">
+        <span class="pixel-header-avatar">👾</span>
+        <div>
+          <h3 class="pixel-title">PIXEL AI</h3>
+          <p class="pixel-subtitle">La IA Oficial de Diseño Laser Print</p>
+        </div>
+      </div>
+      <button id="pixelCloseBtn" class="pixel-close-btn" aria-label="Cerrar Chat">✕</button>
+    </div>
+
+    <div id="pixelChatMessages" class="pixel-chat-messages">
+      <div class="pixel-msg pixel-bot-msg">
+        <span class="pixel-msg-icon">👾</span>
+        <div class="pixel-msg-bubble">
+          ¡Hola! Soy <b>PIXEL</b>, La IA Oficial de <b>Diseño Laser Print</b>. 🕹️✨<br><br>
+          Te ayudo con cotizaciones, especificaciones técnicas de DTF, Lona, Corte Láser, Sublimación y resolución de dudas sobre tus diseños.<br><br>
+          <i>¡Selecciona una pregunta rápida o escribe lo que necesites!</i>
+        </div>
+      </div>
+    </div>
+
+    <div class="pixel-quick-prompts" id="pixelQuickPrompts">
+      <button class="pixel-prompt-btn" data-query="preparar archivos">📁 ¿Cómo preparo mis archivos?</button>
+      <button class="pixel-prompt-btn" data-query="dtf">👕 Precios y medidas DTF</button>
+      <button class="pixel-prompt-btn" data-query="ubicacion">📍 Ubicación y Horarios</button>
+      <button class="pixel-prompt-btn" data-query="whatsapp">💬 Cotizar por WhatsApp</button>
+    </div>
+
+    <form id="pixelChatForm" class="pixel-chat-form">
+      <input type="text" id="pixelInput" class="pixel-input" placeholder="Escribe tu duda a PIXEL..." autocomplete="off">
+      <button type="submit" id="pixelSendBtn" class="pixel-send-btn">ENVIAR</button>
+    </form>
   </div>
 
   <script src="index.js"></script>
