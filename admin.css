@@ -1,0 +1,741 @@
+/* ==========================================================================
+   1. RESET, FUENTES Y VARIABLES GLOBALES (RETRO CYBERPUNK ARCADE STYLING)
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Paleta Neon Arcade 8-Bit */
+  --bg-dark-main: #06050e;
+  
+  --arcade-cyan: #00f0ff;
+  --arcade-pink: #ff007f;
+  --arcade-yellow: #ffe600;
+  --arcade-green: #39ff14;
+  --arcade-purple: #9d4edd;
+  --arcade-red: #ff3366;
+  
+  /* Contenedores y Cajas Retro */
+  --retro-bg-card: rgba(13, 14, 25, 0.92);
+  --retro-bg-modal: rgba(8, 8, 16, 0.96);
+  --retro-border-cyan: #00f0ff;
+  --retro-border-pink: #ff007f;
+  --input-bg: #090a14;
+
+  /* Fuentes Retro */
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-terminal: 'VT323', monospace;
+
+  /* Textos */
+  --text-primary: #ffffff;
+  --text-secondary: #00f0ff;
+  --text-dark: #000000;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-terminal);
+  font-size: 1.35rem;
+  letter-spacing: 1px;
+  background-color: var(--bg-dark-main);
+  color: var(--text-primary);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-image: 
+    linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+/* ==========================================================================
+   2. OVERLAY CRT SCANLINES (EFECTO MONITOR DE TUBO RETRO)
+   ========================================================================== */
+body::before {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%), 
+              linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  z-index: 999;
+  background-size: 100% 4px, 6px 100%;
+  pointer-events: none;
+}
+
+/* Ambient Glow de Retroalimentación Neon */
+.bg-glow {
+  position: fixed;
+  width: clamp(350px, 45vw, 700px);
+  height: clamp(350px, 45vw, 700px);
+  border-radius: 50%;
+  filter: blur(140px);
+  z-index: 0;
+  opacity: 0.25;
+  pointer-events: none;
+  animation: floatBg 12s ease-in-out infinite alternate;
+}
+
+.ambient-cyan {
+  background: var(--arcade-cyan);
+  top: -15%;
+  left: -10%;
+}
+
+.ambient-magenta {
+  background: var(--arcade-pink);
+  bottom: -15%;
+  right: -10%;
+  animation-delay: -6s;
+}
+
+@keyframes floatBg {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, 40px) scale(1.1); }
+  100% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+/* ==========================================================================
+   3. ENCABEZADO ADMIN (HEADER HUD ARCADE)
+   ========================================================================== */
+.admin-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem clamp(1rem, 4vw, 2.5rem);
+  background: #090a14;
+  border-bottom: 3px solid var(--arcade-cyan);
+  box-shadow: 0 5px 20px rgba(0, 240, 255, 0.3);
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.admin-logo {
+  height: 44px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px var(--arcade-cyan));
+  image-rendering: pixelated;
+  transition: transform 0.2s ease;
+}
+
+.admin-logo:hover {
+  transform: scale(1.1) rotate(-3deg);
+}
+
+.header-title {
+  font-family: var(--font-pixel);
+  font-size: clamp(0.9rem, 2vw, 1.3rem);
+  font-weight: 700;
+  color: var(--arcade-cyan);
+  text-shadow: 3px 3px 0px var(--arcade-pink);
+  letter-spacing: 2px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btn-site {
+  font-family: var(--font-pixel);
+  font-size: 0.65rem;
+  color: #fff;
+  text-decoration: none;
+  padding: 0.7rem 1.1rem;
+  background: #000;
+  border: 2px solid var(--arcade-cyan);
+  box-shadow: 3px 3px 0px var(--arcade-cyan);
+  transition: all 0.1s ease;
+}
+
+.btn-site:hover {
+  background: var(--arcade-cyan);
+  color: #000;
+  box-shadow: 4px 4px 0px var(--arcade-pink);
+  transform: translate(-2px, -2px);
+}
+
+.btn-logout {
+  font-family: var(--font-pixel);
+  font-size: 0.65rem;
+  background: #000;
+  color: var(--arcade-red);
+  border: 2px solid var(--arcade-red);
+  box-shadow: 3px 3px 0px var(--arcade-red);
+  padding: 0.7rem 1.1rem;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.btn-logout:hover {
+  background: var(--arcade-red);
+  color: #fff;
+  box-shadow: 4px 4px 0px var(--arcade-pink);
+  transform: translate(-2px, -2px);
+}
+
+/* ==========================================================================
+   4. CONTENEDOR PRINCIPAL Y TARJETAS RETRO / ARCADE
+   ========================================================================== */
+.admin-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.glass-card {
+  position: relative;
+  background: var(--retro-bg-card);
+  border: 3px solid var(--arcade-cyan);
+  border-radius: 0px;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  box-shadow: 8px 8px 0px var(--arcade-pink), 0 0 15px rgba(0, 240, 255, 0.2);
+}
+
+.glass-card:hover {
+  box-shadow: 10px 10px 0px var(--arcade-pink), 0 0 25px rgba(0, 240, 255, 0.4);
+}
+
+/* ==========================================================================
+   5. FORMULARIO DE PUBLICACIÓN ESTILO TERMINAL RETRO
+   ========================================================================== */
+.form-header {
+  margin-bottom: 1.8rem;
+  border-bottom: 2px dashed var(--arcade-cyan);
+  padding-bottom: 1rem;
+}
+
+.form-header h2 {
+  font-family: var(--font-pixel);
+  font-size: clamp(1rem, 1.8vw, 1.3rem);
+  color: var(--arcade-yellow);
+  text-shadow: 2px 2px 0px var(--arcade-pink);
+}
+
+.form-subtitle {
+  font-family: var(--font-terminal);
+  font-size: 1.2rem;
+  color: var(--arcade-cyan);
+  margin-top: 0.4rem;
+}
+
+#uploadForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1.4rem;
+  flex-wrap: wrap;
+}
+
+.flex-1 {
+  flex: 1;
+  min-width: 240px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.form-group label {
+  font-family: var(--font-pixel);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: var(--arcade-cyan);
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  background: var(--input-bg);
+  border: 2px solid var(--arcade-cyan);
+  border-radius: 0px;
+  color: var(--arcade-green);
+  font-family: var(--font-terminal);
+  font-size: 1.3rem;
+  outline: none;
+  transition: all 0.1s ease;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.form-group select option {
+  background: #000;
+  color: var(--arcade-green);
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: var(--arcade-pink);
+  box-shadow: 4px 4px 0px var(--arcade-cyan);
+  background: #000;
+}
+
+/* Custom File Input 8-Bit */
+.file-input-wrapper input[type="file"] {
+  background: var(--input-bg);
+  padding: 0.7rem;
+  border: 2px dashed var(--arcade-cyan);
+  color: var(--arcade-cyan);
+  cursor: pointer;
+  width: 100%;
+  font-family: var(--font-terminal);
+}
+
+.file-input-wrapper input[type="file"]:hover {
+  border-color: var(--arcade-pink);
+  background: rgba(255, 0, 127, 0.1);
+}
+
+.file-input-wrapper input[type="file"]::-webkit-file-upload-button {
+  font-family: var(--font-pixel);
+  font-size: 0.6rem;
+  background: var(--arcade-cyan);
+  color: #000;
+  border: none;
+  padding: 0.5rem 0.8rem;
+  margin-right: 1rem;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px var(--arcade-pink);
+}
+
+.file-input-wrapper input[type="file"]::-webkit-file-upload-button:hover {
+  background: var(--arcade-pink);
+  color: #fff;
+  box-shadow: 2px 2px 0px var(--arcade-cyan);
+}
+
+/* Botón Guardar / Submit Arcade */
+.btn-save {
+  font-family: var(--font-pixel);
+  margin-top: 0.8rem;
+  padding: 1rem 1.8rem;
+  background: var(--arcade-green);
+  color: #000;
+  border: 2px solid #000;
+  border-radius: 0px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  box-shadow: 4px 4px 0px var(--arcade-cyan);
+  transition: all 0.1s ease;
+}
+
+.btn-save:hover:not(:disabled) {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px var(--arcade-pink);
+  background: var(--arcade-cyan);
+  color: #000;
+}
+
+.btn-save:disabled {
+  background: #334155;
+  color: #64748b;
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ==========================================================================
+   6. BUSCADOR INTELIGENTE Y HERRAMIENTAS DE TABLA
+   ========================================================================== */
+.table-header-tools {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.table-header-tools h2 {
+  font-family: var(--font-pixel);
+  font-size: clamp(0.9rem, 1.8vw, 1.2rem);
+  color: var(--arcade-pink);
+  text-shadow: 2px 2px 0px var(--arcade-cyan);
+}
+
+/* Buscador Flotante Retro */
+.search-box {
+  position: relative;
+  min-width: 280px;
+  flex: 1;
+  max-width: 420px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 0.8rem 1.2rem;
+  background: var(--input-bg);
+  border: 2px solid var(--arcade-cyan);
+  border-radius: 0px;
+  color: var(--arcade-green);
+  font-family: var(--font-terminal);
+  font-size: 1.3rem;
+  outline: none;
+  transition: all 0.1s ease;
+}
+
+.search-box input:focus {
+  border-color: var(--arcade-pink);
+  box-shadow: 4px 4px 0px var(--arcade-cyan);
+}
+
+.suggestions-list {
+  display: none;
+  position: absolute;
+  top: 105%;
+  left: 0;
+  right: 0;
+  background: #090a14;
+  border: 2px solid var(--arcade-pink);
+  border-radius: 0px;
+  list-style: none;
+  overflow: hidden;
+  z-index: 200;
+  box-shadow: 5px 5px 0px var(--arcade-cyan);
+}
+
+.suggestions-list li {
+  padding: 0.8rem 1.2rem;
+  cursor: pointer;
+  font-family: var(--font-terminal);
+  font-size: 1.2rem;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed rgba(0, 240, 255, 0.3);
+  transition: all 0.1s ease;
+}
+
+.suggestions-list li:hover {
+  background: var(--arcade-cyan);
+  color: #000;
+}
+
+.suggestions-list li small {
+  font-family: var(--font-pixel);
+  font-size: 0.6rem;
+  color: var(--arcade-yellow);
+}
+
+.suggestions-list li:hover small {
+  color: #000;
+}
+
+/* ==========================================================================
+   7. PESTAÑAS DE CATEGORÍA (RETRO TABS)
+   ========================================================================== */
+.category-tabs {
+  display: flex;
+  gap: 0.8rem;
+  overflow-x: auto;
+  padding-bottom: 0.8rem;
+  margin-bottom: 1.4rem;
+  border-bottom: 2px solid var(--arcade-cyan);
+}
+
+.tab-btn {
+  font-family: var(--font-pixel) !important;
+  font-size: 0.6rem !important;
+  background: #000;
+  color: var(--arcade-cyan);
+  border: 2px solid var(--arcade-cyan) !important;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 3px 3px 0px var(--arcade-cyan);
+  transition: all 0.1s ease !important;
+}
+
+.tab-btn:hover {
+  background: var(--arcade-cyan);
+  color: #000;
+  box-shadow: 4px 4px 0px var(--arcade-pink);
+  transform: translate(-2px, -2px);
+}
+
+.tab-btn.active {
+  background: var(--arcade-pink) !important;
+  color: #fff !important;
+  border-color: #fff !important;
+  box-shadow: 4px 4px 0px var(--arcade-cyan) !important;
+}
+
+/* ==========================================================================
+   8. TABLA DE PUBLICACIONES (ARCADE DATA GRID)
+   ========================================================================== */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  border: 2px solid var(--arcade-cyan);
+  background: #000;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  min-width: 650px;
+}
+
+th, td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+  font-size: 1.2rem;
+}
+
+th {
+  font-family: var(--font-pixel);
+  background: #090a14;
+  color: var(--arcade-yellow);
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  border-bottom: 2px solid var(--arcade-cyan);
+}
+
+tbody tr:hover {
+  background: rgba(0, 240, 255, 0.1);
+}
+
+/* Badges estilo Píxel / Arcade */
+.badge-cat {
+  font-family: var(--font-pixel);
+  font-size: 0.55rem;
+  background: #000;
+  border: 1px solid var(--arcade-cyan);
+  padding: 0.3rem 0.6rem;
+  color: var(--arcade-cyan);
+}
+
+.badge-file {
+  font-family: var(--font-pixel);
+  padding: 0.3rem 0.6rem;
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  border: 1px solid #fff;
+}
+
+.badge-img {
+  background: rgba(0, 240, 255, 0.2);
+  color: var(--arcade-cyan);
+  border-color: var(--arcade-cyan);
+}
+
+.badge-video {
+  background: rgba(255, 0, 127, 0.2);
+  color: var(--arcade-pink);
+  border-color: var(--arcade-pink);
+}
+
+.badge-pdf {
+  background: rgba(255, 230, 0, 0.2);
+  color: var(--arcade-yellow);
+  border-color: var(--arcade-yellow);
+}
+
+/* Acciones en Tabla */
+.btn-edit {
+  font-family: var(--font-pixel) !important;
+  font-size: 0.6rem !important;
+  background: #000;
+  color: var(--arcade-cyan);
+  border: 2px solid var(--arcade-cyan) !important;
+  padding: 0.5rem 0.8rem;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px var(--arcade-cyan);
+  transition: all 0.1s ease !important;
+}
+
+.btn-edit:hover {
+  background: var(--arcade-cyan) !important;
+  color: #000 !important;
+  box-shadow: 3px 3px 0px var(--arcade-pink);
+  transform: translate(-2px, -2px);
+}
+
+.btn-del {
+  font-family: var(--font-pixel) !important;
+  font-size: 0.6rem !important;
+  background: #000;
+  color: var(--arcade-red);
+  border: 2px solid var(--arcade-red) !important;
+  padding: 0.5rem 0.8rem;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px var(--arcade-red);
+  transition: all 0.1s ease !important;
+}
+
+.btn-del:hover {
+  background: var(--arcade-red) !important;
+  color: #fff !important;
+  box-shadow: 3px 3px 0px var(--arcade-pink);
+  transform: translate(-2px, -2px);
+}
+
+/* ==========================================================================
+   9. MODAL DE EDICIÓN (GAME PAUSE OVERLAY)
+   ========================================================================== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 1500;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 580px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--retro-bg-modal);
+  border: 3px solid var(--arcade-pink);
+  border-radius: 0px;
+  padding: 2rem;
+  box-shadow: 8px 8px 0px var(--arcade-cyan);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px dashed var(--arcade-pink);
+  padding-bottom: 1rem;
+}
+
+.modal-header h2 {
+  font-family: var(--font-pixel);
+  font-size: 1rem;
+  color: var(--arcade-yellow);
+}
+
+.close-btn {
+  font-family: var(--font-pixel);
+  background: #000;
+  border: 2px solid var(--arcade-red);
+  width: 32px;
+  height: 32px;
+  color: var(--arcade-red);
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 2px 2px 0px var(--arcade-red);
+  transition: all 0.1s ease;
+}
+
+.close-btn:hover {
+  background: var(--arcade-red);
+  color: #fff;
+  transform: translate(-2px, -2px);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.btn-cancel {
+  font-family: var(--font-pixel);
+  font-size: 0.65rem;
+  background: #000;
+  color: #fff;
+  border: 2px solid #fff;
+  padding: 0.8rem 1.4rem;
+  cursor: pointer;
+  box-shadow: 3px 3px 0px #fff;
+  transition: all 0.1s ease;
+}
+
+.btn-cancel:hover {
+  background: #fff;
+  color: #000;
+  transform: translate(-2px, -2px);
+}
+
+/* ==========================================================================
+   10. RESPONSIVIDAD (MOBILE)
+   ========================================================================== */
+@media (max-width: 640px) {
+  .admin-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 1.4rem;
+  }
+
+  .glass-card {
+    padding: 1.2rem;
+  }
+
+  .table-header-tools {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-box {
+    max-width: 100%;
+  }
+}
