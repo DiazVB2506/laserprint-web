@@ -296,12 +296,26 @@ async function guardarPublicacion(e) {
  */
 window.abrirModalEdicion = function(id) {
   playRetroSFX('click');
-  const prod = productosGlobales.find(p => (p._id === id || p.id === id));
-  if (!prod) return;
+  
+  // Buscar producto garantizando la coincidencia con _id o id
+  const prod = productosGlobales.find(p => String(p._id || p.id) === String(id));
+  if (!prod) {
+    mostrarNotificacion('ERROR: REGISTRO NO ENCONTRADO EN MEMORIA', 'error');
+    return;
+  }
 
-  // Asignar el ID al campo oculto
-  const editIdInput = document.getElementById('editId') || document.getElementById('editProductId');
-  if (editIdInput) editIdInput.value = prod._id || prod.id;
+  // Verificar o crear dinámicamente el campo id hidden
+  let idInput = document.getElementById('editId') || document.getElementById('editProductId');
+  if (!idInput) {
+    idInput = document.createElement('input');
+    idInput.type = 'hidden';
+    idInput.id = 'editId';
+    const form = document.getElementById('editForm');
+    if (form) form.appendChild(idInput);
+  }
+
+  // Guardar el valor exacto del ID en el input
+  idInput.value = prod._id || prod.id;
 
   if (document.getElementById('editNombre')) document.getElementById('editNombre').value = prod.nombre || '';
   if (document.getElementById('editDescripcion')) document.getElementById('editDescripcion').value = prod.descripcion || '';
@@ -328,10 +342,10 @@ async function guardarEdicion(e) {
   playRetroSFX('click');
   
   const idInput = document.getElementById('editId') || document.getElementById('editProductId');
-  const id = idInput ? idInput.value : null;
+  const id = idInput ? String(idInput.value).trim() : null;
   const btnSave = document.getElementById('btnSaveEdit');
 
-  if (!id) {
+  if (!id || id === 'undefined' || id === 'null') {
     mostrarNotificacion('ERROR: ID DE PRODUCTO NO ENCONTRADO', 'error');
     return;
   }
@@ -341,7 +355,7 @@ async function guardarEdicion(e) {
     btnSave.innerText = 'SAVING...';
   }
 
-  // Creación explícita de FormData para asegurar coincidencia con el Backend
+  // Creación de FormData para la actualización
   const formData = new FormData();
   
   const nombreEl = document.getElementById('editNombre');
@@ -355,7 +369,7 @@ async function guardarEdicion(e) {
   if (precioEl) formData.append('precio', precioEl.value);
   if (catEl) formData.append('categoria', catEl.value);
 
-  // Adjunta el archivo solo si fue seleccionado por el usuario
+  // Adjunta archivo solo si fue seleccionado
   if (fileInput && fileInput.files && fileInput.files.length > 0) {
     formData.append('archivo', fileInput.files[0]);
   }
