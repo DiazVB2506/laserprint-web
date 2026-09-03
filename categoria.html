@@ -41,34 +41,46 @@
     const urlParams = new URLSearchParams(window.location.search);
     const categoria = urlParams.get('cat');
 
-    document.getElementById('tituloArea').innerText = `Sección: ${categoria}`;
+    document.getElementById('tituloArea').innerText = `Sección: ${categoria || 'General'}`;
 
     async function cargarContenido() {
-      const res = await fetch(`http://localhost:5000/api/productos?categoria=${encodeURIComponent(categoria)}`);
-      const productos = await res.json();
       const grid = document.getElementById('gridArea');
-      grid.innerHTML = '';
-
-      if (productos.length === 0) {
-        grid.innerHTML = '<p>No hay publicaciones en esta área por el momento.</p>';
+      if (!categoria) {
+        grid.innerHTML = '<p>Por favor selecciona una categoría válida.</p>';
         return;
       }
 
-      productos.forEach(p => {
-        let media = '';
-        if (p.tipoArchivo === 'imagen') media = `<img src="${p.archivoUrl}">`;
-        else if (p.tipoArchivo === 'video') media = `<video controls src="${p.archivoUrl}"></video>`;
-        else if (p.tipoArchivo === 'pdf') media = `<a href="${p.archivoUrl}" target="_blank">📄 Ver Documento PDF</a>`;
+      try {
+        const res = await fetch(`/api/productos?categoria=${encodeURIComponent(categoria)}`);
+        const data = await res.json();
+        const productos = data.productos || data || [];
 
-        grid.innerHTML += `
-          <div class="card">
-            ${media}
-            <h3>${p.nombre}</h3>
-            <p>${p.descripcion}</p>
-            ${p.precio ? `<p class="price">$${p.precio}</p>` : ''}
-          </div>
-        `;
-      });
+        grid.innerHTML = '';
+
+        if (!Array.isArray(productos) || productos.length === 0) {
+          grid.innerHTML = '<p>No hay publicaciones en esta área por el momento.</p>';
+          return;
+        }
+
+        productos.forEach(p => {
+          let media = '';
+          if (p.tipoArchivo === 'imagen') media = `<img src="${p.archivoUrl}">`;
+          else if (p.tipoArchivo === 'video') media = `<video controls src="${p.archivoUrl}"></video>`;
+          else if (p.tipoArchivo === 'pdf') media = `<a href="${p.archivoUrl}" target="_blank">📄 Ver Documento PDF</a>`;
+
+          grid.innerHTML += `
+            <div class="card">
+              ${media}
+              <h3>${p.nombre}</h3>
+              <p>${p.descripcion}</p>
+              ${p.precio ? `<p class="price">$${p.precio}</p>` : ''}
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error('Error al cargar categoría:', err);
+        grid.innerHTML = '<p>Error de conexión al cargar la sección.</p>';
+      }
     }
 
     cargarContenido();
