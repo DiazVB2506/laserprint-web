@@ -2,11 +2,12 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LaserPrint - Sección</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f9; }
     header { background: #111; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-    nav { background: #222; padding: 10px; display: flex; gap: 15px; }
+    nav { background: #222; padding: 10px; display: flex; gap: 15px; flex-wrap: wrap; }
     nav a { color: white; text-decoration: none; padding: 8px 12px; border-radius: 4px; }
     nav a:hover, nav a.active { background: #007bff; }
     .container { padding: 30px; }
@@ -38,44 +39,78 @@
   </div>
 
   <script>
+    // Detectar si está en localhost o producción
+    const BACKEND_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+      ? 'http://localhost:3000'
+      : 'https://laserprint-api.onrender.com';
+
     const urlParams = new URLSearchParams(window.location.search);
     const categoria = urlParams.get('cat');
 
-    document.getElementById('tituloArea').innerText = `Sección: ${categoria || 'General'}`;
+    const titulo = document.getElementById('tituloArea');
+    if (titulo) {
+      titulo.textContent = `Sección: ${categoria || 'General'}`;
+    }
+
+    // Iluminar enlace activo en la navegación
+    document.querySelectorAll('nav a').forEach(link => {
+      if (link.getAttribute('href') === `categoria.html?cat=${encodeURIComponent(categoria || '')}`) {
+        link.classList.add('active');
+      }
+    });
+
+    function escapeText(str) {
+      return str ? String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])) : '';
+    }
 
     async function cargarContenido() {
       const grid = document.getElementById('gridArea');
+      if (!grid) return;
+
       if (!categoria) {
         grid.innerHTML = '<p>Por favor selecciona una categoría válida.</p>';
         return;
       }
 
       try {
-        const res = await fetch(`/api/productos?categoria=${encodeURIComponent(categoria)}`);
+        const res = await fetch(`${BACKEND_BASE}/api/productos?categoria=${encodeURIComponent(categoria)}`);
+        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+
         const data = await res.json();
-        const productos = data.productos || data || [];
+        const productos = Array.isArray(data) ? data : (data.productos || []);
 
         grid.innerHTML = '';
 
-        if (!Array.isArray(productos) || productos.length === 0) {
+        if (productos.length === 0) {
           grid.innerHTML = '<p>No hay publicaciones en esta área por el momento.</p>';
           return;
         }
 
         productos.forEach(p => {
-          let media = '';
-          if (p.tipoArchivo === 'imagen') media = `<img src="${p.archivoUrl}">`;
-          else if (p.tipoArchivo === 'video') media = `<video controls src="${p.archivoUrl}"></video>`;
-          else if (p.tipoArchivo === 'pdf') media = `<a href="${p.archivoUrl}" target="_blank">📄 Ver Documento PDF</a>`;
+          const card = document.createElement('div');
+          card.className = 'card';
 
-          grid.innerHTML += `
-            <div class="card">
-              ${media}
-              <h3>${p.nombre}</h3>
-              <p>${p.descripcion}</p>
-              ${p.precio ? `<p class="price">$${p.precio}</p>` : ''}
-            </div>
+          const tipo = (p.tipoArchivo || '').toLowerCase();
+          let mediaHTML = '';
+
+          if (tipo.includes('image') || tipo.includes('jpg') || tipo.includes('png')) {
+            mediaHTML = `<img src="${escapeText(p.archivoUrl)}" alt="${escapeText(p.nombre)}">`;
+          } else if (tipo.includes('video') || tipo.includes('mp4')) {
+            mediaHTML = `<video controls src="${escapeText(p.archivoUrl)}"></video>`;
+          } else if (tipo.includes('pdf')) {
+            mediaHTML = `<p><a href="${escapeText(p.archivoUrl)}" target="_blank" rel="noopener">📄 Ver Documento PDF</a></p>`;
+          }
+
+          const precioHTML = p.precio ? `<p class="price">$${p.precio}</p>` : '';
+
+          card.innerHTML = `
+            ${mediaHTML}
+            <h3>${escapeText(p.nombre)}</h3>
+            <p>${escapeText(p.descripcion)}</p>
+            ${precioHTML}
           `;
+
+          grid.appendChild(card);
         });
       } catch (err) {
         console.error('Error al cargar categoría:', err);
@@ -83,7 +118,7 @@
       }
     }
 
-    cargarContenido();
+    document.addEventListener('DOMContentLoaded', cargarContenido);
   </script>
 </body>
 </html>
