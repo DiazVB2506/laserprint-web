@@ -106,13 +106,13 @@
       <div class="whatsapp-info">
         <h3>💬 ¡Contáctanos por WhatsApp!</h3>
         <p>Cotiza tus proyectos de imprenta, corte láser o vinil al instante.</p>
-        <a href="https://wa.me/525598788857" target="_blank" rel="noopener noreferrer" class="whatsapp-btn">
+        <a href="https://wa.me/5215500000000" target="_blank" rel="noopener noreferrer" class="whatsapp-btn">
           <span>Abrir Chat de WhatsApp</span>
         </a>
       </div>
       
       <div class="whatsapp-qr-container">
-        <img src="uploads/fotos/qr-whatsapp.png" 
+        <img src="uploads/fotos/qr.png" 
              alt="Código QR WhatsApp Diseño Laser Print" 
              class="whatsapp-qr"
              onerror="this.onerror=null; this.src='https://via.placeholder.com/180x180/111/00f0ff?text=QR+WhatsApp';">
@@ -157,26 +157,29 @@
 
     <div id="pixelChatMessages" class="pixel-chat-messages">
       <div class="pixel-msg pixel-bot-msg">
-        <span class="pixel-msg-icon">👾</span>
         <div class="pixel-msg-bubble">
           ¡Hola! Soy <b>PIXEL</b>, La IA Oficial de <b>Diseño Laser Print</b>. 🕹️✨<br><br>
           Te ayudo con cotizaciones, especificaciones técnicas de DTF, Lona, Corte Láser, Sublimación y resolución de dudas sobre tus diseños.<br><br>
-          <i>¡Selecciona una pregunta rápida o escribe lo que necesites!</i>
+          🎨 <i>Ten en cuenta que el servicio de diseño tiene un costo extra dependiendo de la complejidad.</i><br><br>
+          <i>¡Selecciona una opción rápida o escribe lo que necesites!</i>
         </div>
       </div>
     </div>
 
     <div class="pixel-quick-prompts" id="pixelQuickPrompts">
-      <button class="pixel-prompt-btn" data-query="preparar archivos">📁 ¿Cómo preparo mis archivos?</button>
-      <button class="pixel-prompt-btn" data-query="dtf">👕 Precios y medidas DTF</button>
-      <button class="pixel-prompt-btn" data-query="ubicacion">📍 Ubicación y Horarios</button>
-      <button class="pixel-prompt-btn" data-query="whatsapp">💬 Cotizar por WhatsApp</button>
+      <button class="pixel-prompt-btn" data-prompt="como preparo mis archivos">📁 ¿Cómo preparo mis archivos?</button>
+      <button class="pixel-prompt-btn" data-prompt="dtf textil">👕 Precios y medidas DTF</button>
+      <button class="pixel-prompt-btn" data-prompt="volantes">📄 Volantes</button>
+      <button class="pixel-prompt-btn" data-prompt="tarjetas de presentacion">🎴 Tarjetas de Presentación</button>
+      <button class="pixel-prompt-btn" data-prompt="notas de remision">📝 Notas de Remisión</button>
+      <button class="pixel-prompt-btn" data-prompt="ubicacion">📍 Ubicación y Horarios</button>
+      <button class="pixel-prompt-btn" data-prompt="whatsapp">💬 Cotizar por WhatsApp</button>
     </div>
 
-    <form id="pixelChatForm" class="pixel-chat-form">
+    <div class="pixel-chat-form">
       <input type="text" id="pixelInput" class="pixel-input" placeholder="Escribe tu duda a PIXEL..." autocomplete="off">
-      <button type="submit" id="pixelSendBtn" class="pixel-send-btn">ENVIAR</button>
-    </form>
+      <button type="button" id="pixelSendBtn" class="pixel-send-btn">ENVIAR</button>
+    </div>
   </div>
 
   <script src="index.js"></script>
