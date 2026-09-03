@@ -1,6 +1,9 @@
+/* ==========================================================================
+   LASERPRINT ARCADE - ADMIN DASHBOARD ENGINE (PRODUCTION)
+   ========================================================================== */
+
 // Validar autenticación cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
-  // CORRECCIÓN: Soporte flexible para 'adminToken' o 'adminAutenticado'
   const isAuth = localStorage.getItem('adminAutenticado') === 'true' || localStorage.getItem('adminToken');
   if (!isAuth) {
     window.location.href = 'login.html';
@@ -65,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnCancelEdit) btnCancelEdit.addEventListener('click', () => { playRetroSFX('click'); cerrarModal(); });
 });
 
-// CORRECCIÓN: Apuntar al subdominio real 'laserprint-api' en Render
+// Endpoint backend en Render / Desarrollo local
 const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? 'http://localhost:5000/api/productos'
   : 'https://laserprint-api.onrender.com/api/productos';
@@ -120,9 +123,7 @@ function playRetroSFX(type) {
       osc.start(now);
       osc.stop(now + 0.2);
     }
-  } catch (e) {
-    // Silenciar en navegadores con políticas estrictas de autoplay
-  }
+  } catch (e) {}
 }
 
 /**
@@ -298,11 +299,14 @@ window.abrirModalEdicion = function(id) {
   const prod = productosGlobales.find(p => (p._id === id || p.id === id));
   if (!prod) return;
 
-  document.getElementById('editId').value = prod._id || prod.id;
-  document.getElementById('editNombre').value = prod.nombre || '';
-  document.getElementById('editDescripcion').value = prod.descripcion || '';
-  document.getElementById('editPrecio').value = (prod.precio !== undefined && prod.precio !== null) ? prod.precio : '';
-  document.getElementById('editCategoria').value = prod.categoria || 'DTF TEXTIL / UV';
+  // Asignar el ID al campo oculto
+  const editIdInput = document.getElementById('editId') || document.getElementById('editProductId');
+  if (editIdInput) editIdInput.value = prod._id || prod.id;
+
+  if (document.getElementById('editNombre')) document.getElementById('editNombre').value = prod.nombre || '';
+  if (document.getElementById('editDescripcion')) document.getElementById('editDescripcion').value = prod.descripcion || '';
+  if (document.getElementById('editPrecio')) document.getElementById('editPrecio').value = (prod.precio !== undefined && prod.precio !== null) ? prod.precio : '';
+  if (document.getElementById('editCategoria')) document.getElementById('editCategoria').value = prod.categoria || 'LONA';
 
   const fileInput = document.getElementById('editArchivo');
   if (fileInput) fileInput.value = '';
@@ -316,21 +320,45 @@ function cerrarModal() {
   if (modal) modal.style.display = 'none';
 }
 
+/**
+ * Guarda los cambios al editar un producto
+ */
 async function guardarEdicion(e) {
   e.preventDefault();
   playRetroSFX('click');
   
-  const id = document.getElementById('editId').value;
+  const idInput = document.getElementById('editId') || document.getElementById('editProductId');
+  const id = idInput ? idInput.value : null;
   const btnSave = document.getElementById('btnSaveEdit');
-  if (!id) return;
+
+  if (!id) {
+    mostrarNotificacion('ERROR: ID DE PRODUCTO NO ENCONTRADO', 'error');
+    return;
+  }
 
   if (btnSave) {
     btnSave.disabled = true;
     btnSave.innerText = 'SAVING...';
   }
 
-  // Usar siempre FormData para garantizar que Multer procese la petición en Express sin romper la cabecera
-  const formData = new FormData(e.target);
+  // Creación explícita de FormData para asegurar coincidencia con el Backend
+  const formData = new FormData();
+  
+  const nombreEl = document.getElementById('editNombre');
+  const descEl = document.getElementById('editDescripcion');
+  const precioEl = document.getElementById('editPrecio');
+  const catEl = document.getElementById('editCategoria');
+  const fileInput = document.getElementById('editArchivo');
+
+  if (nombreEl) formData.append('nombre', nombreEl.value);
+  if (descEl) formData.append('descripcion', descEl.value);
+  if (precioEl) formData.append('precio', precioEl.value);
+  if (catEl) formData.append('categoria', catEl.value);
+
+  // Adjunta el archivo solo si fue seleccionado por el usuario
+  if (fileInput && fileInput.files && fileInput.files.length > 0) {
+    formData.append('archivo', fileInput.files[0]);
+  }
 
   try {
     const res = await fetch(`${API_URL}/${id}`, {
@@ -346,7 +374,7 @@ async function guardarEdicion(e) {
       cerrarModal();
       cargarPublicaciones();
     } else {
-      mostrarNotificacion('ERROR: ' + (data.error || data.mensaje || 'UPDATE FAILED'), 'error');
+      mostrarNotificacion('ERROR: ' + (data.error || data.mensaje || `HTTP ${res.status}`), 'error');
     }
   } catch (error) {
     console.error('Error en guardarEdicion:', error);
