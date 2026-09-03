@@ -1,6 +1,12 @@
 /* ==========================================================================
-   LASERPRINT ARCADE - LONA ENGINE & AUDIO SYNTHESIZER
+   LASERPRINT ARCADE - LONA ENGINE & AUDIO SYNTHESIZER (PRODUCTION)
    ========================================================================== */
+
+// Endpoints backend para producción (Render) y desarrollo local
+const RENDER_BASE_URL = 'https://laserprint-api.onrender.com';
+const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:5000/api/productos'
+  : `${RENDER_BASE_URL}/api/productos`;
 
 const ArcadeAudio = {
   ctx: null,
@@ -54,9 +60,20 @@ document.addEventListener('DOMContentLoaded', () => {
   initAudioEffects();
 });
 
+/**
+ * Convierte rutas relativas en URLs absolutas hacia el servidor Render
+ */
+function obtenerUrlCompleta(url) {
+  if (!url) return 'https://via.placeholder.com/300x200/0d1124/00f0ff?text=PREVIEW+NO+DISPONIBLE';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  
+  const cleanPath = url.startsWith('/') ? url : `/${url}`;
+  return `${RENDER_BASE_URL}${cleanPath}`;
+}
+
 async function cargarProductosCategoria(categoria) {
   try {
-    const response = await fetch(`/api/productos?categoria=${encodeURIComponent(categoria)}`);
+    const response = await fetch(`${API_URL}?categoria=${encodeURIComponent(categoria)}`);
     if (!response.ok) throw new Error('No se pudo conectar a la API');
 
     const data = await response.json();
@@ -79,14 +96,18 @@ function renderSecciones(productos) {
   if (gridPdf) gridPdf.innerHTML = '';
 
   productos.forEach(prod => {
-    const tipo = (prod.tipoArchivo || detectTipo(prod.archivoUrl)).toLowerCase();
+    const rawUrl = prod.fullArchivoUrl || prod.archivoUrl;
+    const urlAbsoluta = obtenerUrlCompleta(rawUrl);
+    const tipo = (prod.tipoArchivo || detectTipo(urlAbsoluta)).toLowerCase();
+
+    const productoProcesado = { ...prod, archivoUrlAbsoluta: urlAbsoluta };
 
     if (tipo === 'imagen' && gridImg) {
-      gridImg.appendChild(createCardImagen(prod));
+      gridImg.appendChild(createCardImagen(productoProcesado));
     } else if (tipo === 'video' && gridVid) {
-      gridVid.appendChild(createCardVideo(prod));
+      gridVid.appendChild(createCardVideo(productoProcesado));
     } else if (tipo === 'pdf' && gridPdf) {
-      gridPdf.appendChild(createCardPdf(prod));
+      gridPdf.appendChild(createCardPdf(productoProcesado));
     }
   });
 }
@@ -94,9 +115,11 @@ function renderSecciones(productos) {
 function createCardImagen(prod) {
   const card = document.createElement('div');
   card.className = 'card-arcade';
+  const url = prod.archivoUrlAbsoluta;
+
   card.innerHTML = `
-    <div class="media-wrapper arcade-sound-btn" onclick="ArcadeAudio.playSelect(); openModal('img', '${prod.archivoUrl}', '${escapeQuotes(prod.nombre)}')">
-      <img src="${prod.archivoUrl}" alt="${prod.nombre}" loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200/0d1124/00f0ff?text=PREVIEW+NO+DISPONIBLE';">
+    <div class="media-wrapper arcade-sound-btn" onclick="ArcadeAudio.playSelect(); openModal('img', '${url}', '${escapeQuotes(prod.nombre)}')">
+      <img src="${url}" alt="${prod.nombre}" loading="lazy" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200/0d1124/00f0ff?text=PREVIEW+NO+DISPONIBLE';">
     </div>
     <div class="card-info">
       <div class="card-title">${prod.nombre}</div>
@@ -109,9 +132,11 @@ function createCardImagen(prod) {
 function createCardVideo(prod) {
   const card = document.createElement('div');
   card.className = 'card-arcade';
+  const url = prod.archivoUrlAbsoluta;
+
   card.innerHTML = `
-    <div class="media-wrapper arcade-sound-btn" onclick="ArcadeAudio.playSelect(); openModal('video', '${prod.archivoUrl}', '${escapeQuotes(prod.nombre)}')">
-      <video src="${prod.archivoUrl}" muted preload="metadata"></video>
+    <div class="media-wrapper arcade-sound-btn" onclick="ArcadeAudio.playSelect(); openModal('video', '${url}', '${escapeQuotes(prod.nombre)}')">
+      <video src="${url}" muted preload="metadata"></video>
     </div>
     <div class="card-info">
       <div class="card-title">${prod.nombre}</div>
@@ -125,9 +150,10 @@ function createCardPdf(prod) {
   const card = document.createElement('div');
   card.className = 'card-arcade';
   const canvasId = 'pdf-canvas-' + Math.random().toString(36).substr(2, 9);
+  const url = prod.archivoUrlAbsoluta;
 
   card.innerHTML = `
-    <div class="media-wrapper arcade-sound-btn" onclick="ArcadeAudio.playSelect(); window.open('${prod.archivoUrl}', '_blank')">
+    <div class="media-wrapper arcade-sound-btn" onclick="ArcadeAudio.playSelect(); window.open('${url}', '_blank')">
       <div class="pdf-cover-container">
         <span class="pdf-badge">PORTADA PDF</span>
         <canvas id="${canvasId}"></canvas>
@@ -136,11 +162,11 @@ function createCardPdf(prod) {
     <div class="card-info">
       <div class="card-title">${prod.nombre}</div>
       ${prod.precio ? `<div class="card-price">$${prod.precio} MXN</div>` : ''}
-      <a href="${prod.archivoUrl}" target="_blank" class="btn-arcade arcade-sound-btn" onclick="ArcadeAudio.playSelect()">ABRIR DOCUMENTO</a>
+      <a href="${url}" target="_blank" class="btn-arcade arcade-sound-btn" onclick="ArcadeAudio.playSelect()">ABRIR DOCUMENTO</a>
     </div>
   `;
 
-  setTimeout(() => renderPdfCover(prod.archivoUrl, canvasId), 150);
+  setTimeout(() => renderPdfCover(url, canvasId), 150);
   return card;
 }
 
@@ -169,7 +195,7 @@ async function renderPdfCover(pdfUrl, canvasId) {
   } catch (error) {
     const canvas = document.getElementById(canvasId);
     if (canvas && canvas.parentElement) {
-      canvas.parentElement.innerHTML = '<div style="color: var(--neon-magenta); font-family: var(--font-arcade); font-size: 8px; text-align: center; padding: 20px;">DOCUMENTO PDF</div>';
+      canvas.parentElement.innerHTML = '<div style="color: var(--neon-magenta, #ff0055); font-family: var(--font-arcade); font-size: 8px; text-align: center; padding: 20px;">DOCUMENTO PDF</div>';
     }
   }
 }
@@ -188,9 +214,9 @@ function initTabs() {
       const secVid = document.getElementById('sec-videos');
       const secPdf = document.getElementById('sec-pdfs');
 
-      if (secImg) secImg.style.display = (target === 'imagenes') ? 'block' : 'none';
-      if (secVid) secVid.style.display = (target === 'videos') ? 'block' : 'none';
-      if (secPdf) secPdf.style.display = (target === 'pdfs') ? 'block' : 'none';
+      if (secImg) secImg.style.display = (target === 'imagenes' || target === 'todos') ? 'block' : 'none';
+      if (secVid) secVid.style.display = (target === 'videos' || target === 'todos') ? 'block' : 'none';
+      if (secPdf) secPdf.style.display = (target === 'pdfs' || target === 'todos') ? 'block' : 'none';
     });
   });
 }
