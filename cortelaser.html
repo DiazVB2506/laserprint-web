@@ -6,7 +6,7 @@
   <title>LaserPrint Arcade - CORTE LÁSER</title>
 
   <!-- FAVICON -->
-  <link rel="icon" type="image/png" href="/uploads/fotos/LOGOTIPO.png">
+  <link rel="icon" type="image/png" href="uploads/fotos/LOGOTIPO.png">
 
   <!-- FUENTES RETRO & TECH -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,7 +15,11 @@
 
   <!-- PDF.JS LIBRARY -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-  <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
+  <script>
+    if (typeof pdfjsLib !== 'undefined') {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+  </script>
 
   <!-- ESTILOS ARCADE -->
   <link rel="stylesheet" href="cortelaser.css">
@@ -26,7 +30,7 @@
   <header class="retro-header">
     <div class="header-logo-container">
       <a href="index.html">
-        <img src="/uploads/fotos/LOGOTIPO.png" alt="LaserPrint Logo" class="logo-img" onerror="this.onerror=null; this.src='https://via.placeholder.com/150x50/000/00f0ff?text=LASERPRINT';">
+        <img src="uploads/fotos/LOGOTIPO.png" alt="LaserPrint Logo" class="logo-img" id="mainLogo">
       </a>
     </div>
 
@@ -86,13 +90,25 @@
   </main>
 
   <!-- VISOR MODAL RETRO -->
-  <div id="mediaModal" class="pixel-modal">
+  <div id="mediaModal" class="pixel-modal" style="display: none;">
     <span class="close-modal arcade-sound-btn" id="closeModal">&times;</span>
     <div class="modal-content-wrapper">
       <div id="modalBody"></div>
       <p id="captionModal" class="modal-caption"></p>
     </div>
   </div>
+
+  <!-- CONTROL DE FALLBACK PARA LOGO -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const logo = document.getElementById('mainLogo');
+      if (logo) {
+        logo.addEventListener('error', () => {
+          logo.src = 'https://via.placeholder.com/150x50/000/00f0ff?text=LASERPRINT';
+        });
+      }
+    });
+  </script>
 
   <!-- LÓGICA DE CONTROL -->
   <script src="cortelaser.js"></script>
