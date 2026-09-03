@@ -1,85 +1,277 @@
-const API_URL = 'https://laserprint-api.onrender.com/api/productos';
+// Validar autenticación inmediatamente antes de renderizar la vista
+if (localStorage.getItem('adminAutenticado') !== 'true') {
+  window.location.href = 'login.html';
+}
+
+const API_URL = '/api/productos';
 const formatoMXN = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+
+// Estado global de la aplicación
+let productosGlobales = [];
+let categoriaActiva = 'TODAS';
+let busquedaTexto = '';
+
+// ==========================================================================
+// AUDIO SYNTHESIZER RETRO 8-BIT (EFECTOS DE SONIDO SIN ARCHIVOS EXTERNOS)
+// ==========================================================================
+function playRetroSFX(type) {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    const now = ctx.currentTime;
+
+    if (type === 'click') {
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(400, now);
+      osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+      osc.start(now);
+      osc.stop(now + 0.05);
+    } else if (type === 'save') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(261.63, now); // C4
+      osc.frequency.setValueAtTime(329.63, now + 0.08); // E4
+      osc.frequency.setValueAtTime(392.00, now + 0.16); // G4
+      osc.frequency.setValueAtTime(523.25, now + 0.24); // C5
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+      osc.start(now);
+      osc.stop(now + 0.35);
+    } else if (type === 'delete') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(300, now);
+      osc.frequency.linearRampToValueAtTime(80, now + 0.2);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+      osc.start(now);
+      osc.stop(now + 0.2);
+    }
+  } catch (e) {
+    // Silenciar si la política del navegador bloquea el audio dinámico
+  }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   cargarPublicaciones();
 
-  const form = document.querySelector('form') || document.getElementById('uploadForm');
-  if (form) {
-    form.addEventListener('submit', guardarPublicacion);
+  // Evento formulario de subida
+  const form = document.getElementById('uploadForm');
+  if (form) form.addEventListener('submit', guardarPublicacion);
+
+  // Evento formulario de edición
+  const editForm = document.getElementById('editForm');
+  if (editForm) editForm.addEventListener('submit', guardarEdicion);
+
+  // Cerrar sesión
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      playRetroSFX('click');
+      localStorage.removeItem('adminAutenticado');
+      window.location.href = 'login.html';
+    });
   }
+
+  // 1. EVENTOS DE PESTAÑAS DE CATEGORÍA
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      playRetroSFX('click');
+      tabButtons.forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      categoriaActiva = e.target.getAttribute('data-cat');
+      renderizarTabla();
+    });
+  });
+
+  // 2. EVENTOS DEL BUSCADOR CON AUTOCOMPLETADO
+  const searchInput = document.getElementById('searchInput');
+  const suggestionsBox = document.getElementById('searchSuggestions');
+
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      busquedaTexto = e.target.value.trim().toLowerCase();
+      renderizarTabla();
+      mostrarSugerencias(busquedaTexto);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.search-box') && suggestionsBox) {
+        suggestionsBox.style.display = 'none';
+      }
+    });
+  }
+
+  // Cerrar Modal de Edición
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  const btnCancelEdit = document.getElementById('btnCancelEdit');
+  if (closeModalBtn) closeModalBtn.addEventListener('click', () => { playRetroSFX('click'); cerrarModal(); });
+  if (btnCancelEdit) btnCancelEdit.addEventListener('click', () => { playRetroSFX('click'); cerrarModal(); });
 });
 
-// 1. Cargar la lista de publicaciones existentes en la tabla
+/**
+ * Carga inicial de datos desde el backend
+ */
 async function cargarPublicaciones() {
-  const tablaBody = document.querySelector('tbody');
+  const tablaBody = document.getElementById('tabla');
   if (!tablaBody) return;
 
+  tablaBody.innerHTML = `
+    <tr>
+      <td colspan="5" style="text-align:center; padding: 2.5rem; color: var(--arcade-cyan); font-family: var(--font-pixel); font-size: 0.75rem;">
+        👾 CARGANDO DATOS DEL SISTEMA...
+      </td>
+    </tr>`;
+
   try {
-    const res = await fetch(`${API_URL}?limit=100`);
+    const res = await fetch(`${API_URL}?limit=500`);
+    if (!res.ok) throw new Error('Error al obtener datos');
+
     const data = await res.json();
-
-    tablaBody.innerHTML = '';
-
-    if (!data.productos || data.productos.length === 0) {
-      tablaBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No hay publicaciones activas.</td></tr>`;
-      return;
-    }
-
-    data.productos.forEach(prod => {
-      const precioTexto = (prod.precio !== null && prod.precio !== undefined && prod.precio !== '') 
-        ? `${formatoMXN.format(prod.precio)} MXN` 
-        : 'N/A';
-
-      const fila = document.createElement('tr');
-      fila.innerHTML = `
-        <td><b>${prod.nombre}</b></td>
-        <td>${prod.categoria}</td>
-        <td><b style="color:#2ed573;">${precioTexto}</b></td>
-        <td>${prod.tipoArchivo ? prod.tipoArchivo.toUpperCase() : 'N/A'}</td>
-        <td>
-          <button onclick="eliminarProducto('${prod._id}')" style="background:#ff4757; color:white; border:none; padding:5px 10px; cursor:pointer; border-radius:3px;">Eliminar</button>
-        </td>
-      `;
-      tablaBody.appendChild(fila);
-    });
+    productosGlobales = data.productos || [];
+    renderizarTabla();
   } catch (error) {
     console.error('Error al cargar publicaciones:', error);
+    tablaBody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align:center; color: var(--arcade-red); padding: 2rem; font-family: var(--font-pixel); font-size: 0.75rem;">
+          ❌ ERROR DE CONEXIÓN: SERVER OFFLINE.
+        </td>
+      </tr>`;
   }
 }
 
-// 2. Enviar la nueva publicación a Render
+/**
+ * Renderiza la tabla filtrada por Pestaña Activa y Texto de Búsqueda
+ */
+function renderizarTabla() {
+  const tablaBody = document.getElementById('tabla');
+  if (!tablaBody) return;
+
+  const filtrados = productosGlobales.filter(prod => {
+    const coincideCategoria = (categoriaActiva === 'TODAS') || (prod.categoria === categoriaActiva);
+    const coincideTexto = !busquedaTexto || 
+      (prod.nombre && prod.nombre.toLowerCase().includes(busquedaTexto)) ||
+      (prod.descripcion && prod.descripcion.toLowerCase().includes(busquedaTexto));
+
+    return coincideCategoria && coincideTexto;
+  });
+
+  tablaBody.innerHTML = '';
+
+  if (filtrados.length === 0) {
+    tablaBody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align:center; padding: 2.5rem; color: var(--arcade-yellow); font-family: var(--font-pixel); font-size: 0.7rem;">
+          🕹️ NO DATA FOUND // INSERT COIN
+        </td>
+      </tr>`;
+    return;
+  }
+
+  filtrados.forEach(prod => {
+    const precioTexto = (prod.precio !== null && prod.precio !== undefined && prod.precio !== '') 
+      ? `${formatoMXN.format(prod.precio)}` 
+      : 'N/A';
+
+    const tipoExt = prod.tipoArchivo ? prod.tipoArchivo.toUpperCase() : 'UNKNOWN';
+    
+    let badgeClass = 'badge-file';
+    if (tipoExt.includes('IMAGE') || tipoExt.includes('JPG') || tipoExt.includes('PNG')) badgeClass += ' badge-img';
+    else if (tipoExt.includes('VIDEO') || tipoExt.includes('MP4')) badgeClass += ' badge-video';
+    else if (tipoExt.includes('PDF')) badgeClass += ' badge-pdf';
+
+    const fila = document.createElement('tr');
+    fila.innerHTML = `
+      <td><strong style="color: #ffffff; text-shadow: 0 0 5px var(--arcade-cyan);">${escapeHTML(prod.nombre)}</strong></td>
+      <td><span class="badge-cat">${escapeHTML(prod.categoria)}</span></td>
+      <td><strong style="color: var(--arcade-green); text-shadow: 2px 2px 0px #000;">${precioTexto}</strong></td>
+      <td><span class="${badgeClass}">${tipoExt}</span></td>
+      <td>
+        <div style="display: flex; gap: 0.6rem;">
+          <button onclick="abrirModalEdicion('${prod._id}')" class="btn-edit" title="Editar registro">EDIT</button>
+          <button onclick="eliminarProducto('${prod._id}')" class="btn-del" title="Eliminar registro">DEL</button>
+        </div>
+      </td>
+    `;
+    tablaBody.appendChild(fila);
+  });
+}
+
+/**
+ * Muestra el menú de sugerencias estilo autocompletado Arcade
+ */
+function mostrarSugerencias(texto) {
+  const suggestionsBox = document.getElementById('searchSuggestions');
+  if (!suggestionsBox) return;
+
+  if (!texto) {
+    suggestionsBox.style.display = 'none';
+    return;
+  }
+
+  const coincidencias = productosGlobales.filter(p => p.nombre && p.nombre.toLowerCase().includes(texto)).slice(0, 5);
+
+  if (coincidencias.length === 0) {
+    suggestionsBox.style.display = 'none';
+    return;
+  }
+
+  suggestionsBox.innerHTML = '';
+  coincidencias.forEach(item => {
+    const li = document.createElement('li');
+    li.innerHTML = `<span>> ${escapeHTML(item.nombre)}</span> <small>[${item.categoria}]</small>`;
+    li.addEventListener('click', () => {
+      playRetroSFX('click');
+      document.getElementById('searchInput').value = item.nombre;
+      busquedaTexto = item.nombre.toLowerCase();
+      suggestionsBox.style.display = 'none';
+      renderizarTabla();
+    });
+    suggestionsBox.appendChild(li);
+  });
+
+  suggestionsBox.style.display = 'block';
+}
+
+/**
+ * Guardar nueva publicación
+ */
 async function guardarPublicacion(e) {
   e.preventDefault();
-
-  const btnSubir = e.target.querySelector('button[type="submit"]');
-  const textoOriginal = btnSubir ? btnSubir.innerText : '';
+  playRetroSFX('click');
+  const btnSubir = document.getElementById('btnSubmit');
+  const textoOriginal = btnSubir ? btnSubir.innerText : 'GUARDAR';
   
   if (btnSubir) {
     btnSubir.disabled = true;
-    btnSubir.innerText = 'Subiendo...';
+    btnSubir.innerText = 'UPLOADING...';
   }
 
   const formData = new FormData(e.target);
 
   try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      body: formData
-    });
-
+    const res = await fetch(API_URL, { method: 'POST', body: formData });
     const data = await res.json();
 
     if (res.ok) {
-      alert('✅ Publicación guardada exitosamente');
+      playRetroSFX('save');
+      mostrarNotificacion('DATA SAVED SUCCESSFULLY', 'exito');
       e.target.reset();
       cargarPublicaciones();
     } else {
-      alert('❌ Error: ' + (data.error || 'No se pudo guardar'));
+      mostrarNotificacion('ERROR: ' + (data.error || 'SAVE FAILED'), 'error');
     }
   } catch (error) {
-    alert('❌ Error de conexión con el servidor en Render');
-    console.error(error);
+    mostrarNotificacion('SERVER CONNECTION ERROR', 'error');
   } finally {
     if (btnSubir) {
       btnSubir.disabled = false;
@@ -88,19 +280,156 @@ async function guardarPublicacion(e) {
   }
 }
 
-// 3. Eliminar publicación (asignada a window para acceso en onclick inline)
+/**
+ * FUNCIONES DE EDICIÓN
+ */
+window.abrirModalEdicion = function(id) {
+  playRetroSFX('click');
+  const prod = productosGlobales.find(p => p._id === id);
+  if (!prod) return;
+
+  document.getElementById('editId').value = prod._id;
+  document.getElementById('editNombre').value = prod.nombre || '';
+  document.getElementById('editDescripcion').value = prod.descripcion || '';
+  document.getElementById('editPrecio').value = prod.precio !== undefined && prod.precio !== null ? prod.precio : '';
+  document.getElementById('editCategoria').value = prod.categoria || 'DTF TEXTIL / UV';
+
+  const fileInput = document.getElementById('editArchivo');
+  if (fileInput) fileInput.value = '';
+
+  const modal = document.getElementById('editModal');
+  if (modal) modal.classList.add('active');
+};
+
+function cerrarModal() {
+  const modal = document.getElementById('editModal');
+  if (modal) modal.classList.remove('active');
+}
+
+async function guardarEdicion(e) {
+  e.preventDefault();
+  playRetroSFX('click');
+  const id = document.getElementById('editId').value;
+  const btnSave = document.getElementById('btnSaveEdit');
+  if (!id) return;
+
+  if (btnSave) {
+    btnSave.disabled = true;
+    btnSave.innerText = 'SAVING...';
+  }
+
+  const fileInput = document.getElementById('editArchivo');
+  const tieneNuevoArchivo = fileInput && fileInput.files.length > 0;
+
+  try {
+    let res;
+
+    if (tieneNuevoArchivo) {
+      const formData = new FormData(e.target);
+      res = await fetch(`${API_URL}/${id}`, {
+        method: 'PUT',
+        body: formData
+      });
+    } else {
+      const payload = {
+        nombre: document.getElementById('editNombre').value,
+        descripcion: document.getElementById('editDescripcion').value,
+        precio: document.getElementById('editPrecio').value,
+        categoria: document.getElementById('editCategoria').value
+      };
+
+      res = await fetch(`${API_URL}/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    }
+
+    const data = await res.json().catch(() => ({}));
+
+    if (res.ok) {
+      playRetroSFX('save');
+      mostrarNotificacion('RECORD UPDATED', 'exito');
+      cerrarModal();
+      cargarPublicaciones();
+    } else {
+      mostrarNotificacion('ERROR: ' + (data.error || data.mensaje || 'UPDATE FAILED'), 'error');
+    }
+  } catch (error) {
+    console.error('Error detallado en guardarEdicion:', error);
+    mostrarNotificacion('SERVER CONNECTION ERROR', 'error');
+  } finally {
+    if (btnSave) {
+      btnSave.disabled = false;
+      btnSave.innerText = 'GUARDAR CAMBIOS';
+    }
+  }
+}
+
+/**
+ * Eliminar publicación
+ */
 window.eliminarProducto = async function(id) {
-  if (!confirm('¿Seguro que deseas eliminar esta publicación?')) return;
+  playRetroSFX('click');
+  if (!confirm('¿CONFIRMAR ELIMINACIÓN DE REGISTRO?')) return;
 
   try {
     const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
     if (res.ok) {
-      alert('Publicación eliminada');
+      playRetroSFX('delete');
+      mostrarNotificacion('ITEM DELETED', 'exito');
       cargarPublicaciones();
     } else {
-      alert('Error al eliminar');
+      mostrarNotificacion('ERROR AT DELETE ATTEMPT', 'error');
     }
   } catch (error) {
-    console.error('Error al eliminar:', error);
+    mostrarNotificacion('SERVER CONNECTION ERROR', 'error');
   }
 };
+
+function escapeHTML(str) {
+  return str ? String(str).replace(/[&<>"']/g, match => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[match])) : '';
+}
+
+/**
+ * Notificaciones estilo HUD / Terminal Arcade
+ */
+function mostrarNotificacion(mensaje, tipo = 'exito') {
+  let toast = document.getElementById('toast-notification');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'toast-notification';
+    document.body.appendChild(toast);
+  }
+
+  const isExito = tipo === 'exito';
+  const borderColor = isExito ? 'var(--arcade-green)' : 'var(--arcade-pink)';
+  const textColor = isExito ? 'var(--arcade-green)' : 'var(--arcade-pink)';
+  
+  toast.style.cssText = `
+    position: fixed; bottom: 25px; right: 25px;
+    background: #090a14; color: ${textColor};
+    border: 3px solid ${borderColor};
+    box-shadow: 5px 5px 0px ${borderColor};
+    padding: 1rem 1.4rem;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.65rem;
+    line-height: 1.4;
+    z-index: 2000; transition: all 0.2s ease;
+    opacity: 0; transform: scale(0.8);
+  `;
+
+  toast.innerText = `[SYS_LOG]: ${mensaje}`;
+
+  requestAnimationFrame(() => {
+    toast.style.opacity = '1';
+    toast.style.transform = 'scale(1)';
+  });
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'scale(0.8)';
+  }, 3500);
+}
