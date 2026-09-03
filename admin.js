@@ -1,6 +1,8 @@
 // Validar autenticación cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
-  if (localStorage.getItem('adminAutenticado') !== 'true') {
+  // CORRECCIÓN: Soporte flexible para 'adminToken' o 'adminAutenticado'
+  const isAuth = localStorage.getItem('adminAutenticado') === 'true' || localStorage.getItem('adminToken');
+  if (!isAuth) {
     window.location.href = 'login.html';
     return;
   }
@@ -21,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     logoutBtn.addEventListener('click', () => {
       playRetroSFX('click');
       localStorage.removeItem('adminAutenticado');
+      localStorage.removeItem('adminToken');
       window.location.href = 'login.html';
     });
   }
@@ -62,14 +65,14 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnCancelEdit) btnCancelEdit.addEventListener('click', () => { playRetroSFX('click'); cerrarModal(); });
 });
 
-// Detectar URL backend automáticamente según entorno (Local vs Producción)
+// CORRECCIÓN: Apuntar al subdominio real 'laserprint-api' en Render
 const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? 'http://localhost:3000/api/productos'
-  : 'https://laserprint-backend.onrender.com/api/productos'; // Cambia esta URL por tu Servidor backend real (Render/Heroku/Vercel)
+  ? 'http://localhost:5000/api/productos'
+  : 'https://laserprint-api.onrender.com/api/productos';
 
 const formatoMXN = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
 
-// Estado global de la aplicación
+// Estado global
 let productosGlobales = [];
 let categoriaActiva = 'TODAS';
 let busquedaTexto = '';
@@ -118,7 +121,7 @@ function playRetroSFX(type) {
       osc.stop(now + 0.2);
     }
   } catch (e) {
-    // Silenciar si el navegador bloquea el audio dinámico
+    // Silenciar en navegadores con políticas estrictas de autoplay
   }
 }
 
@@ -190,9 +193,11 @@ function renderizarTabla() {
     const tipoExt = prod.tipoArchivo ? prod.tipoArchivo.toUpperCase() : 'UNKNOWN';
     
     let badgeClass = 'badge-file';
-    if (tipoExt.includes('IMAGE') || tipoExt.includes('JPG') || tipoExt.includes('PNG')) badgeClass += ' badge-img';
+    if (tipoExt.includes('IMAGE') || tipoExt.includes('IMAGEN') || tipoExt.includes('JPG') || tipoExt.includes('PNG')) badgeClass += ' badge-img';
     else if (tipoExt.includes('VIDEO') || tipoExt.includes('MP4')) badgeClass += ' badge-video';
     else if (tipoExt.includes('PDF')) badgeClass += ' badge-pdf';
+
+    const prodId = prod._id || prod.id;
 
     const fila = document.createElement('tr');
     fila.innerHTML = `
@@ -202,8 +207,8 @@ function renderizarTabla() {
       <td><span class="${badgeClass}">${tipoExt}</span></td>
       <td>
         <div style="display: flex; gap: 0.6rem;">
-          <button onclick="abrirModalEdicion('${prod._id || prod.id}')" class="btn-edit" title="Editar registro">EDIT</button>
-          <button onclick="eliminarProducto('${prod._id || prod.id}')" class="btn-del" title="Eliminar registro">DEL</button>
+          <button onclick="abrirModalEdicion('${prodId}')" class="btn-edit" title="Editar registro">EDIT</button>
+          <button onclick="eliminarProducto('${prodId}')" class="btn-del" title="Eliminar registro">DEL</button>
         </div>
       </td>
     `;
@@ -212,7 +217,7 @@ function renderizarTabla() {
 }
 
 /**
- * Muestra el menú de sugerencias estilo autocompletado Arcade
+ * Sugerencias estilo autocompletado Arcade
  */
 function mostrarSugerencias(texto) {
   const suggestionsBox = document.getElementById('searchSuggestions');
@@ -296,7 +301,7 @@ window.abrirModalEdicion = function(id) {
   document.getElementById('editId').value = prod._id || prod.id;
   document.getElementById('editNombre').value = prod.nombre || '';
   document.getElementById('editDescripcion').value = prod.descripcion || '';
-  document.getElementById('editPrecio').value = prod.precio !== undefined && prod.precio !== null ? prod.precio : '';
+  document.getElementById('editPrecio').value = (prod.precio !== undefined && prod.precio !== null) ? prod.precio : '';
   document.getElementById('editCategoria').value = prod.categoria || 'DTF TEXTIL / UV';
 
   const fileInput = document.getElementById('editArchivo');
@@ -314,6 +319,7 @@ function cerrarModal() {
 async function guardarEdicion(e) {
   e.preventDefault();
   playRetroSFX('click');
+  
   const id = document.getElementById('editId').value;
   const btnSave = document.getElementById('btnSaveEdit');
   if (!id) return;
@@ -323,32 +329,14 @@ async function guardarEdicion(e) {
     btnSave.innerText = 'SAVING...';
   }
 
-  const fileInput = document.getElementById('editArchivo');
-  const tieneNuevoArchivo = fileInput && fileInput.files.length > 0;
+  // Usar siempre FormData para garantizar que Multer procese la petición en Express sin romper la cabecera
+  const formData = new FormData(e.target);
 
   try {
-    let res;
-
-    if (tieneNuevoArchivo) {
-      const formData = new FormData(e.target);
-      res = await fetch(`${API_URL}/${id}`, {
-        method: 'PUT',
-        body: formData
-      });
-    } else {
-      const payload = {
-        nombre: document.getElementById('editNombre').value,
-        descripcion: document.getElementById('editDescripcion').value,
-        precio: document.getElementById('editPrecio').value,
-        categoria: document.getElementById('editCategoria').value
-      };
-
-      res = await fetch(`${API_URL}/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-    }
+    const res = await fetch(`${API_URL}/${id}`, {
+      method: 'PUT',
+      body: formData
+    });
 
     const data = await res.json().catch(() => ({}));
 
@@ -361,7 +349,7 @@ async function guardarEdicion(e) {
       mostrarNotificacion('ERROR: ' + (data.error || data.mensaje || 'UPDATE FAILED'), 'error');
     }
   } catch (error) {
-    console.error('Error detallado en guardarEdicion:', error);
+    console.error('Error en guardarEdicion:', error);
     mostrarNotificacion('SERVER CONNECTION ERROR', 'error');
   } finally {
     if (btnSave) {
