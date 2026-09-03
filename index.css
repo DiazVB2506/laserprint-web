@@ -1,8 +1,6 @@
 /* ==========================================================================
    1. SYSTEM RESET & ARCADE PALETTE (8-BIT & 16-BIT CYBER-PRINT)
    ========================================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
-
 *,
 *::before,
 *::after {
@@ -61,7 +59,7 @@ body {
    2. OVERLAY CRT SCANLINES (EFECTO MONITOR DE TUBO RETRO)
    ========================================================================== */
 body::before {
-  content: " ";
+  content: "";
   display: block;
   position: fixed;
   top: 0; left: 0; bottom: 0; right: 0;
@@ -96,17 +94,17 @@ body::before {
 .glass-card {
   background: var(--arcade-card-bg);
   border: 3px solid var(--cmyk-cyan);
-  border-radius: 0px;
-  box-shadow: 8px 8px 0px var(--cmyk-magenta), 0 0 25px rgba(0, 240, 255, 0.2);
+  border-radius: 0;
+  box-shadow: 8px 8px 0 var(--cmyk-magenta), 0 0 25px rgba(0, 240, 255, 0.2);
   transition: var(--transition-arcade);
 }
 
 .glass-card:hover {
-  box-shadow: 10px 10px 0px var(--cmyk-magenta), 0 0 35px rgba(0, 240, 255, 0.4);
+  box-shadow: 10px 10px 0 var(--cmyk-magenta), 0 0 35px rgba(0, 240, 255, 0.4);
 }
 
 /* ==========================================================================
-   3. HEADER & NAVEGACIÓN ARCADE (FLEXIBILIZADO Y ANTIDESBORDAMIENTO)
+   3. HEADER & NAVEGACIÓN ARCADE
    ========================================================================== */
 .glass-header {
   position: fixed;
@@ -117,7 +115,7 @@ body::before {
   background: rgba(6, 7, 14, 0.95);
   border-bottom: 3px solid var(--cmyk-cyan);
   padding: 10px 20px;
-  box-shadow: 0 4px 0px var(--cmyk-magenta);
+  box-shadow: 0 4px 0 var(--cmyk-magenta);
 }
 
 .nav-container {
@@ -165,7 +163,7 @@ body::before {
   color: var(--cmyk-cyan);
   text-decoration: none;
   padding: 8px 12px;
-  border-radius: 0px;
+  border-radius: 0;
   font-size: 0.55rem;
   line-height: 1.2;
   letter-spacing: 0.5px;
@@ -173,34 +171,34 @@ body::before {
   white-space: nowrap;
   transition: var(--transition-arcade);
   border: 2px solid var(--cmyk-cyan);
-  background: #000;
-  box-shadow: 3px 3px 0px var(--cmyk-cyan);
+  background: #000000;
+  box-shadow: 3px 3px 0 var(--cmyk-cyan);
 }
 
 .nav-btn:hover, 
 .nav-btn.active {
-  color: #000;
+  color: #000000;
   background: var(--cmyk-cyan);
-  box-shadow: 3px 3px 0px var(--cmyk-magenta);
+  box-shadow: 3px 3px 0 var(--cmyk-magenta);
   transform: translate(-1px, -1px);
 }
 
 .nav-btn:active {
   transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0px var(--cmyk-magenta);
+  box-shadow: 1px 1px 0 var(--cmyk-magenta);
 }
 
 .btn-admin {
   background: var(--cmyk-magenta) !important;
   color: #ffffff !important;
-  border: 2px solid #fff !important;
-  box-shadow: 3px 3px 0px var(--cmyk-yellow) !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 3px 3px 0 var(--cmyk-yellow) !important;
 }
 
 .btn-admin:hover {
   background: var(--cmyk-yellow) !important;
   color: #000000 !important;
-  box-shadow: 3px 3px 0px var(--cmyk-cyan) !important;
+  box-shadow: 3px 3px 0 var(--cmyk-cyan) !important;
 }
 
 /* Menú Móvil Botón */
@@ -222,7 +220,7 @@ body::before {
   width: 100%;
   height: 3px;
   background-color: var(--cmyk-cyan);
-  box-shadow: 2px 2px 0px var(--cmyk-magenta);
+  box-shadow: 2px 2px 0 var(--cmyk-magenta);
 }
 
 /* ==========================================================================
@@ -246,12 +244,12 @@ body::before {
   letter-spacing: 2px;
   line-height: 1.3;
   margin-bottom: 24px;
-  color: #fff;
+  color: #ffffff;
 }
 
 .text-gradient {
   color: var(--cmyk-cyan);
-  text-shadow: 4px 4px 0px var(--cmyk-magenta);
+  text-shadow: 4px 4px 0 var(--cmyk-magenta);
   display: inline-block;
 }
 
@@ -276,17 +274,17 @@ body::before {
 .video-container {
   width: 100%;
   height: 75vh;
-  border-radius: 0px;
+  border-radius: 0;
   overflow: hidden;
   position: relative;
   border: 4px solid var(--cmyk-cyan);
-  box-shadow: 10px 10px 0px var(--cmyk-magenta), 0 0 30px rgba(0, 240, 255, 0.3);
+  box-shadow: 10px 10px 0 var(--cmyk-magenta), 0 0 30px rgba(0, 240, 255, 0.3);
   transition: var(--transition-arcade);
 }
 
 .video-container:hover {
   transform: scale(1.005);
-  box-shadow: 12px 12px 0px var(--cmyk-magenta), 0 0 45px rgba(0, 240, 255, 0.5);
+  box-shadow: 12px 12px 0 var(--cmyk-magenta), 0 0 45px rgba(0, 240, 255, 0.5);
 }
 
 .video-container img {
@@ -312,7 +310,7 @@ body::before {
   font-size: clamp(1.2rem, 3vw, 2.2rem);
   color: var(--cmyk-yellow);
   margin-bottom: 14px;
-  text-shadow: 3px 3px 0px var(--cmyk-magenta);
+  text-shadow: 3px 3px 0 var(--cmyk-magenta);
 }
 
 .carousel-hint {
@@ -356,12 +354,12 @@ body::before {
   height: 480px;
   transition: all 0.5s var(--transition-arcade);
   cursor: pointer;
-  border-radius: 0px;
+  border-radius: 0;
   overflow: hidden;
   opacity: 0;
   pointer-events: none;
   border: 4px solid var(--cmyk-cyan);
-  box-shadow: 6px 6px 0px var(--cmyk-magenta);
+  box-shadow: 6px 6px 0 var(--cmyk-magenta);
 }
 
 .carousel-slide-3d img {
@@ -380,7 +378,7 @@ body::before {
   z-index: 3;
   opacity: 1;
   pointer-events: auto;
-  box-shadow: 10px 10px 0px var(--cmyk-magenta), 0 0 35px rgba(0, 240, 255, 0.4);
+  box-shadow: 10px 10px 0 var(--cmyk-magenta), 0 0 35px rgba(0, 240, 255, 0.4);
 }
 
 .carousel-slide-3d.prev {
@@ -408,12 +406,12 @@ body::before {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: #000;
+  background: #000000;
   border: 3px solid var(--cmyk-cyan);
   color: var(--cmyk-cyan);
   width: 60px;
   height: 60px;
-  border-radius: 0px;
+  border-radius: 0;
   font-family: var(--font-pixel);
   font-size: 1.2rem;
   z-index: 10;
@@ -421,20 +419,20 @@ body::before {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 4px 4px 0px var(--cmyk-magenta);
+  box-shadow: 4px 4px 0 var(--cmyk-magenta);
   transition: var(--transition-arcade);
 }
 
 .carousel-btn:hover {
   background: var(--cmyk-cyan);
-  color: #000;
-  box-shadow: 6px 6px 0px var(--cmyk-magenta);
+  color: #000000;
+  box-shadow: 6px 6px 0 var(--cmyk-magenta);
   transform: translateY(-50%) translate(-2px, -2px);
 }
 
 .carousel-btn:active {
   transform: translateY(-50%) translate(2px, 2px);
-  box-shadow: 1px 1px 0px var(--cmyk-magenta);
+  box-shadow: 1px 1px 0 var(--cmyk-magenta);
 }
 
 .prev-btn { left: 20px; }
@@ -450,8 +448,8 @@ body::before {
 .dot {
   width: 14px;
   height: 14px;
-  border-radius: 0px;
-  background: #000;
+  border-radius: 0;
+  background: #000000;
   border: 2px solid var(--cmyk-cyan);
   cursor: pointer;
   transition: var(--transition-arcade);
@@ -461,7 +459,7 @@ body::before {
   background: var(--cmyk-yellow);
   border-color: var(--cmyk-magenta);
   width: 32px;
-  box-shadow: 3px 3px 0px var(--cmyk-magenta);
+  box-shadow: 3px 3px 0 var(--cmyk-magenta);
 }
 
 /* ==========================================================================
@@ -487,18 +485,18 @@ body::before {
 
 .map-container {
   width: 100%;
-  border-radius: 0px;
+  border-radius: 0;
   overflow: hidden;
   border: 3px solid var(--cmyk-cyan);
-  box-shadow: 6px 6px 0px var(--cmyk-magenta);
+  box-shadow: 6px 6px 0 var(--cmyk-magenta);
 }
 
 .streetview-note {
   margin-top: 25px;
   padding: 16px 20px;
-  background: #000;
+  background: #000000;
   border: 2px solid var(--cmyk-yellow);
-  box-shadow: 4px 4px 0px var(--cmyk-yellow);
+  box-shadow: 4px 4px 0 var(--cmyk-yellow);
   color: var(--cmyk-yellow);
   font-family: var(--font-terminal);
   font-size: 1.25rem;
@@ -522,7 +520,7 @@ body::before {
   gap: 30px;
   background: #090a14;
   border: 3px solid var(--arcade-green);
-  box-shadow: 8px 8px 0px var(--cmyk-cyan);
+  box-shadow: 8px 8px 0 var(--cmyk-cyan);
 }
 
 .whatsapp-info h3 {
@@ -530,7 +528,7 @@ body::before {
   font-size: clamp(1rem, 2vw, 1.4rem);
   color: var(--arcade-green);
   margin-bottom: 12px;
-  text-shadow: 3px 3px 0px #000;
+  text-shadow: 3px 3px 0 #000000;
 }
 
 .whatsapp-info p {
@@ -542,27 +540,27 @@ body::before {
 .whatsapp-btn {
   display: inline-block;
   background: var(--arcade-green);
-  color: #000;
+  color: #000000;
   font-family: var(--font-pixel);
   font-size: 0.75rem;
   padding: 14px 24px;
-  border-radius: 0px;
-  border: 2px solid #000;
+  border-radius: 0;
+  border: 2px solid #000000;
   text-decoration: none;
-  box-shadow: 4px 4px 0px var(--cmyk-cyan);
+  box-shadow: 4px 4px 0 var(--cmyk-cyan);
   transition: var(--transition-arcade);
 }
 
 .whatsapp-btn:hover {
   background: var(--cmyk-cyan);
-  color: #000;
-  box-shadow: 6px 6px 0px var(--cmyk-magenta);
+  color: #000000;
+  box-shadow: 6px 6px 0 var(--cmyk-magenta);
   transform: translate(-2px, -2px);
 }
 
 .whatsapp-btn:active {
   transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0px var(--cmyk-magenta);
+  box-shadow: 1px 1px 0 var(--cmyk-magenta);
 }
 
 .whatsapp-qr-container {
@@ -575,9 +573,9 @@ body::before {
 .whatsapp-qr {
   width: 150px;
   height: 150px;
-  border-radius: 0px;
+  border-radius: 0;
   border: 3px solid var(--arcade-green);
-  box-shadow: 4px 4px 0px var(--cmyk-cyan);
+  box-shadow: 4px 4px 0 var(--cmyk-cyan);
   object-fit: cover;
   image-rendering: pixelated;
 }
@@ -599,7 +597,7 @@ body::before {
   color: var(--cmyk-cyan);
   font-family: var(--font-pixel);
   font-size: 0.65rem;
-  box-shadow: 0 -4px 0px var(--cmyk-magenta);
+  box-shadow: 0 -4px 0 var(--cmyk-magenta);
 }
 
 .footer-content {
@@ -633,9 +631,9 @@ body::before {
 .image-modal-content {
   max-width: 90%;
   max-height: 80vh;
-  border-radius: 0px;
+  border-radius: 0;
   border: 4px solid var(--cmyk-cyan);
-  box-shadow: 10px 10px 0px var(--cmyk-magenta);
+  box-shadow: 10px 10px 0 var(--cmyk-magenta);
 }
 
 .image-modal-caption {
@@ -649,11 +647,11 @@ body::before {
   position: absolute;
   top: 20px;
   right: 30px;
-  color: var(--cmyk-pink, #ff007f);
+  color: #ff007f;
   font-family: var(--font-pixel);
   font-size: 35px;
   cursor: pointer;
-  text-shadow: 2px 2px 0px var(--cmyk-cyan);
+  text-shadow: 2px 2px 0 var(--cmyk-cyan);
 }
 
 /* ==========================================================================
@@ -664,24 +662,24 @@ body::before {
   bottom: 25px;
   right: 25px;
   z-index: 9000;
-  background: #000;
+  background: #000000;
   border: 3px solid var(--cmyk-cyan);
   color: var(--cmyk-cyan);
   width: 65px;
   height: 65px;
-  border-radius: 0px;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 4px 4px 0px var(--cmyk-magenta), 0 0 20px rgba(0, 240, 255, 0.4);
+  box-shadow: 4px 4px 0 var(--cmyk-magenta), 0 0 20px rgba(0, 240, 255, 0.4);
   transition: var(--transition-arcade);
 }
 
 .pixel-toggle-btn:hover {
   background: var(--cmyk-cyan);
-  color: #000;
-  box-shadow: 6px 6px 0px var(--cmyk-magenta), 0 0 30px rgba(0, 240, 255, 0.7);
+  color: #000000;
+  box-shadow: 6px 6px 0 var(--cmyk-magenta), 0 0 30px rgba(0, 240, 255, 0.7);
   transform: translate(-2px, -2px) scale(1.05);
 }
 
@@ -695,12 +693,12 @@ body::before {
   top: -8px;
   right: -8px;
   background: var(--arcade-green);
-  color: #000;
+  color: #000000;
   font-family: var(--font-pixel);
   font-size: 0.45rem;
   padding: 3px 5px;
-  border: 1px solid #000;
-  box-shadow: 2px 2px 0px #000;
+  border: 1px solid #000000;
+  box-shadow: 2px 2px 0 #000000;
 }
 
 .pixel-chat-widget {
@@ -715,7 +713,7 @@ body::before {
   z-index: 9001;
   background: #090a14;
   border: 3px solid var(--cmyk-cyan);
-  box-shadow: 8px 8px 0px var(--cmyk-magenta), 0 0 30px rgba(0, 240, 255, 0.3);
+  box-shadow: 8px 8px 0 var(--cmyk-magenta), 0 0 30px rgba(0, 240, 255, 0.3);
   flex-direction: column;
   overflow: hidden;
   animation: pixelPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -731,7 +729,7 @@ body::before {
 }
 
 .pixel-chat-header {
-  background: #000;
+  background: #000000;
   border-bottom: 2px solid var(--cmyk-cyan);
   padding: 12px 16px;
   display: flex;
@@ -753,7 +751,7 @@ body::before {
   font-family: var(--font-pixel);
   font-size: 0.8rem;
   color: var(--cmyk-yellow);
-  text-shadow: 2px 2px 0px var(--cmyk-magenta);
+  text-shadow: 2px 2px 0 var(--cmyk-magenta);
 }
 
 .pixel-subtitle {
@@ -763,7 +761,7 @@ body::before {
 }
 
 .pixel-close-btn {
-  background: #000;
+  background: #000000;
   border: 2px solid var(--arcade-red);
   color: var(--arcade-red);
   font-family: var(--font-pixel);
@@ -771,13 +769,13 @@ body::before {
   width: 28px;
   height: 28px;
   cursor: pointer;
-  box-shadow: 2px 2px 0px var(--arcade-red);
+  box-shadow: 2px 2px 0 var(--arcade-red);
   transition: var(--transition-arcade);
 }
 
 .pixel-close-btn:hover {
   background: var(--arcade-red);
-  color: #fff;
+  color: #ffffff;
   transform: translate(-1px, -1px);
 }
 
@@ -819,15 +817,15 @@ body::before {
   padding: 10px 14px;
   border: 2px solid var(--cmyk-cyan);
   background: #090a14;
-  color: #fff;
-  box-shadow: 3px 3px 0px var(--cmyk-cyan);
+  color: #ffffff;
+  box-shadow: 3px 3px 0 var(--cmyk-cyan);
 }
 
 .pixel-user-msg .pixel-msg-bubble {
   border-color: var(--cmyk-magenta);
   background: #140912;
   color: var(--cmyk-yellow);
-  box-shadow: -3px 3px 0px var(--cmyk-magenta);
+  box-shadow: -3px 3px 0 var(--cmyk-magenta);
 }
 
 .pixel-msg-bubble b {
@@ -839,7 +837,7 @@ body::before {
   gap: 6px;
   padding: 8px 12px;
   overflow-x: auto;
-  background: #000;
+  background: #000000;
   border-top: 1px dashed var(--cmyk-cyan);
 }
 
@@ -857,13 +855,13 @@ body::before {
 
 .pixel-prompt-btn:hover {
   background: var(--cmyk-cyan);
-  color: #000;
+  color: #000000;
 }
 
 .pixel-chat-form {
   display: flex;
   padding: 10px;
-  background: #000;
+  background: #000000;
   border-top: 2px solid var(--cmyk-cyan);
   gap: 8px;
 }
@@ -881,18 +879,18 @@ body::before {
 
 .pixel-input:focus {
   border-color: var(--cmyk-magenta);
-  box-shadow: 2px 2px 0px var(--cmyk-cyan);
+  box-shadow: 2px 2px 0 var(--cmyk-cyan);
 }
 
 .pixel-send-btn {
   font-family: var(--font-pixel);
   font-size: 0.6rem;
   background: var(--arcade-green);
-  color: #000;
-  border: 2px solid #000;
+  color: #000000;
+  border: 2px solid #000000;
   padding: 0 14px;
   cursor: pointer;
-  box-shadow: 2px 2px 0px var(--cmyk-cyan);
+  box-shadow: 2px 2px 0 var(--cmyk-cyan);
   transition: var(--transition-arcade);
 }
 
@@ -902,7 +900,7 @@ body::before {
 }
 
 /* ==========================================================================
-   11. RESPONSIVE DESIGN (BREAKPOINTS Y AJUSTES DE BARRA DE NAVEGACIÓN)
+   11. RESPONSIVE DESIGN
    ========================================================================== */
 @media (max-width: 1280px) {
   .mobile-menu-btn { 
@@ -917,7 +915,7 @@ body::before {
     width: 100%;
     background: #06070e;
     border-bottom: 3px solid var(--cmyk-cyan);
-    box-shadow: 0 4px 0px var(--cmyk-magenta);
+    box-shadow: 0 4px 0 var(--cmyk-magenta);
     flex-direction: column;
     align-items: stretch;
     padding: 20px;
