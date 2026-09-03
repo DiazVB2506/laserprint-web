@@ -1,65 +1,10 @@
-// Validar autenticación inmediatamente antes de renderizar la vista
-if (localStorage.getItem('adminAutenticado') !== 'true') {
-  window.location.href = 'login.html';
-}
-
-const API_URL = '/api/productos';
-const formatoMXN = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
-
-// Estado global de la aplicación
-let productosGlobales = [];
-let categoriaActiva = 'TODAS';
-let busquedaTexto = '';
-
-// ==========================================================================
-// AUDIO SYNTHESIZER RETRO 8-BIT (EFECTOS DE SONIDO SIN ARCHIVOS EXTERNOS)
-// ==========================================================================
-function playRetroSFX(type) {
-  try {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) return;
-    const ctx = new AudioContext();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    const now = ctx.currentTime;
-
-    if (type === 'click') {
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(400, now);
-      osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
-      gain.gain.setValueAtTime(0.1, now);
-      gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
-      osc.start(now);
-      osc.stop(now + 0.05);
-    } else if (type === 'save') {
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(261.63, now); // C4
-      osc.frequency.setValueAtTime(329.63, now + 0.08); // E4
-      osc.frequency.setValueAtTime(392.00, now + 0.16); // G4
-      osc.frequency.setValueAtTime(523.25, now + 0.24); // C5
-      gain.gain.setValueAtTime(0.12, now);
-      gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
-      osc.start(now);
-      osc.stop(now + 0.35);
-    } else if (type === 'delete') {
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(300, now);
-      osc.frequency.linearRampToValueAtTime(80, now + 0.2);
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
-      osc.start(now);
-      osc.stop(now + 0.2);
-    }
-  } catch (e) {
-    // Silenciar si la política del navegador bloquea el audio dinámico
-  }
-}
-
+// Validar autenticación cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('adminAutenticado') !== 'true') {
+    window.location.href = 'login.html';
+    return;
+  }
+  
   cargarPublicaciones();
 
   // Evento formulario de subida
@@ -117,6 +62,66 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnCancelEdit) btnCancelEdit.addEventListener('click', () => { playRetroSFX('click'); cerrarModal(); });
 });
 
+// Detectar URL backend automáticamente según entorno (Local vs Producción)
+const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:3000/api/productos'
+  : 'https://laserprint-backend.onrender.com/api/productos'; // Cambia esta URL por tu Servidor backend real (Render/Heroku/Vercel)
+
+const formatoMXN = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+
+// Estado global de la aplicación
+let productosGlobales = [];
+let categoriaActiva = 'TODAS';
+let busquedaTexto = '';
+
+// ==========================================================================
+// AUDIO SYNTHESIZER RETRO 8-BIT
+// ==========================================================================
+function playRetroSFX(type) {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    const now = ctx.currentTime;
+
+    if (type === 'click') {
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(400, now);
+      osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
+      osc.start(now);
+      osc.stop(now + 0.05);
+    } else if (type === 'save') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(261.63, now);
+      osc.frequency.setValueAtTime(329.63, now + 0.08);
+      osc.frequency.setValueAtTime(392.00, now + 0.16);
+      osc.frequency.setValueAtTime(523.25, now + 0.24);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
+      osc.start(now);
+      osc.stop(now + 0.35);
+    } else if (type === 'delete') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(300, now);
+      osc.frequency.linearRampToValueAtTime(80, now + 0.2);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+      osc.start(now);
+      osc.stop(now + 0.2);
+    }
+  } catch (e) {
+    // Silenciar si el navegador bloquea el audio dinámico
+  }
+}
+
 /**
  * Carga inicial de datos desde el backend
  */
@@ -126,7 +131,7 @@ async function cargarPublicaciones() {
 
   tablaBody.innerHTML = `
     <tr>
-      <td colspan="5" style="text-align:center; padding: 2.5rem; color: var(--arcade-cyan); font-family: var(--font-pixel); font-size: 0.75rem;">
+      <td colspan="5" style="text-align:center; padding: 2.5rem; color: #00f3ff; font-size: 0.85rem;">
         👾 CARGANDO DATOS DEL SISTEMA...
       </td>
     </tr>`;
@@ -136,14 +141,14 @@ async function cargarPublicaciones() {
     if (!res.ok) throw new Error('Error al obtener datos');
 
     const data = await res.json();
-    productosGlobales = data.productos || [];
+    productosGlobales = Array.isArray(data) ? data : (data.productos || []);
     renderizarTabla();
   } catch (error) {
     console.error('Error al cargar publicaciones:', error);
     tablaBody.innerHTML = `
       <tr>
-        <td colspan="5" style="text-align:center; color: var(--arcade-red); padding: 2rem; font-family: var(--font-pixel); font-size: 0.75rem;">
-          ❌ ERROR DE CONEXIÓN: SERVER OFFLINE.
+        <td colspan="5" style="text-align:center; color: #ff0055; padding: 2rem; font-size: 0.85rem;">
+          ❌ ERROR DE CONEXIÓN: SERVER OFFLINE O RUTA NO ENCONTRADA.
         </td>
       </tr>`;
   }
@@ -170,8 +175,8 @@ function renderizarTabla() {
   if (filtrados.length === 0) {
     tablaBody.innerHTML = `
       <tr>
-        <td colspan="5" style="text-align:center; padding: 2.5rem; color: var(--arcade-yellow); font-family: var(--font-pixel); font-size: 0.7rem;">
-          🕹️ NO DATA FOUND // INSERT COIN
+        <td colspan="5" style="text-align:center; padding: 2.5rem; color: #ffe600; font-size: 0.85rem;">
+          🕹️ NO DATA FOUND // SIN REGISTROS
         </td>
       </tr>`;
     return;
@@ -191,14 +196,14 @@ function renderizarTabla() {
 
     const fila = document.createElement('tr');
     fila.innerHTML = `
-      <td><strong style="color: #ffffff; text-shadow: 0 0 5px var(--arcade-cyan);">${escapeHTML(prod.nombre)}</strong></td>
+      <td><strong style="color: #ffffff;">${escapeHTML(prod.nombre)}</strong></td>
       <td><span class="badge-cat">${escapeHTML(prod.categoria)}</span></td>
-      <td><strong style="color: var(--arcade-green); text-shadow: 2px 2px 0px #000;">${precioTexto}</strong></td>
+      <td><strong style="color: #00ff66;">${precioTexto}</strong></td>
       <td><span class="${badgeClass}">${tipoExt}</span></td>
       <td>
         <div style="display: flex; gap: 0.6rem;">
-          <button onclick="abrirModalEdicion('${prod._id}')" class="btn-edit" title="Editar registro">EDIT</button>
-          <button onclick="eliminarProducto('${prod._id}')" class="btn-del" title="Eliminar registro">DEL</button>
+          <button onclick="abrirModalEdicion('${prod._id || prod.id}')" class="btn-edit" title="Editar registro">EDIT</button>
+          <button onclick="eliminarProducto('${prod._id || prod.id}')" class="btn-del" title="Eliminar registro">DEL</button>
         </div>
       </td>
     `;
@@ -285,10 +290,10 @@ async function guardarPublicacion(e) {
  */
 window.abrirModalEdicion = function(id) {
   playRetroSFX('click');
-  const prod = productosGlobales.find(p => p._id === id);
+  const prod = productosGlobales.find(p => (p._id === id || p.id === id));
   if (!prod) return;
 
-  document.getElementById('editId').value = prod._id;
+  document.getElementById('editId').value = prod._id || prod.id;
   document.getElementById('editNombre').value = prod.nombre || '';
   document.getElementById('editDescripcion').value = prod.descripcion || '';
   document.getElementById('editPrecio').value = prod.precio !== undefined && prod.precio !== null ? prod.precio : '';
@@ -298,12 +303,12 @@ window.abrirModalEdicion = function(id) {
   if (fileInput) fileInput.value = '';
 
   const modal = document.getElementById('editModal');
-  if (modal) modal.classList.add('active');
+  if (modal) modal.style.display = 'flex';
 };
 
 function cerrarModal() {
   const modal = document.getElementById('editModal');
-  if (modal) modal.classList.remove('active');
+  if (modal) modal.style.display = 'none';
 }
 
 async function guardarEdicion(e) {
@@ -405,8 +410,8 @@ function mostrarNotificacion(mensaje, tipo = 'exito') {
   }
 
   const isExito = tipo === 'exito';
-  const borderColor = isExito ? 'var(--arcade-green)' : 'var(--arcade-pink)';
-  const textColor = isExito ? 'var(--arcade-green)' : 'var(--arcade-pink)';
+  const borderColor = isExito ? '#00ff66' : '#ff0055';
+  const textColor = isExito ? '#00ff66' : '#ff0055';
   
   toast.style.cssText = `
     position: fixed; bottom: 25px; right: 25px;
@@ -414,8 +419,8 @@ function mostrarNotificacion(mensaje, tipo = 'exito') {
     border: 3px solid ${borderColor};
     box-shadow: 5px 5px 0px ${borderColor};
     padding: 1rem 1.4rem;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.65rem;
+    font-family: monospace;
+    font-size: 0.75rem;
     line-height: 1.4;
     z-index: 2000; transition: all 0.2s ease;
     opacity: 0; transform: scale(0.8);
