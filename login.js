@@ -3,11 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const alertBox = document.getElementById('alertMessage');
   const btnSubmit = document.getElementById('btnLogin') || document.querySelector('button[type="submit"]');
 
-  // URL de producción conectada a Render (en lugar de la ruta relativa de GitHub Pages)
-  const API_URL = 'https://laserprint-api.onrender.com/api/login';
-
   // ==========================================================================
-  // AUDIO SYNTHESIZER RETRO 8-BIT (EFECTOS DE SONIDO SIN ARCHIVOS EXTERNOS)
+  // AUDIO SYNTHESIZER RETRO 8-BIT
   // ==========================================================================
   function playRetroSFX(type) {
     try {
@@ -32,10 +29,10 @@ document.addEventListener('DOMContentLoaded', () => {
         osc.stop(now + 0.05);
       } else if (type === 'granted') {
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(330, now); // E4
-        osc.frequency.setValueAtTime(440, now + 0.08); // A4
-        osc.frequency.setValueAtTime(554.37, now + 0.16); // C#5
-        osc.frequency.setValueAtTime(659.25, now + 0.24); // E5
+        osc.frequency.setValueAtTime(330, now);
+        osc.frequency.setValueAtTime(440, now + 0.08);
+        osc.frequency.setValueAtTime(554.37, now + 0.16);
+        osc.frequency.setValueAtTime(659.25, now + 0.24);
         gain.gain.setValueAtTime(0.12, now);
         gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
         osc.start(now);
@@ -49,24 +46,19 @@ document.addEventListener('DOMContentLoaded', () => {
         osc.start(now);
         osc.stop(now + 0.25);
       }
-    } catch (e) {
-      // Silenciar si la política del navegador bloquea la reproducción de audio dinámico
-    }
+    } catch (e) {}
   }
 
-  // Reproducir efecto al interactuar con el botón
   if (btnSubmit) {
     btnSubmit.addEventListener('mousedown', () => playRetroSFX('click'));
   }
 
-  // Función para mostrar mensajes de error estilo Terminal / Cyberpunk
   function mostrarError(mensaje) {
     playRetroSFX('denied');
     if (alertBox) {
       alertBox.textContent = `[SYSTEM ERROR]: ${mensaje.toUpperCase()}`;
       alertBox.style.display = 'block';
       alertBox.classList.remove('shake');
-      // Forzar reflow visual para reiniciar la animación CRT Shake
       void alertBox.offsetWidth;
       alertBox.classList.add('shake');
     } else {
@@ -74,37 +66,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Animación de carga interactiva en el botón Arcade
-  function setEstadoCargando(cargando) {
-    if (!btnSubmit) return;
-
-    if (cargando) {
-      btnSubmit.disabled = true;
-      btnSubmit.dataset.textoOriginal = btnSubmit.textContent;
-      btnSubmit.innerHTML = `
-        <span style="display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
-          <span class="retro-spinner">⏳</span> AUTHENTICATING...
-        </span>
-      `;
-    } else {
-      btnSubmit.disabled = false;
-      btnSubmit.textContent = btnSubmit.dataset.textoOriginal || 'Entrar';
-    }
-  }
-
-  // Estilos dinámicos para efectos retro de la interfaz
+  // Estilos dinámicos para efectos retro
   if (!document.getElementById('spinner-style')) {
     const style = document.createElement('style');
     style.id = 'spinner-style';
     style.innerHTML = `
-      .retro-spinner {
-        display: inline-block;
-        animation: pixelPulse 0.4s infinite alternate;
-      }
-      @keyframes pixelPulse {
-        0% { transform: scale(1); opacity: 1; }
-        100% { transform: scale(1.3); opacity: 0.4; }
-      }
       .shake { animation: shakeError 0.35s steps(4, end); }
       @keyframes shakeError {
         0% { transform: translate(0, 0); }
@@ -117,74 +83,43 @@ document.addEventListener('DOMContentLoaded', () => {
     document.head.appendChild(style);
   }
 
-  // Función para conceder el acceso
-  function otogarAcceso() {
-    localStorage.setItem('adminAutenticado', 'true');
-    playRetroSFX('granted');
-
-    if (btnSubmit) {
-      btnSubmit.style.background = 'var(--arcade-green, #00ff66)';
-      btnSubmit.style.color = '#000000';
-      btnSubmit.style.boxShadow = '6px 6px 0px var(--arcade-cyan, #00f0ff)';
-      btnSubmit.innerHTML = '★ ACCESS GRANTED ★';
-    }
-
-    setTimeout(() => {
-      window.location.href = 'admin.html';
-    }, 600);
-  }
-
-  // Procesar el envío del formulario
+  // Procesar inicio de sesión
   if (form) {
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
+      e.stopPropagation();
 
       if (alertBox) alertBox.style.display = 'none';
 
-      const usuarioInput = document.getElementById('usuario') || document.querySelector('input[type="text"]');
-      const passwordInput = document.getElementById('password') || document.querySelector('input[type="password"]');
+      const inputs = form.querySelectorAll('input');
+      let usuario = '';
+      let password = '';
 
-      const usuario = usuarioInput ? usuarioInput.value.trim() : '';
-      const password = passwordInput ? passwordInput.value.trim() : '';
-
-      if (!usuario || !password) {
-        mostrarError('INGRESA USUARIO Y CONTRASEÑA');
-        return;
-      }
-
-      setEstadoCargando(true);
-
-      try {
-        // Intento de conexión al servidor API de Render
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ usuario, password, username: usuario })
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success || data.token) {
-            otogarAcceso();
-            return;
-          } else {
-            setEstadoCargando(false);
-            mostrarError(data.message || 'INVALID CREDENTIALS');
-            return;
-          }
+      inputs.forEach(input => {
+        if (input.type === 'password') {
+          password = input.value.trim();
+        } else if (input.type === 'text' || input.type === 'email' || !input.type) {
+          usuario = input.value.trim();
         }
-      } catch (err) {
-        console.warn('⚡ API fuera de línea o iniciando en Render. Ejecutando respaldo local...');
-      }
+      });
 
-      // RESPALDO LOCAL (Si el servidor Render está dormido/offline)
-      if (usuario === '2025' && password === '2025') {
-        otogarAcceso();
+      // VALIDACIÓN DE CREDENCIALES DIRECTA (SIN PETICIONES HTTP / POST)
+      if (usuario === '2025' && password === 'LaserPrint01') {
+        localStorage.setItem('adminAutenticado', 'true');
+        playRetroSFX('granted');
+
+        if (btnSubmit) {
+          btnSubmit.style.background = '#00ff66';
+          btnSubmit.style.color = '#000000';
+          btnSubmit.style.boxShadow = '0 0 15px #00ff66';
+          btnSubmit.innerHTML = '★ ACCESS GRANTED ★';
+        }
+
+        setTimeout(() => {
+          window.location.href = 'admin.html';
+        }, 600);
       } else {
-        setEstadoCargando(false);
-        mostrarError('INVALID CREDENTIALS');
+        mostrarError('USUARIO O CONTRASEÑA INCORRECTOS');
       }
     });
   }
