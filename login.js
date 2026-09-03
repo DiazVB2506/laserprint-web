@@ -83,27 +83,21 @@ document.addEventListener('DOMContentLoaded', () => {
     document.head.appendChild(style);
   }
 
-  // Procesar inicio de sesión
+  // Procesar inicio de sesión local directo
   if (form) {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      e.stopPropagation();
 
       if (alertBox) alertBox.style.display = 'none';
 
-      const inputs = form.querySelectorAll('input');
-      let usuario = '';
-      let password = '';
+      // Capturar entradas buscando por ID o por tipo
+      const userEl = document.getElementById('usuario') || document.querySelector('input[type="text"]');
+      const passEl = document.getElementById('password') || document.querySelector('input[type="password"]');
 
-      inputs.forEach(input => {
-        if (input.type === 'password') {
-          password = input.value.trim();
-        } else if (input.type === 'text' || input.type === 'email' || !input.type) {
-          usuario = input.value.trim();
-        }
-      });
+      const usuario = userEl ? userEl.value.trim() : '';
+      const password = passEl ? passEl.value.trim() : '';
 
-      // VALIDACIÓN DE CREDENCIALES DIRECTA (SIN PETICIONES HTTP / POST)
+      // VALIDACIÓN LOCAL DIRECTA
       if (usuario === '2025' && password === 'LaserPrint01') {
         localStorage.setItem('adminAutenticado', 'true');
         playRetroSFX('granted');
@@ -119,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
           window.location.href = 'admin.html';
         }, 600);
       } else {
-        mostrarError('USUARIO O CONTRASEÑA INCORRECTOS');
+        mostrarError('INVALID CREDENTIALS');
       }
     });
   }
