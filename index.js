@@ -2,28 +2,9 @@
  * ==============================================================================
  * DISEÑO LASER PRINT - SISTEMA DE INTERFAZ & ASISTENTE VIRTUAL "PIXEL AI v3.3"
  * ==============================================================================
- * ARCHIVO COMPLETO INTEGRADO Y CORREGIDO
- *
- * Tabla de Contenidos:
- * 1. Inicialización Global y Eventos DOM
- * 2. Sintetizador de Efectos de Sonido Retro 8-Bit (Web Audio API Arcade Engine)
- * 3. Control de Reproducción de GIF y Medios sin Caché
- * 4. Menú de Navegación Móvil Responsivo e Interactivo
- * 5. Carrusel 3D Infinito, Dinámico y Táctil (API / Fallback)
- * 6. Lightbox Arcade (Visor Ampliador de Muestras e Imágenes)
- * 7. Catálogo de Tarifas y Motor de Cotizaciones Dinámico
- * 8. Engine de Pre-Prensa y Validador Técnico de Archivos
- * 9. PIXEL AI ENGINE & INTERFAZ DE CHAT (INTEGRACIÓN WHATSAPP & UBICACIÓN)
- * 10. Módulo de Checkout Directo a WhatsApp
- * 11. FAQ Engine & Notificador Toast
- * 12. Bootstrapper Final
  */
 
 const NUMERO_WHATSAPP = "5215500000000"; // Reemplaza con tu número a 10 dígitos más código de país
-
-document.addEventListener('DOMContentLoaded', () => {
-  LaserPrintApp.bootstrap();
-});
 
 /* ==========================================================================
    1. SINTETIZADOR DE EFECTOS DE SONIDO RETRO 8-BIT (WEB AUDIO API)
@@ -594,38 +575,7 @@ const CotizadorEngine = {
 };
 
 /* ==========================================================================
-   7. ENGINE DE PRE-PRENSA Y VALIDACIÓN TÉCNICA
-   ========================================================================== */
-
-const PrePrensaValidator = {
-  inspeccionarArchivoUsuario: function(file) {
-    return new Promise((resolve) => {
-      if (!file) {
-        resolve({ error: true, mensaje: "No se proporcionó ningún archivo." });
-        return;
-      }
-
-      const tamanoMB = file.size / (1024 * 1024);
-      if (tamanoMB > 150) {
-        resolve({
-          error: true,
-          mensaje: `❌ El archivo excede el límite máximo de 150 MB.`
-        });
-        return;
-      }
-
-      resolve({
-        error: false,
-        nombreArchivo: file.name,
-        tamanoMB: tamanoMB.toFixed(2),
-        diagnostico: "📄 ARCHIVO RECIBIDO: Listo para validación de impresión."
-      });
-    });
-  }
-};
-
-/* ==========================================================================
-   8. BASE DE CONOCIMIENTO MAESTRA DE PIXEL AI
+   7. BASE DE CONOCIMIENTO MAESTRA DE PIXEL AI
    ========================================================================== */
 
 const AVISO_COTIZACION_VARIA = `<br><br>⚠️ <i><b>Aviso importante:</b> El costo total estimado puede variar según especificaciones finales. El servicio de diseño tiene costo extra (puede variar dependiendo la complejidad). Para una cotización exacta dirígete a la sucursal o escríbenos vía WhatsApp.</i>`;
@@ -763,31 +713,27 @@ const PIXEL_KNOWLEDGE_BASE = {
 };
 
 /* ==========================================================================
-   9. PIXEL AI ENGINE & INTERFAZ DE CHAT INTERACTIVA
+   8. PIXEL AI ENGINE & INTERFAZ DE CHAT INTERACTIVA
    ========================================================================== */
 
 const PixelUI = {
   chatWidget: null,
   chatBox: null,
   inputField: null,
-  fileInput: null,
   sendBtn: null,
-  statusIndicator: null,
   isProcessing: false,
 
   init: function() {
     this.chatWidget = document.getElementById('pixelChatWidget');
     this.chatBox = document.getElementById('pixelChatMessages');
     this.inputField = document.getElementById('pixelInput');
-    this.fileInput = document.getElementById('pixelFileInput');
     this.sendBtn = document.getElementById('pixelSendBtn');
-    this.statusIndicator = document.getElementById('pixelBotStatus');
 
     this.bindEvents();
   },
 
   bindEvents: function() {
-    const toggleElements = document.querySelectorAll('#pixelToggleBtn, .pixel-toggle-btn, [data-action="open-pixel"]');
+    const toggleElements = document.querySelectorAll('#pixelToggleBtn, .pixel-toggle-btn');
 
     toggleElements.forEach(element => {
       element.addEventListener('click', (e) => {
@@ -816,10 +762,6 @@ const PixelUI = {
       });
     }
 
-    if (this.fileInput) {
-      this.fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
-    }
-
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('.pixel-prompt-btn, .pixel-quick-btn');
       if (btn) {
@@ -832,14 +774,14 @@ const PixelUI = {
 
   toggleChat: function() {
     if (!this.chatWidget) return;
-    const isOpen = this.chatWidget.classList.contains('active') || this.chatWidget.classList.contains('open');
+    const isOpen = this.chatWidget.classList.contains('active') || this.chatWidget.style.display === 'flex';
     if (isOpen) this.ocultarChat(); else this.mostrarChat();
   },
 
   mostrarChat: function() {
     if (!this.chatWidget) return;
     playArcadeSound('openModal');
-    this.chatWidget.classList.add('active', 'open');
+    this.chatWidget.classList.add('active');
     this.chatWidget.style.display = 'flex';
     if (this.inputField) setTimeout(() => this.inputField.focus(), 150);
   },
@@ -847,7 +789,7 @@ const PixelUI = {
   ocultarChat: function() {
     if (!this.chatWidget) return;
     playArcadeSound('closeModal');
-    this.chatWidget.classList.remove('active', 'open');
+    this.chatWidget.classList.remove('active');
     this.chatWidget.style.display = 'none';
   },
 
@@ -873,283 +815,119 @@ const PixelUI = {
   procesarMensajeDirecto: function(queryText) {
     this.appendMessage('user', queryText);
     playArcadeSound('click');
-
-    this.setProcessingState(true);
+    this.isProcessing = true;
 
     setTimeout(() => {
       this.procesarRespuestaInteligente(queryText);
+      this.isProcessing = false;
     }, 400);
   },
 
-  handleFileUpload: async function(e) {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    const file = files[0];
-    this.appendMessage('user', `📎 Adjuntando archivo: <b>${file.name}</b>`);
-    
-    const validacion = await PrePrensaValidator.inspeccionarArchivoUsuario(file);
-    if (validacion.error) {
-      this.appendMessage('bot', validacion.mensaje);
-      playArcadeSound('error');
-    } else {
-      this.appendMessage('bot', `✅ Archivo <b>${file.name}</b> recibido correctamente.<br>Puedes enviárnoslo también a WhatsApp para confirmar detalles.`);
-      playArcadeSound('success');
-    }
-  },
-
-  setProcessingState: function(active) {
-    this.isProcessing = active;
-    if (this.statusIndicator) {
-      this.statusIndicator.textContent = active ? 'Pixel AI pensando...' : 'Pixel AI - En Línea';
-    }
-  },
-
-  appendMessage: function(sender, htmlContent) {
+  appendMessage: function(sender, contentHTML) {
     if (!this.chatBox) return;
 
     const msgDiv = document.createElement('div');
-    msgDiv.className = `pixel-msg ${sender === 'user' ? 'pixel-user-msg user-msg' : 'pixel-bot-msg bot-msg'}`;
-    
-    msgDiv.innerHTML = `
-      <div class="pixel-msg-bubble">${htmlContent}</div>
-    `;
+    msgDiv.className = `pixel-msg ${sender === 'user' ? 'pixel-user-msg' : 'pixel-bot-msg'}`;
 
+    const bubbleDiv = document.createElement('div');
+    bubbleDiv.className = 'pixel-msg-bubble';
+    bubbleDiv.innerHTML = contentHTML;
+
+    msgDiv.appendChild(bubbleDiv);
     this.chatBox.appendChild(msgDiv);
     this.chatBox.scrollTop = this.chatBox.scrollHeight;
   },
 
-  procesarRespuestaInteligente: function(textoUsuario) {
-    const textoLower = textoUsuario.toLowerCase().trim();
+  procesarRespuestaInteligente: function(query) {
+    const qLower = query.toLowerCase().trim();
 
-    // 1. Solicitud directa de WhatsApp
-    if (textoLower.includes('whatsapp') || textoLower.includes('cotizar por whatsapp')) {
-      const urlWsp = `https://wa.me/${NUMERO_WHATSAPP}?text=Hola%20Dise%C3%B1o%20Laser%20Print,%20quiero%20cotizar%20un%20trabajo`;
-      const wspHtml = `
-        📲 <b>CONTACTO DIRECTO WHATSAPP</b><br><br>
-        Haz clic en el siguiente enlace para abrir el chat de WhatsApp con un asesor:<br><br>
-        👉 <a href="${urlWsp}" target="_blank" style="color:#00f0ff; font-weight:bold; text-decoration:underline;">Abrir Chat de WhatsApp Directo</a>
-      `;
-      this.appendMessage('bot', wspHtml);
-      playArcadeSound('success');
-      this.setProcessingState(false);
-      return;
-    }
+    // 1. Detección de medidas y cotizaciones dinámicas
+    const datosMedidas = CotizadorEngine.parsearMedidasDesdeTexto(qLower);
 
-    // 2. Redirección específica para DTF UV
-    if (textoLower.includes('dtf uv') || textoLower.includes('uv dtf')) {
-      const urlWspUv = `https://wa.me/${NUMERO_WHATSAPP}?text=Hola,%20quiero%20cotizar%20DTF%20UV%20con%20contacto%20directo`;
-      const uvHtml = `
-        ✨ <b>COTIZACIÓN DTF UV</b><br><br>
-        Para la cotización de <b>DTF UV</b> solicitamos hablar directamente con nuestro contacto de atención personalizada.<br><br>
-        👉 <a href="${urlWspUv}" target="_blank" style="color:#00f0ff; font-weight:bold; text-decoration:underline;">Hablar con contacto directo por WhatsApp</a>
-      `;
-      this.appendMessage('bot', uvHtml);
-      playArcadeSound('success');
-      this.setProcessingState(false);
-      return;
-    }
-
-    // 3. Motor de Cotizaciones con cálculo dinámico
-    if (typeof CotizadorEngine !== 'undefined') {
-
-      // A) Cotización de DTF Textil
-      if (textoLower.includes('dtf')) {
-        const medidas = CotizadorEngine.parsearMedidasDesdeTexto(textoUsuario);
-        let metros = 1;
-
-        if (medidas) {
-          if (medidas.metrosLineales) metros = medidas.metrosLineales;
-          else if (medidas.alto) metros = medidas.alto;
-        }
-
-        const resDtf = CotizadorEngine.calcularDTFTextil(metros);
-        const msgWsp = encodeURIComponent(`Hola, quiero solicitar cotización exacta de DTF Textil para ${resDtf.metrosSolicitados}m`);
-
-        const dtfHtml = `
-          👕 <b>COTIZACIÓN ESTIMADA - DTF TEXTIL</b><br><br>
-          • <b>Especificaciones:</b> 57 cm ancho x 100 cm alto por metro.<br>
-          • <b>Metros solicitados:</b> ${resDtf.metrosSolicitados} m<br>
-          • <b>Metros calculados:</b> ${resDtf.metrosCobrados} m ${resDtf.aplicoMinimo ? '(Venta mínima: 0.5m)' : ''}<br>
-          • <b>Precio por metro:</b> $${resDtf.precioPorMetro} MXN<br>
-          • <b>Total Estimado:</b> <b>$${resDtf.total} MXN</b>
-          ${AVISO_COTIZACION_VARIA}<br><br>
-          📲 <a href="https://wa.me/${NUMERO_WHATSAPP}?text=${msgWsp}" target="_blank" style="color:#00f0ff; font-weight:bold; text-decoration:underline;">Confirmar cotización por WhatsApp</a>
-        `;
-        this.appendMessage('bot', dtfHtml);
+    if (datosMedidas) {
+      if (qLower.includes('dtf') || qLower.includes('textil')) {
+        const m = datosMedidas.metrosLineales || datosMedidas.ancho;
+        const res = CotizadorEngine.calcularDTFTextil(m);
+        const msg = `<b>👕 PIXEL AI - COTIZACIÓN DTF TEXTIL:</b><br><br>
+        • Metros calculados: <b>${res.metrosCobrados} m</b><br>
+        • Precio por metro: <b>$${res.precioPorMetro} MXN</b><br>
+        • Total estimado: <b style="color:#00f0ff; font-size:1.1em;">$${res.total} MXN</b>
+        ${res.aplicoMinimo ? '<br><i>(Aplica mínimo de compra de 0.5 metros)</i>' : ''}
+        ${AVISO_COTIZACION_VARIA}`;
+        this.appendMessage('bot', msg);
         playArcadeSound('success');
-        this.setProcessingState(false);
         return;
       }
 
-      // B) Cotización de Vinil para Sticker
-      if (textoLower.includes('sticker') || textoLower.includes('stickers') || textoLower.includes('calcomania') || textoLower.includes('calcomanías')) {
-        const medidas = CotizadorEngine.parsearMedidasDesdeTexto(textoUsuario);
-        let metros = 1;
-
-        if (medidas) {
-          if (medidas.metrosLineales) metros = medidas.metrosLineales;
-          else if (medidas.alto) metros = medidas.alto;
-        }
-
-        const resSticker = CotizadorEngine.calcularVinilSticker(metros);
-        const msgWsp = encodeURIComponent(`Hola, quiero solicitar cotización exacta de Vinil Sticker para ${resSticker.metrosSolicitados}m`);
-
-        const stickerHtml = `
-          🏷️ <b>COTIZACIÓN ESTIMADA - VINIL PARA STICKERS</b><br><br>
-          • <b>Especificaciones:</b> 1.5 m (150 cm) ancho x 1 m (100 cm) alto por metro.<br>
-          • <b>Metros solicitados:</b> ${resSticker.metrosSolicitados} m<br>
-          • <b>Metros calculados:</b> ${resSticker.metrosCobrados} m ${resSticker.aplicoMinimo ? '(Venta mínima: 0.5m)' : ''}<br>
-          • <b>Precio por metro:</b> $${resSticker.precioPorMetro} MXN<br>
-          • <b>Total Estimado:</b> <b>$${resSticker.total} MXN</b>
-          ${AVISO_COTIZACION_VARIA}<br><br>
-          📲 <a href="https://wa.me/${NUMERO_WHATSAPP}?text=${msgWsp}" target="_blank" style="color:#00f0ff; font-weight:bold; text-decoration:underline;">Confirmar cotización por WhatsApp</a>
-        `;
-        this.appendMessage('bot', stickerHtml);
+      if (qLower.includes('sticker') || qLower.includes('vinil sticker')) {
+        const m = datosMedidas.metrosLineales || datosMedidas.ancho;
+        const res = CotizadorEngine.calcularVinilSticker(m);
+        const msg = `<b>🏷️ PIXEL AI - COTIZACIÓN VINIL STICKER:</b><br><br>
+        • Metros calculados: <b>${res.metrosCobrados} m</b><br>
+        • Precio por metro: <b>$${res.precioPorMetro} MXN</b><br>
+        • Total estimado: <b style="color:#00f0ff; font-size:1.1em;">$${res.total} MXN</b>
+        ${res.aplicoMinimo ? '<br><i>(Aplica mínimo de compra de 0.5 metros)</i>' : ''}
+        ${AVISO_COTIZACION_VARIA}`;
+        this.appendMessage('bot', msg);
         playArcadeSound('success');
-        this.setProcessingState(false);
         return;
       }
 
-      // C) Gran Formato, Lona y Sublimación por m²
-      const medidas = CotizadorEngine.parsearMedidasDesdeTexto(textoUsuario);
-      if (medidas && medidas.ancho && medidas.alto) {
+      if (datosMedidas.ancho && datosMedidas.alto) {
         let prodKey = 'LONA_440G';
-        if (textoLower.includes('vinil')) prodKey = 'VINIL_IMPRESO';
-        if (textoLower.includes('sublimacion') || textoLower.includes('sublimación')) prodKey = 'SUBLIMACION_M2';
+        if (qLower.includes('sublimacion') || qLower.includes('sublimación')) prodKey = 'SUBLIMACION_M2';
+        if (qLower.includes('vinil') && !qLower.includes('sticker')) prodKey = 'VINIL_IMPRESO';
 
-        const res = CotizadorEngine.calcularGranFormato(prodKey, medidas.ancho, medidas.alto, 1);
-        if (!res.error) {
-          const msgWsp = encodeURIComponent(`Hola, solicito cotización para: ${res.producto} de ${res.ancho}m x ${res.alto}m (Total estimado: $${res.total} ${res.moneda})`);
-          
-          const cotizacionHtml = `
-            📊 <b>COTIZACIÓN ESTIMADA</b><br><br>
-            • <b>Producto:</b> ${res.producto}<br>
-            • <b>Medidas:</b> ${res.ancho}m x ${res.alto}m (${res.areaM2Unidad} m²)<br>
-            • <b>Total Estimado:</b> <b>$${res.total} ${res.moneda}</b><br>
-            ${res.aplicoMinimo ? '⚠️ <i>Se aplica cobro mínimo por m².</i>' : ''}
-            ${AVISO_COTIZACION_VARIA}<br><br>
-            📲 <a href="https://wa.me/${NUMERO_WHATSAPP}?text=${msgWsp}" target="_blank" style="color:#00f0ff; font-weight:bold; text-decoration:underline;">Solicitar cotización exacta por WhatsApp</a>
-          `;
-          this.appendMessage('bot', cotizacionHtml);
-          playArcadeSound('success');
-          this.setProcessingState(false);
-          return;
-        }
+        const res = CotizadorEngine.calcularGranFormato(prodKey, datosMedidas.ancho, datosMedidas.alto);
+        const msg = `<b>📊 PIXEL AI - COTIZACIÓN EN VIVO:</b><br><br>
+        • Producto: <b>${res.producto}</b><br>
+        • Dimensiones: <b>${res.ancho} m x ${res.alto} m</b> (${res.areaM2Unidad} m²)<br>
+        • Total estimado: <b style="color:#00f0ff; font-size:1.1em;">$${res.total} MXN</b>
+        ${res.aplicoMinimo ? '<br><i>(Aplica mínimo de cobro de 1 m²)</i>' : ''}
+        ${AVISO_COTIZACION_VARIA}`;
+        this.appendMessage('bot', msg);
+        playArcadeSound('success');
+        return;
       }
     }
 
-    // 4. Coincidencia por Base de Conocimientos
-    if (typeof PIXEL_KNOWLEDGE_BASE !== 'undefined') {
-      for (const key in PIXEL_KNOWLEDGE_BASE) {
-        const item = PIXEL_KNOWLEDGE_BASE[key];
-        if (item.keywords.some(kw => textoLower.includes(kw))) {
-          this.appendMessage('bot', item.response);
-          playArcadeSound('hover');
-          this.setProcessingState(false);
-          return;
-        }
+    // 2. Búsqueda por palabras clave en Base de Conocimientos
+    for (const key in PIXEL_KNOWLEDGE_BASE) {
+      const item = PIXEL_KNOWLEDGE_BASE[key];
+      if (item.keywords.some(kw => qLower.includes(kw))) {
+        this.appendMessage('bot', item.response);
+        playArcadeSound('success');
+        return;
       }
     }
 
-    // 5. Fallback para Consultas No Entendidas (Enlace directo a WhatsApp)
-    const msgFallback = encodeURIComponent(`Hola Diseño Laser Print, tengo la siguiente duda: "${textoUsuario}"`);
-    const urlFallbackWsp = `https://wa.me/${NUMERO_WHATSAPP}?text=${msgFallback}`;
+    // 3. Respuesta por defecto
+    const defaultMsg = `<b>👾 PIXEL AI:</b> No pude entender completamente tu consulta, pero te ayudo a resolverla al instante.<br><br>
+    Puedes pedirme cotizaciones expresando la medida como: <b>"1.5 x 2m de lona"</b>, <b>"2 metros dtf textil"</b> o escribir la duda que tengas.<br><br>
+    📲 O habla directo con nuestro equipo:<br>
+    👉 <a href="https://wa.me/${NUMERO_WHATSAPP}?text=Hola,%20tengo%20una%20duda%20sobre%20un%20trabajo" target="_blank" style="color:#00f0ff; font-weight:bold; text-decoration:underline;">Cotizar por WhatsApp</a>`;
     
-    const respuestaFallback = `
-      <b>👾 PIXEL AI:</b> No pude comprender con precisión tu consulta.<br><br>
-      Para asegurarte la información correcta y resolver tus dudas de inmediato, por favor escríbenos directamente a WhatsApp:<br><br>
-      👉 <a href="${urlFallbackWsp}" target="_blank" style="color:#00f0ff; font-weight:bold; text-decoration:underline;">Haz clic aquí para consultarlo vía WhatsApp</a><br><br>
-      📍 <i>Nota: Si buscas la dirección física de la sucursal, la puedes encontrar detallada <b>al final de esta página web</b>.</i>
-    `;
-    this.appendMessage('bot', respuestaFallback);
-    playArcadeSound('hover');
-    this.setProcessingState(false);
-  }
-};
-
-function initPixelAI() {
-  PixelUI.init();
-}
-
-/* ==========================================================================
-   10. MÓDULO DE CHECKOUT DIRECTO A WHATSAPP
-   ========================================================================== */
-
-const WhatsAppCheckout = {
-  abrirChatGeneral: function() {
-    const urlApi = `https://wa.me/${NUMERO_WHATSAPP}?text=Hola%20Dise%C3%B1o%20Laser%20Print,%20quiero%20mas%20informacion`;
-    window.open(urlApi, '_blank');
+    this.appendMessage('bot', defaultMsg);
+    playArcadeSound('error');
   }
 };
 
 /* ==========================================================================
-   11. FAQ ENGINE & NOTIFICADOR TOAST
-   ========================================================================== */
-
-const FAQEngine = {
-  renderizarSeccionFAQ: function(contenedorId = 'faqContainer') {
-    const container = document.getElementById(contenedorId);
-    if (!container) return;
-    container.innerHTML = `<p style="color:#a0a5b5; font-size:14px;">Centro de ayuda interactivo.</p>`;
-  }
-};
-
-const PixelNotifier = {
-  container: null,
-
-  init: function() {
-    this.container = document.getElementById('pixelToastContainer');
-    if (!this.container) {
-      this.container = document.createElement('div');
-      this.container.id = 'pixelToastContainer';
-      this.container.style.cssText = `position:fixed; bottom:20px; right:20px; z-index:999999; display:flex; flex-direction:column; gap:10px;`;
-      document.body.appendChild(this.container);
-    }
-  },
-
-  show: function(message, duration = 3000) {
-    if (!this.container) this.init();
-    const toast = document.createElement('div');
-    toast.style.cssText = `background:#0f111a; color:#fff; border:1px solid #00f0ff; padding:10px 15px; border-radius:5px; font-size:13px;`;
-    toast.innerHTML = message;
-    this.container.appendChild(toast);
-    setTimeout(() => toast.remove(), duration);
-  }
-};
-
-/* ==========================================================================
-   12. CONTROLADOR DE BOOTSTRAP Y PUNTO DE ENTRADA
+   9. BOOTSTRAPPER FINAL
    ========================================================================== */
 
 const LaserPrintApp = {
-  isLoaded: false,
-
   bootstrap: function() {
-    if (this.isLoaded) return;
-    
-    console.log(`🎮 [LASER PRINT SYSTEM v${LASER_PRINT_DB.version}] Inicializado.`);
-
     initRetroSFXSystem();
-    initMobileMenu();
     initGifPlayback();
+    initMobileMenu();
     cargarCarruselDinamico();
     initLightbox();
-    initPixelAI();
-    PixelNotifier.init();
-    FAQEngine.renderizarSeccionFAQ('faqContainer');
-
-    this.bindGlobalButtons();
-    this.isLoaded = true;
-  },
-
-  bindGlobalButtons: function() {
-    const sendWspBtn = document.querySelectorAll('.whatsapp-btn, .btn-whatsapp-direct');
-    sendWspBtn.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        WhatsAppCheckout.abrirChatGeneral();
-      });
-    });
+    PixelUI.init();
+    console.log("🎮 Laser Print UI & Pixel AI v3.3 listos.");
   }
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+  LaserPrintApp.bootstrap();
+});
