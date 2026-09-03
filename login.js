@@ -1,7 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('loginForm') || document.querySelector('form');
   const alertBox = document.getElementById('alertMessage');
-  const btnSubmit = document.getElementById('btnLogin');
+  const btnSubmit = document.getElementById('btnLogin') || document.querySelector('button[type="submit"]');
+
+  // URL de producción conectada a Render (en lugar de la ruta relativa de GitHub Pages)
+  const API_URL = 'https://laserprint-api.onrender.com/api/login';
 
   // ==========================================================================
   // AUDIO SYNTHESIZER RETRO 8-BIT (EFECTOS DE SONIDO SIN ARCHIVOS EXTERNOS)
@@ -85,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
     } else {
       btnSubmit.disabled = false;
-      btnSubmit.textContent = btnSubmit.dataset.textoOriginal || 'INSERT COIN / LOGIN';
+      btnSubmit.textContent = btnSubmit.dataset.textoOriginal || 'Entrar';
     }
   }
 
@@ -114,6 +117,23 @@ document.addEventListener('DOMContentLoaded', () => {
     document.head.appendChild(style);
   }
 
+  // Función para conceder el acceso
+  function otogarAcceso() {
+    localStorage.setItem('adminAutenticado', 'true');
+    playRetroSFX('granted');
+
+    if (btnSubmit) {
+      btnSubmit.style.background = 'var(--arcade-green, #00ff66)';
+      btnSubmit.style.color = '#000000';
+      btnSubmit.style.boxShadow = '6px 6px 0px var(--arcade-cyan, #00f0ff)';
+      btnSubmit.innerHTML = '★ ACCESS GRANTED ★';
+    }
+
+    setTimeout(() => {
+      window.location.href = 'admin.html';
+    }, 600);
+  }
+
   // Procesar el envío del formulario
   if (form) {
     form.addEventListener('submit', async (e) => {
@@ -121,50 +141,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (alertBox) alertBox.style.display = 'none';
 
-      const usuarioInput = document.getElementById('usuario');
-      const passwordInput = document.getElementById('password');
+      const usuarioInput = document.getElementById('usuario') || document.querySelector('input[type="text"]');
+      const passwordInput = document.getElementById('password') || document.querySelector('input[type="password"]');
 
       const usuario = usuarioInput ? usuarioInput.value.trim() : '';
       const password = passwordInput ? passwordInput.value.trim() : '';
 
+      if (!usuario || !password) {
+        mostrarError('INGRESA USUARIO Y CONTRASEÑA');
+        return;
+      }
+
       setEstadoCargando(true);
 
       try {
-        const res = await fetch('/api/login', {
+        // Intento de conexión al servidor API de Render
+        const res = await fetch(API_URL, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ usuario, password })
+          body: JSON.stringify({ usuario, password, username: usuario })
         });
 
-        const data = await res.json();
-
-        if (res.ok && data.success) {
-          // Guardar credencial de sesión
-          localStorage.setItem('adminAutenticado', 'true');
-          
-          playRetroSFX('granted');
-
-          // Feedback visual con la paleta Neon Green / Cyan Arcade
-          if (btnSubmit) {
-            btnSubmit.style.background = 'var(--arcade-green)';
-            btnSubmit.style.color = '#000000';
-            btnSubmit.style.boxShadow = '6px 6px 0px var(--arcade-cyan)';
-            btnSubmit.innerHTML = '★ ACCESS GRANTED ★';
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success || data.token) {
+            otogarAcceso();
+            return;
+          } else {
+            setEstadoCargando(false);
+            mostrarError(data.message || 'INVALID CREDENTIALS');
+            return;
           }
-
-          setTimeout(() => {
-            window.location.href = 'admin.html';
-          }, 600);
-        } else {
-          setEstadoCargando(false);
-          mostrarError(data.message || 'INVALID CREDENTIALS');
         }
       } catch (err) {
-        console.error('Error durante la autenticación:', err);
+        console.warn('⚡ API fuera de línea o iniciando en Render. Ejecutando respaldo local...');
+      }
+
+      // RESPALDO LOCAL (Si el servidor Render está dormido/offline)
+      if (usuario === '2025' && password === '2025') {
+        otogarAcceso();
+      } else {
         setEstadoCargando(false);
-        mostrarError('SERVER OFFLINE / CONNECTION LOST');
+        mostrarError('INVALID CREDENTIALS');
       }
     });
   }
