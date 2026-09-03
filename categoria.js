@@ -1,8 +1,13 @@
 /* ==========================================================================
-   LASERPRINT ARCADE - CATEGORIA ENGINE (UNIFICADO Y COMPATIBLE)
+   LASERPRINT ARCADE - CATEGORIA ENGINE (CORREGIDO PARA GITHUB PAGES Y RENDER)
    ========================================================================== */
 
-const API_URL = '/api/productos';
+// Detecta automáticamente si está en local o en producción (Render)
+const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:5000/api/productos'
+  : 'https://laserprint-api.onrender.com/api/productos';
+
+const RENDER_BASE_URL = 'https://laserprint-api.onrender.com';
 const formatoMXN = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -30,9 +35,22 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-function obtenerUrlCompleta(url) {
+/**
+ * Convierte URLs relativas (/uploads/...) a URLs absolutas apuntando a Render
+ */
+function obtenerUrlCompleta(prod) {
+  const url = prod ? (prod.fullArchivoUrl || prod.archivoUrl) : '';
+  
   if (!url) return 'https://via.placeholder.com/300x200/111/d4af37?text=Sin+Archivo';
-  return url;
+  
+  // Si ya es una URL completa (http/https/Cloudinary/etc.)
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  
+  // Si es una ruta relativa de Express (/uploads/...)
+  const cleanPath = url.startsWith('/') ? url : `/${url}`;
+  return `${RENDER_BASE_URL}${cleanPath}`;
 }
 
 async function cargarProductosPorCategoria(categoria) {
@@ -43,6 +61,8 @@ async function cargarProductosPorCategoria(categoria) {
 
   try {
     const res = await fetch(`${API_URL}?categoria=${encodeURIComponent(categoria)}`);
+    if (!res.ok) throw new Error('Error en la respuesta del servidor');
+
     const data = await res.json();
     const productos = data.productos || data || [];
 
@@ -93,7 +113,7 @@ async function cargarProductosPorCategoria(categoria) {
 function crearTarjetaArcade(prod, tipo) {
   const card = document.createElement('div');
   card.className = 'card-arcade';
-  const urlFinal = obtenerUrlCompleta(prod.archivoUrl);
+  const urlFinal = obtenerUrlCompleta(prod);
   const precioTexto = prod.precio ? formatoMXN.format(prod.precio) : '';
 
   if (tipo === 'pdf') {
@@ -140,7 +160,7 @@ function crearTarjetaArcade(prod, tipo) {
 function crearTarjetaGenerica(prod) {
   const card = document.createElement('div');
   card.className = 'card producto-card';
-  const urlFinal = obtenerUrlCompleta(prod.archivoUrl);
+  const urlFinal = obtenerUrlCompleta(prod);
   const tipo = (prod.tipoArchivo || '').toLowerCase();
 
   let recursoHTML = '';
