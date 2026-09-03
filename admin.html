@@ -15,6 +15,13 @@
   
   <!-- Estilos CSS externo -->
   <link rel="stylesheet" href="admin.css">
+
+  <!-- Verificación inmediata de sesión antes de renderizar la página -->
+  <script>
+    if (localStorage.getItem('adminAutenticado') !== 'true') {
+      window.location.href = 'login.html';
+    }
+  </script>
 </head>
 <body>
 
@@ -25,7 +32,7 @@
   <!-- Encabezado del Panel -->
   <header class="admin-header glass-card">
     <div class="header-brand">
-      <img src="uploads/fotos/LOGOTIPO.png" alt="Logo LaserPrint" class="admin-logo" onerror="this.onerror=null; this.src='/uploads/fotos/LOGOTIPO.png';">
+      <img src="uploads/fotos/LOGOTIPO.png" alt="Logo LaserPrint" class="admin-logo" onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/diazvb2506/laserprint-web/main/uploads/fotos/LOGOTIPO.png';">
       <h1 class="header-title">Panel de Administración</h1>
     </div>
     <div class="header-actions">
@@ -44,7 +51,7 @@
         <p class="form-subtitle">Sube y gestiona el contenido de tus diferentes secciones</p>
       </div>
       
-      <form id="uploadForm">
+      <form id="uploadForm" autocomplete="off">
         <div class="form-group">
           <label for="nombre">Nombre del Producto / Servicio</label>
           <input type="text" id="nombre" name="nombre" required maxlength="120" placeholder="Ej. Impresión DTF Playera Negra">
@@ -127,7 +134,7 @@
   </main>
 
   <!-- Modal Flotante para Edición de Publicaciones -->
-  <div id="editModal" class="modal-overlay">
+  <div id="editModal" class="modal-overlay" style="display: none;">
     <div class="modal-content glass-card">
       <div class="modal-header">
         <h2>✏️ Editar Publicación</h2>
@@ -181,7 +188,7 @@
     </div>
   </div>
 
-  <!-- Script del Administrador -->
-  <script src="admin.js"></script>
+  <!-- Script del Administrador con versión anti-caché -->
+  <script src="admin.js?v=2.0"></script>
 </body>
 </html>
