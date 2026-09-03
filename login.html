@@ -15,17 +15,17 @@
   <div class="bg-glow ambient-cyan"></div>
   <div class="bg-glow ambient-magenta"></div>
 
-  <!-- Contenedor en 2 columnas (Izquierda: Logo | Derecha: Login) -->
+  <!-- Contenedor principal -->
   <main class="login-split-container">
 
-    <!-- COLUMNA IZQUIERDA: LOGO GRANDE Y MARCA -->
+    <!-- COLUMNA IZQUIERDA: LOGO Y MARCA -->
     <section class="brand-side">
       <a href="index.html" class="logo-hero-link">
         <img 
           src="uploads/fotos/LOGOTIPO.png" 
           alt="Diseño Laser Print Logo" 
           class="hero-logo-img"
-          onerror="this.onerror=null; this.src='/uploads/fotos/LOGOTIPO.png';"
+          onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/diazvb2506/laserprint-web/main/uploads/fotos/LOGOTIPO.png';"
         >
       </a>
       <h1 class="brand-title-outside">LASERPRINT</h1>
@@ -36,39 +36,42 @@
     <section class="form-side">
       <div class="card">
         <div class="card2">
-          <form class="form" id="loginForm">
+          <form class="form" id="loginForm" autocomplete="off">
 
             <h2 id="heading">Panel de Acceso</h2>
 
-            <!-- Alertas -->
-            <div id="alertMessage" class="alert-message"></div>
+            <!-- Mensajes de alerta -->
+            <div id="alertMessage" class="alert-message" style="display: none;"></div>
 
             <!-- Campo Usuario -->
             <div class="field">
-              <svg class="input-icon" viewBox="0 0 24 24">
+              <svg class="input-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
               </svg>
               <input 
                 type="text" 
                 id="usuario" 
+                name="usuario"
                 class="input-field" 
                 placeholder="Usuario" 
                 required 
-                autocomplete="off"
+                autocomplete="username"
               >
             </div>
 
             <!-- Campo Contraseña -->
             <div class="field">
-              <svg class="input-icon" viewBox="0 0 24 24">
+              <svg class="input-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                 <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
               </svg>
               <input 
                 type="password" 
                 id="password" 
+                name="password"
                 class="input-field" 
                 placeholder="Contraseña" 
                 required
+                autocomplete="current-password"
               >
             </div>
 
@@ -86,6 +89,7 @@
 
   </main>
 
-  <script src="login.js"></script>
+  <!-- Script cargado al final con parámetro anti-caché para forzar actualización -->
+  <script src="login.js?v=2.0"></script>
 </body>
 </html>
