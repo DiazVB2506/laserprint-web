@@ -1,0 +1,434 @@
+/* ==========================================================================
+   1. RESET, FUENTES Y VARIABLES GLOBALES (RETRO CYBERPUNK ARCADE STYLING)
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Paleta Neon Arcade 8-Bit */
+  --bg-dark-main: #06050e;
+  
+  --arcade-cyan: #00f0ff;
+  --arcade-pink: #ff007f;
+  --arcade-yellow: #ffe600;
+  --arcade-green: #39ff14;
+  --arcade-purple: #9d4edd;
+  --arcade-red: #ff3366;
+  
+  /* Contenedores y Cajas Retro */
+  --retro-bg-card: rgba(13, 14, 25, 0.95);
+  --input-bg: #090a14;
+
+  /* Fuentes Retro */
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-terminal: 'VT323', monospace;
+
+  /* Textos */
+  --text-primary: #ffffff;
+  --text-secondary: #00f0ff;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-terminal);
+  font-size: 1.35rem;
+  letter-spacing: 1px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg-dark-main);
+  position: relative;
+  color: var(--text-primary);
+  padding: clamp(1rem, 3vw, 2.5rem);
+  background-image: 
+    linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+/* ==========================================================================
+   2. OVERLAY CRT SCANLINES (EFECTO MONITOR DE TUBO RETRO)
+   ========================================================================== */
+body::before {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%), 
+              linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  z-index: 999;
+  background-size: 100% 4px, 6px 100%;
+  pointer-events: none;
+}
+
+/* Ambient Glow de Retroalimentación Neon */
+.bg-glow {
+  position: fixed;
+  width: clamp(250px, 45vw, 650px);
+  height: clamp(250px, 45vw, 650px);
+  border-radius: 50%;
+  filter: blur(130px);
+  z-index: 0;
+  opacity: 0.25;
+  pointer-events: none;
+  animation: floatBg 12s ease-in-out infinite alternate;
+}
+
+.ambient-cyan {
+  background: var(--arcade-cyan);
+  top: -10%;
+  left: -10%;
+}
+
+.ambient-magenta {
+  background: var(--arcade-pink);
+  bottom: -10%;
+  right: -10%;
+  animation-delay: -6s;
+}
+
+@keyframes floatBg {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, 40px) scale(1.1); }
+  100% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+/* ==========================================================================
+   3. ESTRUCTURA PRINCIPAL (LAYOUT ADAPTABLE MOBILE-FIRST)
+   ========================================================================== */
+.login-split-container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 1100px;
+  gap: clamp(2rem, 4vw, 4rem);
+  margin: auto;
+}
+
+/* ==========================================================================
+   4. SECCIÓN MARCA Y LOGOTIPO
+   ========================================================================== */
+.brand-side {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: fadeInDown 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.logo-hero-link {
+  display: inline-block;
+  text-decoration: none;
+  margin-bottom: clamp(0.5rem, 1.5vw, 1.2rem);
+}
+
+.hero-logo-img {
+  width: 100%;
+  max-width: clamp(150px, 30vw, 380px);
+  height: auto;
+  max-height: clamp(100px, 20vh, 220px);
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px var(--arcade-cyan));
+  image-rendering: pixelated;
+  transition: transform 0.2s ease, filter 0.2s ease;
+  animation: floatLogo 4s ease-in-out infinite alternate;
+}
+
+.hero-logo-img:hover {
+  transform: scale(1.08) rotate(-2deg);
+  filter: drop-shadow(0 0 18px var(--arcade-pink));
+}
+
+.brand-title-outside {
+  font-family: var(--font-pixel);
+  font-size: clamp(1.2rem, 3.2vw, 2.3rem);
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--arcade-cyan);
+  margin-bottom: 0.6rem;
+  text-shadow: 4px 4px 0px var(--arcade-pink);
+}
+
+.brand-quote-outside {
+  font-family: var(--font-terminal);
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  color: var(--arcade-yellow);
+  letter-spacing: 1px;
+  max-width: 480px;
+  line-height: 1.3;
+}
+
+@keyframes floatLogo {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-10px); }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   5. SECCIÓN FORMULARIO Y TARJETA RETRO ARCADE
+   ========================================================================== */
+.form-side {
+  width: 100%;
+  max-width: clamp(320px, 90vw, 460px);
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card {
+  position: relative;
+  background: var(--retro-bg-card);
+  border: 3px solid var(--arcade-cyan);
+  border-radius: 0px;
+  padding: 0px;
+  width: 100%;
+  box-shadow: 8px 8px 0px var(--arcade-pink), 0 0 20px rgba(0, 240, 255, 0.2);
+  transition: all 0.1s ease;
+}
+
+.card:hover {
+  box-shadow: 10px 10px 0px var(--arcade-pink), 0 0 30px rgba(0, 240, 255, 0.4);
+}
+
+.card2 {
+  border-radius: 0px;
+  overflow: visible;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 2vh, 1.4rem);
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  background: transparent;
+}
+
+#heading {
+  text-align: center;
+  margin-bottom: 0.5rem;
+  color: var(--arcade-yellow);
+  font-family: var(--font-pixel);
+  font-size: clamp(0.9rem, 2vw, 1.15rem);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 0px var(--arcade-pink);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   6. ALERTAS Y MENSAJES DE ERROR ARCADE
+   ========================================================================== */
+.alert-message {
+  display: none;
+  padding: 0.8rem;
+  border-radius: 0px;
+  font-family: var(--font-pixel);
+  font-size: 0.65rem;
+  line-height: 1.4;
+  text-align: center;
+  background-color: #000;
+  color: var(--arcade-red);
+  border: 2px solid var(--arcade-red);
+  box-shadow: 3px 3px 0px var(--arcade-red);
+}
+
+/* ==========================================================================
+   7. CAMPOS DE ENTRADA (INPUTS 8-BIT)
+   ========================================================================== */
+.field {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  border-radius: 0px;
+  padding: clamp(0.7rem, 1.5vh, 0.9rem) 1rem;
+  border: 2px solid var(--arcade-cyan);
+  background-color: var(--input-bg);
+  box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.8);
+  transition: all 0.1s ease;
+}
+
+.field:focus-within {
+  border-color: var(--arcade-pink);
+  box-shadow: 4px 4px 0px var(--arcade-cyan);
+  background-color: #000;
+}
+
+.input-icon {
+  height: 1.2rem;
+  width: 1.2rem;
+  fill: var(--arcade-cyan);
+  transition: fill 0.1s ease;
+  flex-shrink: 0;
+}
+
+.field:focus-within .input-icon {
+  fill: var(--arcade-pink);
+}
+
+.input-field {
+  background: none;
+  border: none;
+  outline: none;
+  width: 100%;
+  color: var(--arcade-green);
+  font-size: 1.3rem;
+  font-family: var(--font-terminal);
+  letter-spacing: 1px;
+}
+
+.input-field::placeholder {
+  color: rgba(0, 240, 255, 0.4);
+  font-family: var(--font-terminal);
+}
+
+/* ==========================================================================
+   8. BOTONES Y NAVEGACIÓN ARCADE
+   ========================================================================== */
+.form .btn {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.4rem;
+}
+
+.button1 {
+  width: 100%;
+  padding: 1rem 1.2rem;
+  background: var(--arcade-green);
+  color: #000;
+  border: 2px solid #000;
+  font-family: var(--font-pixel);
+  font-weight: 700;
+  font-size: clamp(0.75rem, 1.5vw, 0.85rem);
+  border-radius: 0px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0px var(--arcade-cyan);
+  transition: all 0.1s ease;
+}
+
+.button1:hover {
+  background: var(--arcade-cyan);
+  color: #000;
+  box-shadow: 6px 6px 0px var(--arcade-pink);
+  transform: translate(-2px, -2px);
+}
+
+.button1:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px var(--arcade-pink);
+}
+
+.button-back {
+  display: block;
+  text-align: center;
+  margin-top: 0.4rem;
+  padding: 0.6rem;
+  color: var(--arcade-cyan);
+  font-family: var(--font-pixel);
+  font-size: 0.6rem;
+  text-decoration: none;
+  border-radius: 0px;
+  border: 2px solid transparent;
+  transition: all 0.1s ease;
+}
+
+.button-back:hover {
+  color: #fff;
+  background-color: #000;
+  border-color: var(--arcade-cyan);
+  box-shadow: 3px 3px 0px var(--arcade-cyan);
+}
+
+/* ==========================================================================
+   9. MEDIA QUERIES (RESPONSIVIDAD RETRO)
+   ========================================================================== */
+
+/* Tablets y Desktops (Pantallas anchas) -> Cambio a 2 Columnas */
+@media (min-width: 850px) {
+  .login-split-container {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .brand-side {
+    flex: 1;
+    animation-name: fadeInLeft;
+  }
+
+  .form-side {
+    flex: 1;
+    animation-name: fadeInRight;
+  }
+
+  @keyframes fadeInLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes fadeInRight {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+}
+
+/* Pantallas ultra anchas / 4K */
+@media (min-width: 1600px) {
+  .login-split-container {
+    max-width: 1300px;
+    gap: 6rem;
+  }
+
+  .form-side {
+    max-width: 480px;
+  }
+}
+
+/* Teléfonos en horizontal (Mobile Landscape) */
+@media (max-height: 550px) and (orientation: landscape) {
+  body {
+    padding: 0.5rem 1rem;
+    align-items: flex-start;
+  }
+
+  .login-split-container {
+    flex-direction: row;
+    gap: 1.5rem;
+  }
+
+  .brand-quote-outside {
+    display: none;
+  }
+
+  .hero-logo-img {
+    max-height: 90px;
+  }
+
+  .form {
+    padding: 1rem 1.2rem;
+    gap: 0.8rem;
+  }
+}
