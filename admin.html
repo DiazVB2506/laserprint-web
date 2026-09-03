@@ -2,181 +2,186 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LaserPrint - Panel Admin</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f9; }
-    header { background: #18181c; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-    .container { padding: 30px; max-width: 900px; margin: 0 auto; }
-    .form-box { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 30px; }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; font-weight: bold; margin-bottom: 5px; }
-    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 8px; box-sizing: border-box; }
-    .btn-save { background: #2ed573; color: white; border: none; padding: 12px; width: 100%; font-weight: bold; cursor: pointer; border-radius: 4px; font-size: 16px; }
-    .btn-save:disabled { background: #a4b0be; cursor: not-allowed; }
-    table { width: 100%; border-collapse: collapse; background: white; }
-    th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
-    th { background: #2f3542; color: white; }
-    .btn-del { background: #ff4757; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 3px; }
-  </style>
+
+  <!-- Favicon e Iconos -->
+  <link rel="icon" type="image/png" href="uploads/fotos/LOGOTIPO.png">
+
+  <!-- Fuentes tipográficas -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Estilos CSS externo -->
+  <link rel="stylesheet" href="admin.css">
 </head>
 <body>
-  <header>
-    <h1>Panel de Administración</h1>
-    <div>
-      <a href="index.html" style="color:white; margin-right: 15px;">Ver Sitio Web</a>
-      <button onclick="localStorage.removeItem('adminAutenticado'); window.location.href='login.html';">Salir</button>
+
+  <!-- Fondo ambiental con orbes claros -->
+  <div class="bg-glow ambient-cyan"></div>
+  <div class="bg-glow ambient-magenta"></div>
+
+  <!-- Encabezado del Panel -->
+  <header class="admin-header glass-card">
+    <div class="header-brand">
+      <img src="uploads/fotos/LOGOTIPO.png" alt="Logo LaserPrint" class="admin-logo" onerror="this.onerror=null; this.src='/uploads/fotos/LOGOTIPO.png';">
+      <h1 class="header-title">Panel de Administración</h1>
+    </div>
+    <div class="header-actions">
+      <a href="index.html" class="btn-site">🌐 Ver Sitio Web</a>
+      <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
     </div>
   </header>
 
-  <div class="container">
-    <div class="form-box">
-      <h2>Nueva Publicación</h2>
-      <br>
+  <!-- Contenido Principal -->
+  <main class="admin-container">
+
+    <!-- Tarjeta del Formulario (Creación) -->
+    <section class="form-box glass-card">
+      <div class="form-header">
+        <h2>Nueva Publicación</h2>
+        <p class="form-subtitle">Sube y gestiona el contenido de tus diferentes secciones</p>
+      </div>
+      
       <form id="uploadForm">
         <div class="form-group">
-          <label>Nombre del Producto / Servicio:</label>
-          <input type="text" id="nombre" name="nombre" required maxlength="120">
+          <label for="nombre">Nombre del Producto / Servicio</label>
+          <input type="text" id="nombre" name="nombre" required maxlength="120" placeholder="Ej. Impresión DTF Playera Negra">
         </div>
         
         <div class="form-group">
-          <label>Descripción:</label>
-          <textarea id="descripcion" name="descripcion" required maxlength="1000"></textarea>
+          <label for="descripcion">Descripción</label>
+          <textarea id="descripcion" name="descripcion" rows="4" required maxlength="1000" placeholder="Escribe los detalles, dimensiones o características principales..."></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="precio">Precio en Pesos (MXN)</label>
+            <input type="number" id="precio" name="precio" step="0.01" min="0" placeholder="0.00 (Opcional)">
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="categoria">Sección de Destino</label>
+            <select id="categoria" name="categoria" required>
+              <option value="DTF TEXTIL / UV">DTF TEXTIL / UV</option>
+              <option value="SUBLIMACION">SUBLIMACION</option>
+              <option value="LONA">LONA</option>
+              <option value="COROPLAST">COROPLAST</option>
+              <option value="CORTE LASER">CORTE LASER</option>
+              <option value="VINIL">VINIL</option>
+            </select>
+          </div>
         </div>
 
         <div class="form-group">
-          <label>Precio en Pesos Mexicanos (Opcional):</label>
-          <input type="number" id="precio" name="precio" step="0.01" min="0" placeholder="Ejemplo: 250.00">
-        </div>
-
-        <div class="form-group">
-          <label>Página donde se publicará:</label>
-          <select id="categoria" name="categoria" required>
-            <option value="DTF TEXTIL / UV">DTF TEXTIL / UV</option>
-            <option value="SUBLIMACION">SUBLIMACION</option>
-            <option value="LONA">LONA</option>
-            <option value="COROPLAST">COROPLAST</option>
-            <option value="CORTE LASER">CORTE LASER</option>
-            <option value="VINIL">VINIL</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Seleccionar Archivo (Imagen, Video o PDF):</label>
-          <input type="file" id="archivo" name="archivo" accept="image/jpeg,image/png,image/webp,video/mp4,application/pdf" required>
+          <label for="archivo">Archivo Multimedia (Imagen, Video o PDF)</label>
+          <div class="file-input-wrapper">
+            <input type="file" id="archivo" name="archivo" accept="image/jpeg,image/png,image/webp,video/mp4,application/pdf" required>
+          </div>
         </div>
 
         <button type="submit" id="btnSubmit" class="btn-save">Subir y Publicar</button>
       </form>
-    </div>
+    </section>
 
-    <h2>Publicaciones Activas</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Sección</th>
-          <th>Precio (MXN)</th>
-          <th>Tipo</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody id="tabla"></tbody>
-    </table>
+    <!-- Tarjeta de Gestión (Buscador, Pestañas por Sección y Tabla) -->
+    <section class="table-box glass-card">
+      <div class="table-header-tools">
+        <h2>📋 Publicaciones Activas</h2>
+        
+        <!-- Buscador inteligente en tiempo real con sugerencias -->
+        <div class="search-box">
+          <input type="text" id="searchInput" placeholder="🔍 Buscar por nombre o descripción..." autocomplete="off">
+          <ul id="searchSuggestions" class="suggestions-list"></ul>
+        </div>
+      </div>
+
+      <!-- Pestañas para separar la tabla por secciones -->
+      <div class="category-tabs" id="categoryTabs">
+        <button class="tab-btn active" data-cat="TODAS">TODAS</button>
+        <button class="tab-btn" data-cat="DTF TEXTIL / UV">DTF TEXTIL / UV</button>
+        <button class="tab-btn" data-cat="SUBLIMACION">SUBLIMACION</button>
+        <button class="tab-btn" data-cat="LONA">LONA</button>
+        <button class="tab-btn" data-cat="COROPLAST">COROPLAST</button>
+        <button class="tab-btn" data-cat="CORTE LASER">CORTE LASER</button>
+        <button class="tab-btn" data-cat="VINIL">VINIL</button>
+      </div>
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Sección</th>
+              <th>Precio (MXN)</th>
+              <th>Tipo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tabla"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal Flotante para Edición de Publicaciones -->
+  <div id="editModal" class="modal-overlay">
+    <div class="modal-content glass-card">
+      <div class="modal-header">
+        <h2>✏️ Editar Publicación</h2>
+        <button id="closeModalBtn" class="close-btn">&times;</button>
+      </div>
+
+      <form id="editForm">
+        <input type="hidden" id="editId">
+
+        <div class="form-group">
+          <label for="editNombre">Nombre del Producto / Servicio</label>
+          <input type="text" id="editNombre" name="nombre" required maxlength="120">
+        </div>
+
+        <div class="form-group">
+          <label for="editDescripcion">Descripción</label>
+          <textarea id="editDescripcion" name="descripcion" rows="3" required maxlength="1000"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="editPrecio">Precio (MXN)</label>
+            <input type="number" id="editPrecio" name="precio" step="0.01" min="0">
+          </div>
+
+          <div class="form-group flex-1">
+            <label for="editCategoria">Sección de Destino</label>
+            <select id="editCategoria" name="categoria" required>
+              <option value="DTF TEXTIL / UV">DTF TEXTIL / UV</option>
+              <option value="SUBLIMACION">SUBLIMACION</option>
+              <option value="LONA">LONA</option>
+              <option value="COROPLAST">COROPLAST</option>
+              <option value="CORTE LASER">CORTE LASER</option>
+              <option value="VINIL">VINIL</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editArchivo">Remplazar Archivo (Opcional)</label>
+          <div class="file-input-wrapper">
+            <input type="file" id="editArchivo" name="archivo" accept="image/jpeg,image/png,image/webp,video/mp4,application/pdf">
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="btnCancelEdit" class="btn-cancel">Cancelar</button>
+          <button type="submit" id="btnSaveEdit" class="btn-save">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
   </div>
 
-  <script>
-    if (localStorage.getItem('adminAutenticado') !== 'true') {
-      window.location.href = 'login.html';
-    }
-
-    const API_URL = 'https://laserprint-api.onrender.com/api/productos';
-    const formatoMXN = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
-
-    async function cargarTabla() {
-      try {
-        const res = await fetch(`${API_URL}?limit=100`);
-        const data = await res.json();
-        const productos = data.productos || [];
-        const tbody = document.getElementById('tabla');
-        tbody.innerHTML = '';
-
-        if (productos.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay publicaciones disponibles.</td></tr>';
-          return;
-        }
-
-        productos.forEach(p => {
-          const precioTexto = (p.precio !== null && p.precio !== undefined) ? `${formatoMXN.format(p.precio)} MXN` : 'N/A';
-
-          tbody.innerHTML += `
-            <tr>
-              <td><b>${p.nombre}</b></td>
-              <td>${p.categoria}</td>
-              <td><b style="color:#2ed573;">${precioTexto}</b></td>
-              <td>${p.tipoArchivo ? p.tipoArchivo.toUpperCase() : 'N/A'}</td>
-              <td>
-                <button class="btn-del" onclick="eliminar('${p._id}')">Eliminar</button>
-              </td>
-            </tr>
-          `;
-        });
-      } catch (err) {
-        console.error('Error al cargar tabla desde Render:', err);
-      }
-    }
-
-    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const btnSubmit = document.getElementById('btnSubmit');
-      btnSubmit.disabled = true;
-      btnSubmit.innerText = 'Subiendo...';
-
-      const formData = new FormData();
-      formData.append('nombre', document.getElementById('nombre').value);
-      formData.append('descripcion', document.getElementById('descripcion').value);
-      formData.append('precio', document.getElementById('precio').value);
-      formData.append('categoria', document.getElementById('categoria').value);
-      formData.append('archivo', document.getElementById('archivo').files[0]);
-
-      try {
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          body: formData
-        });
-
-        if (res.ok) {
-          alert('¡Publicado con éxito!');
-          document.getElementById('uploadForm').reset();
-          cargarTabla();
-        } else {
-          const errData = await res.json();
-          alert('Error al subir: ' + (errData.error || 'Verifica los datos'));
-        }
-      } catch (err) {
-        alert('Error de conexión con el servidor en Render');
-      } finally {
-        btnSubmit.disabled = false;
-        btnSubmit.innerText = 'Subir y Publicar';
-      }
-    });
-
-    async function eliminar(id) {
-      if (confirm('¿Eliminar esta publicación de la base de datos?')) {
-        try {
-          const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-          if (res.ok) {
-            cargarTabla();
-          } else {
-            alert('No se pudo eliminar el registro.');
-          }
-        } catch (err) {
-          alert('Error al intentar eliminar el registro.');
-        }
-      }
-    }
-
-    cargarTabla();
-  </script>
+  <!-- Script del Administrador -->
+  <script src="admin.js"></script>
 </body>
 </html>
