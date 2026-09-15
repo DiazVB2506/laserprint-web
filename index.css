@@ -1,192 +1,141 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Diseño Laser Print - Imprenta Digital y Catálogo Profesional</title>
+/* ==========================================================
+   DISEÑO LASER PRINT - ESTILOS PRINCIPALES (index.css)
+   ========================================================== */
 
-  <!-- FAVICON -->
-  <link rel="icon" type="image/png" href="uploads/fotos/LOGOTIPO.png">
+:root {
+  --bg-primary: #0a0d14;
+  --bg-secondary: #121824;
+  --accent-cyan: #00f2fe;
+  --accent-magenta: #ff007f;
+  --text-main: #ffffff;
+  --text-muted: #a0aec0;
+  --glass-bg: rgba(18, 24, 36, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --font-main: 'Roboto', 'Google Sans', system-ui, -apple-system, sans-serif;
+  --font-arcade: 'Press Start 2P', monospace;
+}
 
-  <!-- FUENTES EDITORIALES & MODERNAS -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+/* Reset y Base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-  <!-- ESTILOS EDITORIALES -->
-  <link rel="stylesheet" href="index.css">
-</head>
-<body>
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
 
-  <!-- ENCABEZADO EDITORIAL -->
-  <header class="glass-header">
-    <div class="nav-container">
-      <a href="index.html" class="logo">
-        <img src="uploads/fotos/LOGOTIPO.png" alt="Diseño Laser Print Logo" class="logo-img" id="mainLogo">
-      </a>
+/* Fondos Neón (Ambient Glows) */
+.bg-glow {
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  filter: blur(120px);
+  z-index: -1;
+  pointer-events: none;
+}
 
-      <!-- MENÚ MÓVIL TOGGLE -->
-      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir Menú">
-        <span></span><span></span><span></span>
-      </button>
+.ambient-cyan {
+  background: var(--accent-cyan);
+  top: -50px;
+  left: -50px;
+  opacity: 0.35;
+}
 
-      <nav class="nav-links" id="navLinks">
-        <a href="index.html" class="nav-btn active">Inicio</a>
-        <a href="dtf.html" class="nav-btn">DTF Textil / UV</a>
-        <a href="sublimacion.html" class="nav-btn">Sublimación</a>
-        <a href="lona.html" class="nav-btn">Lona</a>
-        <a href="coroplast.html" class="nav-btn">Coroplast</a>
-        <a href="cortelaser.html" class="nav-btn">Corte Láser</a>
-        <a href="vinil.html" class="nav-btn">Vinil</a>
-        <a href="admin.html" class="nav-btn btn-admin">Iniciar Sesión Admin</a>
-      </nav>
-    </div>
-  </header>
+.ambient-magenta {
+  background: var(--accent-magenta);
+  top: 200px;
+  right: -50px;
+  opacity: 0.3;
+}
 
-  <main>
-    <!-- HERO SECTION -->
-    <section class="hero-section">
-      <div class="hero-content">
-        <h1 class="hero-title">Bienvenidos a <span class="text-gradient">Diseño Laser Print</span></h1>
-        <p class="hero-subtitle">Imprenta digital, corte de alta precisión y soluciones visuales de calidad editorial.</p>
-      </div>
-    </section>
+/* Header Glassmorphism */
+.glass-header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border);
+  z-index: 100;
+}
 
-    <!-- PANTALLA DE VIDEO DE PRESENTACIÓN -->
-    <section class="video-section">
-      <div class="video-container">
-        <video autoplay loop muted playsinline poster="uploads/fotos/LOGOTIPO.png">
-          <source src="Mandala 3D Abstract Motion Graphics For...mp4" type="video/mp4">
-          Tu navegador no soporta la reproducción de video.
-        </video>
-      </div>
-    </section>
+/* Tipografía de Títulos / Arcade */
+h1, h2, h3, .arcade-font {
+  font-family: var(--font-arcade);
+  letter-spacing: 1px;
+}
 
-    <!-- CARRUSEL 3D / DESTACADOS -->
-    <section class="carousel-section">
-      <h2 class="section-title">Catálogo Destacado</h2>
-      <p class="carousel-hint">Explora la precisión en nuestros acabados y materiales</p>
+/* Layout y Contenedores */
+main, container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
 
-      <div class="carousel-wrapper">
-        <button class="carousel-btn prev-btn" id="prevBtn" aria-label="Anterior">&larr;</button>
+/* Carrusel y Tarjetas */
+.carousel-container, .card-grid {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  padding: 1rem 0;
+  scroll-behavior: smooth;
+}
 
-        <div class="carousel-track-container">
-          <div class="carousel-track" id="carouselTrack">
-            <!-- Las tarjetas de servicios se cargan dinámicamente desde el JS -->
-          </div>
-        </div>
+.card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  min-width: 260px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-        <button class="carousel-btn next-btn" id="nextBtn" aria-label="Siguiente">&rarr;</button>
-      </div>
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 242, 254, 0.2);
+  border-color: var(--accent-cyan);
+}
 
-      <div class="carousel-dots" id="carouselDots"></div>
-    </section>
+/* Botones */
+.btn {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, var(--accent-cyan), #0072ff);
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
 
-    <!-- SECCIÓN UBICACIÓN -->
-    <section class="location-section">
-      <div class="glass-card location-card">
-        <h2 class="section-title">Nuestra Ubicación</h2>
-        <p class="location-address">Visítanos en nuestro taller de producción para atención personalizada.</p>
-        
-        <div class="map-container">
-          <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3758.214815481845!2d-99.2084!3d19.6181!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTksMzcnMDU4LjIiTiA5OcKwMTInMzAuMiJX!5e0!3m2!1ses!2smx!4v1620000000000!5m2!1ses!2smx" 
-            width="100%" 
-            height="380" 
-            style="border:0;" 
-            allowfullscreen="" 
-            loading="lazy">
-          </iframe>
-        </div>
-      </div>
-    </section>
+.btn:hover {
+  opacity: 0.9;
+}
 
-    <!-- SECCIÓN WHATSAPP & CONTACTO -->
-    <section class="whatsapp-section">
-      <div class="glass-card whatsapp-card">
-        <div class="whatsapp-info">
-          <h3>Cotizaciones Directas</h3>
-          <p>Envíanos tus archivos y recibe un presupuesto a la medida vía WhatsApp.</p>
-          <a href="https://wa.me/5215500000000" target="_blank" rel="noopener noreferrer" class="whatsapp-btn">
-            Iniciar Chat
-          </a>
-        </div>
-        <div class="whatsapp-qr-container">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://wa.me/5215500000000" alt="QR WhatsApp" class="whatsapp-qr">
-          <span class="qr-label">Escanea para cotizar</span>
-        </div>
-      </div>
-    </section>
-  </main>
+/* Responsive */
+@media (max-width: 768px) {
+  .glass-header {
+    padding: 1rem;
+  }
 
-  <!-- ASISTENTE / CHATBOT PIXEL AI -->
-  <button class="pixel-toggle-btn" id="pixelToggleBtn" aria-label="Abrir Asesor">
-    <span class="pixel-avatar-icon">✦</span>
-    <span class="pixel-pulse-badge">Online</span>
-  </button>
-
-  <div class="pixel-chat-widget" id="pixelChatWidget">
-    <div class="pixel-chat-header">
-      <div class="pixel-header-info">
-        <span class="pixel-header-avatar">✦</span>
-        <div>
-          <h4 class="pixel-title">Asesor Laser Print</h4>
-          <span class="pixel-subtitle">Atención técnica en línea</span>
-        </div>
-      </div>
-      <button class="pixel-close-btn" id="pixelCloseBtn">&times;</button>
-    </div>
-
-    <div class="pixel-chat-messages" id="pixelChatMessages">
-      <div class="pixel-msg pixel-bot-msg">
-        <div class="pixel-msg-bubble">
-          ¡Hola! Bienvenido a <b>Diseño Laser Print</b>. ¿Qué servicio te gustaría cotizar o consultar el día de hoy?
-        </div>
-      </div>
-    </div>
-
-    <div class="pixel-quick-prompts">
-      <button class="pixel-prompt-btn" data-prompt="¿Qué es el DTF Textil?">DTF Textil</button>
-      <button class="pixel-prompt-btn" data-prompt="¿Hacen envíos?">Envíos</button>
-      <button class="pixel-prompt-btn" data-prompt="Requisitos de archivos">Archivos</button>
-    </div>
-
-    <form class="pixel-chat-form" id="pixelChatForm">
-      <input type="text" class="pixel-input" id="pixelInput" placeholder="Escribe tu duda aquí..." required>
-      <button type="submit" class="pixel-send-btn">Enviar</button>
-    </form>
-  </div>
-
-  <!-- MODAL DE IMÁGENES -->
-  <div class="image-modal" id="imageModal">
-    <span class="image-modal-close" id="modalClose">&times;</span>
-    <img src="" alt="Vista previa" class="image-modal-content" id="modalImg">
-    <p class="image-modal-caption" id="modalCaption"></p>
-  </div>
-
-  <!-- FOOTER -->
-  <footer class="glass-footer">
-    <div class="footer-content">
-      <p>&copy; 2026 Diseño Laser Print. Todos los derechos reservados.</p>
-      <div class="footer-contact">
-        <span>Imprenta Digital</span> • <span>Corte Láser</span> • <span>Gran Formato</span>
-      </div>
-    </div>
-  </footer>
-
-  <!-- CONTROL DE LOGO FALLBACK -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const logo = document.getElementById('mainLogo');
-      if (logo) {
-        logo.addEventListener('error', () => {
-          logo.src = 'https://via.placeholder.com/150x50/ffffff/0f4c81?text=LASERPRINT';
-        });
-      }
-    });
-  </script>
-
-  <!-- LÓGICA DE INTERACCIÓN Y CARRUSEL -->
-  <script src="index.js"></script>
-</body>
-</html>
+  .bg-glow {
+    width: 200px;
+    height: 200px;
+    filter: blur(80px);
+  }
+}
