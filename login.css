@@ -12,19 +12,22 @@
 }
 
 :root {
-  /* Paleta Neon Arcade 8-Bit */
+  /* Paleta Neon Arcade 8-Bit (Modo Oscuro por Defecto) */
   --bg-dark-main: #06050e;
-  
+  --bg-pattern-line: rgba(0, 240, 255, 0.05);
+
   --arcade-cyan: #00f0ff;
   --arcade-pink: #ff007f;
   --arcade-yellow: #ffe600;
   --arcade-green: #39ff14;
   --arcade-purple: #9d4edd;
   --arcade-red: #ff3366;
-  
+
   /* Contenedores y Cajas Retro */
   --retro-bg-card: rgba(13, 14, 25, 0.95);
   --input-bg: #090a14;
+  --card-border: var(--arcade-cyan);
+  --card-shadow: var(--arcade-pink);
 
   /* Fuentes Retro */
   --font-pixel: 'Press Start 2P', monospace;
@@ -33,6 +36,36 @@
   /* Textos */
   --text-primary: #ffffff;
   --text-secondary: #00f0ff;
+  --text-brand-quote: var(--arcade-yellow);
+  
+  /* Filtro de Logo */
+  --logo-filter: drop-shadow(0 0 10px var(--arcade-cyan));
+
+  /* Opacidad de Scanlines CRT */
+  --crt-opacity: 0.35;
+}
+
+/* ==========================================================================
+   TEMA CLARO (LIGHT THEME OVERRIDES)
+   ========================================================================== */
+.light-theme,
+html.light-theme,
+body.light-theme {
+  --bg-dark-main: #f0f4f8;
+  --bg-pattern-line: rgba(15, 76, 129, 0.08);
+
+  --retro-bg-card: #ffffff;
+  --input-bg: #e2e8f0;
+
+  --text-primary: #0f172a;
+  --text-secondary: #0077b6;
+  --text-brand-quote: #d97706;
+
+  --card-border: #0077b6;
+  --card-shadow: #b5179e;
+
+  --logo-filter: drop-shadow(0 4px 8px rgba(0, 119, 182, 0.3));
+  --crt-opacity: 0.08;
 }
 
 html, body {
@@ -54,9 +87,10 @@ body {
   color: var(--text-primary);
   padding: clamp(1rem, 3vw, 2.5rem);
   background-image: 
-    linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(var(--bg-pattern-line) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
   background-size: 30px 30px;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ==========================================================================
@@ -67,11 +101,12 @@ body::before {
   display: block;
   position: fixed;
   top: 0; left: 0; bottom: 0; right: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%), 
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, var(--crt-opacity)) 50%), 
               linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
   z-index: 999;
   background-size: 100% 4px, 6px 100%;
   pointer-events: none;
+  transition: background 0.3s ease;
 }
 
 /* Ambient Glow de Retroalimentación Neon */
@@ -107,7 +142,39 @@ body::before {
 }
 
 /* ==========================================================================
-   3. ESTRUCTURA PRINCIPAL (LAYOUT ADAPTABLE MOBILE-FIRST)
+   3. BOTÓN TOGGLE DE TEMA (CLARO / OSCURO)
+   ========================================================================== */
+.theme-toggle-btn {
+  position: fixed;
+  top: 1.2rem;
+  right: 1.2rem;
+  z-index: 1000;
+  background: var(--retro-bg-card);
+  border: 2px solid var(--card-border);
+  color: var(--text-primary);
+  font-family: var(--font-pixel);
+  font-size: 0.7rem;
+  padding: 0.6rem 0.9rem;
+  cursor: pointer;
+  box-shadow: 3px 3px 0px var(--card-shadow);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.15s ease;
+}
+
+.theme-toggle-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0px var(--arcade-cyan);
+}
+
+.theme-toggle-btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px var(--arcade-cyan);
+}
+
+/* ==========================================================================
+   4. ESTRUCTURA PRINCIPAL (LAYOUT ADAPTABLE MOBILE-FIRST)
    ========================================================================== */
 .login-split-container {
   position: relative;
@@ -123,7 +190,7 @@ body::before {
 }
 
 /* ==========================================================================
-   4. SECCIÓN MARCA Y LOGOTIPO
+   5. SECCIÓN MARCA Y LOGOTIPO
    ========================================================================== */
 .brand-side {
   width: 100%;
@@ -146,7 +213,7 @@ body::before {
   height: auto;
   max-height: clamp(100px, 20vh, 220px);
   object-fit: contain;
-  filter: drop-shadow(0 0 10px var(--arcade-cyan));
+  filter: var(--logo-filter);
   image-rendering: pixelated;
   transition: transform 0.2s ease, filter 0.2s ease;
   animation: floatLogo 4s ease-in-out infinite alternate;
@@ -163,7 +230,7 @@ body::before {
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--arcade-cyan);
+  color: var(--text-secondary);
   margin-bottom: 0.6rem;
   text-shadow: 4px 4px 0px var(--arcade-pink);
 }
@@ -171,7 +238,7 @@ body::before {
 .brand-quote-outside {
   font-family: var(--font-terminal);
   font-size: clamp(1.1rem, 2vw, 1.4rem);
-  color: var(--arcade-yellow);
+  color: var(--text-brand-quote);
   letter-spacing: 1px;
   max-width: 480px;
   line-height: 1.3;
@@ -188,7 +255,7 @@ body::before {
 }
 
 /* ==========================================================================
-   5. SECCIÓN FORMULARIO Y TARJETA RETRO ARCADE
+   6. SECCIÓN FORMULARIO Y TARJETA RETRO ARCADE
    ========================================================================== */
 .form-side {
   width: 100%;
@@ -199,16 +266,16 @@ body::before {
 .card {
   position: relative;
   background: var(--retro-bg-card);
-  border: 3px solid var(--arcade-cyan);
+  border: 3px solid var(--card-border);
   border-radius: 0px;
   padding: 0px;
   width: 100%;
-  box-shadow: 8px 8px 0px var(--arcade-pink), 0 0 20px rgba(0, 240, 255, 0.2);
-  transition: all 0.1s ease;
+  box-shadow: 8px 8px 0px var(--card-shadow), 0 0 20px rgba(0, 240, 255, 0.15);
+  transition: all 0.2s ease;
 }
 
 .card:hover {
-  box-shadow: 10px 10px 0px var(--arcade-pink), 0 0 30px rgba(0, 240, 255, 0.4);
+  box-shadow: 10px 10px 0px var(--card-shadow), 0 0 30px rgba(0, 240, 255, 0.3);
 }
 
 .card2 {
@@ -227,7 +294,7 @@ body::before {
 #heading {
   text-align: center;
   margin-bottom: 0.5rem;
-  color: var(--arcade-yellow);
+  color: var(--text-brand-quote);
   font-family: var(--font-pixel);
   font-size: clamp(0.9rem, 2vw, 1.15rem);
   font-weight: 700;
@@ -241,7 +308,7 @@ body::before {
 }
 
 /* ==========================================================================
-   6. ALERTAS Y MENSAJES DE ERROR ARCADE
+   7. ALERTAS Y MENSAJES DE ERROR ARCADE
    ========================================================================== */
 .alert-message {
   display: none;
@@ -258,7 +325,7 @@ body::before {
 }
 
 /* ==========================================================================
-   7. CAMPOS DE ENTRADA (INPUTS 8-BIT)
+   8. CAMPOS DE ENTRADA (INPUTS 8-BIT)
    ========================================================================== */
 .field {
   display: flex;
@@ -266,23 +333,22 @@ body::before {
   gap: 0.8rem;
   border-radius: 0px;
   padding: clamp(0.7rem, 1.5vh, 0.9rem) 1rem;
-  border: 2px solid var(--arcade-cyan);
+  border: 2px solid var(--card-border);
   background-color: var(--input-bg);
-  box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.8);
-  transition: all 0.1s ease;
+  box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.2);
+  transition: all 0.15s ease;
 }
 
 .field:focus-within {
   border-color: var(--arcade-pink);
-  box-shadow: 4px 4px 0px var(--arcade-cyan);
-  background-color: #000;
+  box-shadow: 4px 4px 0px var(--card-border);
 }
 
 .input-icon {
   height: 1.2rem;
   width: 1.2rem;
-  fill: var(--arcade-cyan);
-  transition: fill 0.1s ease;
+  fill: var(--text-secondary);
+  transition: fill 0.15s ease;
   flex-shrink: 0;
 }
 
@@ -295,19 +361,19 @@ body::before {
   border: none;
   outline: none;
   width: 100%;
-  color: var(--arcade-green);
+  color: var(--text-primary);
   font-size: 1.3rem;
   font-family: var(--font-terminal);
   letter-spacing: 1px;
 }
 
 .input-field::placeholder {
-  color: rgba(0, 240, 255, 0.4);
+  color: rgba(150, 150, 150, 0.6);
   font-family: var(--font-terminal);
 }
 
 /* ==========================================================================
-   8. BOTONES Y NAVEGACIÓN ARCADE
+   9. BOTONES Y NAVEGACIÓN ARCADE
    ========================================================================== */
 .form .btn {
   display: flex;
@@ -326,7 +392,7 @@ body::before {
   font-size: clamp(0.75rem, 1.5vw, 0.85rem);
   border-radius: 0px;
   cursor: pointer;
-  box-shadow: 4px 4px 0px var(--arcade-cyan);
+  box-shadow: 4px 4px 0px var(--card-border);
   transition: all 0.1s ease;
 }
 
@@ -347,7 +413,7 @@ body::before {
   text-align: center;
   margin-top: 0.4rem;
   padding: 0.6rem;
-  color: var(--arcade-cyan);
+  color: var(--text-secondary);
   font-family: var(--font-pixel);
   font-size: 0.6rem;
   text-decoration: none;
@@ -357,14 +423,14 @@ body::before {
 }
 
 .button-back:hover {
-  color: #fff;
-  background-color: #000;
-  border-color: var(--arcade-cyan);
-  box-shadow: 3px 3px 0px var(--arcade-cyan);
+  color: var(--text-primary);
+  background-color: var(--input-bg);
+  border-color: var(--card-border);
+  box-shadow: 3px 3px 0px var(--card-border);
 }
 
 /* ==========================================================================
-   9. MEDIA QUERIES (RESPONSIVIDAD RETRO)
+   10. MEDIA QUERIES (RESPONSIVIDAD RETRO)
    ========================================================================== */
 
 /* Tablets y Desktops (Pantallas anchas) -> Cambio a 2 Columnas */
