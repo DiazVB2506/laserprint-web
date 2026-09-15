@@ -4,7 +4,7 @@
  * ==============================================================================
  */
 
-const NUMERO_WHATSAPP = "5215598788857"; // Número corregido con código de país 521
+const NUMERO_WHATSAPP = "5215598788857";
 
 /* ==========================================================================
    1. SINTETIZADOR DE EFECTOS DE SONIDO EDITORIAL/RETRO (WEB AUDIO API)
@@ -148,7 +148,7 @@ function initRetroSFXSystem() {
 }
 
 /* ==========================================================================
-   2. CONTROL DE VIDEO DE PRESENTACIÓN (uploads/videos/presentacion3.mp4)
+   2. CONTROL DE VIDEO DE PRESENTACIÓN
    ========================================================================== */
 
 function initVideoPlayback() {
@@ -873,7 +873,7 @@ const PixelUI = {
         return;
       }
 
-      if (qLower.includes('sticker') || qLower.includes('etiqueta') || qLower.includes('calcomania')) {
+      if (qLower.includes('sticker') || qLower.includes('etiqueta') || qLower.includes('vinil sticker')) {
         const m = datosMedidas.metrosLineales || datosMedidas.ancho;
         const res = CotizadorEngine.calcularVinilSticker(m);
         const msg = '<b>🏷️ COTIZACIÓN VINIL STICKER:</b><br><br>' +
@@ -886,11 +886,13 @@ const PixelUI = {
         return;
       }
 
-      if (qLower.includes('sublim')) {
-        const res = CotizadorEngine.calcularGranFormato('SUBLIMACION_M2', datosMedidas.ancho, datosMedidas.alto);
+      if (qLower.includes('sublimacion') || qLower.includes('sublimar')) {
+        const ancho = datosMedidas.ancho || 1;
+        const alto = datosMedidas.alto || 1;
+        const res = CotizadorEngine.calcularGranFormato('SUBLIMACION_M2', ancho, alto, 1);
         const msg = '<b>📊 COTIZACIÓN SUBLIMACIÓN:</b><br><br>' +
-          '• Medidas: <b>' + res.ancho + 'm x ' + res.alto + 'm</b> (' + res.areaM2Unidad + ' m²)<br>' +
-          '• Precio m²: <b>$' + res.precioM2 + ' MXN</b><br>' +
+          '• Medidas: <b>' + ancho + ' x ' + alto + ' m</b><br>' +
+          '• Área total: <b>' + res.areaM2Unidad + ' m²</b><br>' +
           '• Total estimado: <b style="color:#00f0ff; font-size: 1.1em;">$' + res.total + ' MXN</b>' +
           AVISO_COTIZACION_VARIA;
         this.appendMessage('bot', msg);
@@ -898,23 +900,26 @@ const PixelUI = {
         return;
       }
 
-      // Por defecto para lonas / viniles impresos
-      const res = CotizadorEngine.calcularGranFormato('LONA_440G', datosMedidas.ancho, datosMedidas.alto);
-      const msg = '<b>📊 COTIZACIÓN LONA IMPRESA:</b><br><br>' +
-        '• Medidas: <b>' + res.ancho + 'm x ' + res.alto + 'm</b> (' + res.areaM2Unidad + ' m²)<br>' +
-        '• Precio m²: <b>$' + res.precioM2 + ' MXN</b><br>' +
-        '• Total estimado: <b style="color:#00f0ff; font-size: 1.1em;">$' + res.total + ' MXN</b>' +
-        (res.aplicoMinimo ? '<br>⚠️ <i>Aplica cobro por mínimo de 1 m².</i>' : '') +
-        AVISO_COTIZACION_VARIA;
-      this.appendMessage('bot', msg);
-      playArcadeSound('success');
-      return;
+      // Por defecto si indica medidas de dos dimensiones (ancho x alto) -> Cotizar como Lona
+      if (datosMedidas.ancho && datosMedidas.alto) {
+        const res = CotizadorEngine.calcularGranFormato('LONA_440G', datosMedidas.ancho, datosMedidas.alto, 1);
+        const msg = '<b>📊 COTIZACIÓN DE LONA IMPRESA:</b><br><br>' +
+          '• Medidas: <b>' + datosMedidas.ancho + ' x ' + datosMedidas.alto + ' m</b><br>' +
+          '• Área facturada: <b>' + res.areaM2Unidad + ' m²</b><br>' +
+          '• Total estimado: <b style="color:#00f0ff; font-size: 1.1em;">$' + res.total + ' MXN</b>' +
+          AVISO_COTIZACION_VARIA;
+        this.appendMessage('bot', msg);
+        playArcadeSound('success');
+        return;
+      }
     }
 
-    // 2. Coincidencia por palabras clave en la Base de Conocimiento
-    for (let key in PIXEL_KNOWLEDGE_BASE) {
+    // 2. Búsqueda por palabras clave en la Base de Conocimientos
+    for (const key in PIXEL_KNOWLEDGE_BASE) {
       const item = PIXEL_KNOWLEDGE_BASE[key];
-      const match = item.keywords.some(function(kw) { return qLower.includes(kw); });
+      const match = item.keywords.some(function(keyword) {
+        return qLower.includes(keyword);
+      });
 
       if (match) {
         this.appendMessage('bot', item.response);
@@ -923,10 +928,14 @@ const PixelUI = {
       }
     }
 
-    // 3. Respuesta por defecto
-    const defaultMsg = '🤖 No logré entender por completo tu solicitud.<br><br>' +
-      'Puedes escribir la medida que requieres cotizar (ej. <i>"lona 2x1m"</i>, <i>"1m de dtf"</i>) o contactarnos en directo por WhatsApp:<br><br>' +
-      '👉 <a href="https://wa.me/' + NUMERO_WHATSAPP + '?text=Hola,%20tengo%20una%20duda%20sobre%20un%20servicio" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Escribir a WhatsApp Directo</a>';
+    // 3. Respuesta por defecto si no encuentra coincidencias
+    const defaultMsg = '🤖 <b>PIXEL AI:</b> No estoy seguro de entender la solicitud exactametne.<br><br>' +
+      'Puedes probar pidiéndome cotizaciones directas como:<br>' +
+      '• <i>"Lona de 2x3m"</i><br>' +
+      '• <i>"1.5 metros de dtf textil"</i><br>' +
+      '• <i>"Horarios y ubicacion"</i><br><br>' +
+      '📲 O comunícate directo por WhatsApp:<br>' +
+      '👉 <a href="https://wa.me/' + NUMERO_WHATSAPP + '?text=Hola,%20tengo%20una%20consulta" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Contacto por WhatsApp</a>';
 
     this.appendMessage('bot', defaultMsg);
     playArcadeSound('error');
@@ -934,7 +943,7 @@ const PixelUI = {
 };
 
 /* ==========================================================================
-   9. INICIALIZACIÓN GLOBAL DEL SISTEMA AL CARGAR EL DOM
+   9. INICIALIZACIÓN GLOBAL
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -944,6 +953,4 @@ document.addEventListener('DOMContentLoaded', function() {
   cargarCarruselDinamico();
   initLightbox();
   PixelUI.init();
-
-  console.log('✅ [DISEÑO LASER PRINT] Interfaz y PIXEL AI v3.3 cargados exitosamente.');
 });
