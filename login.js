@@ -1,185 +1,385 @@
-/**
- * ==============================================================================
- * DISEÑO LASER PRINT - CONTROL DE LOGIN & GESTIÓN DE TEMA ("THEME ENGINE")
- * ==============================================================================
- */
+/* ==========================================================================
+   1. SYSTEM RESET & PALETAS DINÁMICAS EDITORIAL (LIGHT & DARK THEME)
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap');
 
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('loginForm') || document.querySelector('form');
-  const alertBox = document.getElementById('alertMessage');
-  const btnSubmit = document.getElementById('btnLogin') || document.querySelector('button[type="submit"]');
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  // ==========================================================================
-  // 1. SISTEMA DE GESTIÓN DE TEMA (PERSISTENCIA CLARO / OSCURO)
-  // ==========================================================================
-  const THEME_KEY = 'theme'; // Clave en localStorage
+/* TEMA CLARO (Default) */
+:root,
+[data-theme="light"] {
+  --bg-body: #FFFFFF;
+  --bg-surface: #F9F8F6;
+  --bg-card: #FFFFFF;
+  --bg-input: #FFFFFF;
 
-  function aplicarTemaGuardado() {
-    // Si no hay tema guardado, se puede definir 'dark' por defecto
-    const temaGuardado = localStorage.getItem(THEME_KEY) || 'dark';
-    
-    if (temaGuardado === 'dark') {
-      document.documentElement.classList.add('dark-theme');
-      document.documentElement.classList.remove('light-theme');
-      document.body.classList.add('dark-theme');
-      document.body.classList.remove('light-theme');
-    } else {
-      document.documentElement.classList.add('light-theme');
-      document.documentElement.classList.remove('dark-theme');
-      document.body.classList.add('light-theme');
-      document.body.classList.remove('dark-theme');
-    }
+  --text-primary: #111111;
+  --text-secondary: #555555;
+  --text-muted: #888888;
+
+  --accent-color: #0F4C81;
+  --accent-hover: #0A355C;
+  --accent-soft: rgba(15, 76, 129, 0.06);
+
+  --border-color: #EAEAEA;
+  --border-focus: #0F4C81;
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.04);
+  --shadow-hover: 0 18px 40px rgba(0, 0, 0, 0.08);
+
+  --font-heading: 'Playfair Display', Georgia, serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* TEMA OSCURO */
+[data-theme="dark"] {
+  --bg-body: #0D0F12;
+  --bg-surface: #16191E;
+  --bg-card: #1A1D24;
+  --bg-input: #12141A;
+
+  --text-primary: #F0F2F5;
+  --text-secondary: #A0A5B1;
+  --text-muted: #6C727F;
+
+  --accent-color: #38BDF8;
+  --accent-hover: #0284C7;
+  --accent-soft: rgba(56, 189, 248, 0.1);
+
+  --border-color: #262B35;
+  --border-focus: #38BDF8;
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.4);
+  --shadow-hover: 0 18px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* ==========================================================================
+   2. ESTRUCTURA Y LAYOUT CENTRADO
+   ========================================================================== */
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: var(--bg-body);
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+body {
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Ocultar resplandores neón arcade antiguos */
+.bg-glow {
+  display: none;
+}
+
+/* ==========================================================================
+   3. BOTÓN CONMUTADOR DE TEMA
+   ========================================================================== */
+.theme-toggle-btn {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 1000;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 10px 18px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-soft);
+  transition: var(--transition-smooth);
+}
+
+.theme-toggle-btn:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* ==========================================================================
+   4. CONTENEDOR PRINCIPAL SPLIT EDITORIAL
+   ========================================================================== */
+.login-split-container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 1000px;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  margin: auto;
+}
+
+/* ==========================================================================
+   5. SECCIÓN LOGO Y SELLO EDITORIAL
+   ========================================================================== */
+.brand-side {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.logo-hero-link {
+  display: inline-block;
+  text-decoration: none;
+  margin-bottom: 1.2rem;
+  transition: var(--transition-smooth);
+}
+
+.logo-hero-link:hover {
+  opacity: 0.85;
+}
+
+.hero-logo-img {
+  width: 100%;
+  max-width: clamp(160px, 28vw, 240px);
+  height: auto;
+  object-fit: contain;
+}
+
+.brand-title-outside {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+  margin-bottom: 0.6rem;
+  text-shadow: none;
+}
+
+.brand-quote-outside {
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  color: var(--text-secondary);
+  max-width: 440px;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+/* ==========================================================================
+   6. TARJETA EDITORIAL DE ACCESO
+   ========================================================================== */
+.form-side {
+  width: 100%;
+  max-width: 440px;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: var(--shadow-soft);
+  padding: clamp(2rem, 4vw, 2.8rem);
+  transition: var(--transition-smooth);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-hover);
+  border-color: var(--border-focus);
+}
+
+.card2 {
+  background: transparent;
+  padding: 0;
+  border: none;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+#heading {
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.3px;
+  text-shadow: none;
+}
+
+/* ==========================================================================
+   7. MENSAJES DE ALERTA
+   ========================================================================== */
+.alert-message {
+  display: none;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: center;
+  background-color: rgba(239, 68, 68, 0.08);
+  color: #EF4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  box-shadow: none;
+}
+
+/* ==========================================================================
+   8. CAMPOS DE ENTRADA Y FORMULARIO
+   ========================================================================== */
+.field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-input);
+  box-shadow: none;
+  transition: var(--transition-smooth);
+}
+
+.field:focus-within {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.input-icon {
+  width: 20px;
+  height: 20px;
+  fill: var(--text-muted);
+  transition: var(--transition-smooth);
+  flex-shrink: 0;
+}
+
+.field:focus-within .input-icon {
+  fill: var(--accent-color);
+}
+
+.input-field {
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.98rem;
+  font-weight: 400;
+}
+
+.input-field::placeholder {
+  color: var(--text-muted);
+  font-family: var(--font-body);
+}
+
+/* ==========================================================================
+   9. BOTONES EDITORIALES DE ACCESO Y RETORNO
+   ========================================================================== */
+.form .btn {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.button1 {
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--accent-color);
+  color: #FFFFFF !important;
+  border: none;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: var(--transition-smooth);
+}
+
+[data-theme="dark"] .button1 {
+  color: #0D0F12 !important;
+}
+
+.button1:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 6px 20px rgba(15, 76, 129, 0.25);
+  transform: translateY(-2px);
+}
+
+.button1:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.button-back {
+  display: block;
+  text-align: center;
+  margin-top: 0.4rem;
+  padding: 10px;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: var(--transition-smooth);
+}
+
+.button-back:hover {
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  border-color: var(--border-color);
+}
+
+/* ==========================================================================
+   10. RESPONSIVE DESIGN (DESKTOP SPLIT)
+   ========================================================================== */
+@media (min-width: 850px) {
+  .login-split-container {
+    flex-direction: row;
+    align-items: center;
   }
 
-  function alternarTema() {
-    const esOscuro = document.documentElement.classList.contains('dark-theme') || document.body.classList.contains('dark-theme');
-    const nuevoTema = esOscuro ? 'light' : 'dark';
-    
-    localStorage.setItem(THEME_KEY, nuevoTema);
-    aplicarTemaGuardado();
-    playRetroSFX('click');
+  .brand-side {
+    flex: 1;
+    align-items: flex-start;
+    text-align: left;
   }
 
-  // Aplicar inmediatamente el tema recordado
-  aplicarTemaGuardado();
-
-  // Escuchar botón de alternar tema (si existe en el DOM)
-  const themeToggleBtn = document.getElementById('themeToggle') || document.querySelector('.theme-toggle');
-  if (themeToggleBtn) {
-    themeToggleBtn.addEventListener('click', alternarTema);
+  .form-side {
+    flex: 1;
   }
+}
 
-  // ==========================================================================
-  // 2. SINTETIZADOR AUDIO RETRO 8-BIT (WEB AUDIO API)
-  // ==========================================================================
-  let audioCtx = null;
-
-  function getAudioContext() {
-    if (!audioCtx) {
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (AudioContextClass) audioCtx = new AudioContextClass();
-    }
-    if (audioCtx && audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-    return audioCtx;
+@media (max-width: 849px) {
+  .brand-side {
+    align-items: center;
+    text-align: center;
   }
-
-  function playRetroSFX(type) {
-    try {
-      const ctx = getAudioContext();
-      if (!ctx) return;
-
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-
-      const now = ctx.currentTime;
-
-      if (type === 'click') {
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(400, now);
-        osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
-        gain.gain.setValueAtTime(0.1, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
-        osc.start(now);
-        osc.stop(now + 0.05);
-      } else if (type === 'granted') {
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(330, now);
-        osc.frequency.setValueAtTime(440, now + 0.08);
-        osc.frequency.setValueAtTime(554.37, now + 0.16);
-        osc.frequency.setValueAtTime(659.25, now + 0.24);
-        gain.gain.setValueAtTime(0.12, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
-        osc.start(now);
-        osc.stop(now + 0.4);
-      } else if (type === 'denied') {
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(150, now);
-        osc.frequency.setValueAtTime(90, now + 0.1);
-        gain.gain.setValueAtTime(0.15, now);
-        gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
-        osc.start(now);
-        osc.stop(now + 0.25);
-      }
-    } catch (e) {
-      // Ignorar errores de audio
-    }
-  }
-
-  if (btnSubmit) {
-    btnSubmit.addEventListener('mousedown', () => playRetroSFX('click'));
-  }
-
-  function mostrarError(mensaje) {
-    playRetroSFX('denied');
-    if (alertBox) {
-      alertBox.textContent = `[SYSTEM ERROR]: ${mensaje.toUpperCase()}`;
-      alertBox.style.display = 'block';
-      alertBox.classList.remove('shake');
-      void alertBox.offsetWidth; // Force reflow para reiniciar animación
-      alertBox.classList.add('shake');
-    } else {
-      alert(`[ACCESS DENIED]: ${mensaje}`);
-    }
-  }
-
-  // ==========================================================================
-  // 3. ESTILOS DINÁMICOS Y ANIMACIONES RETRO
-  // ==========================================================================
-  if (!document.getElementById('spinner-style')) {
-    const style = document.createElement('style');
-    style.id = 'spinner-style';
-    style.innerHTML = `
-      .shake { animation: shakeError 0.35s steps(4, end); }
-      @keyframes shakeError {
-        0% { transform: translate(0, 0); }
-        25% { transform: translate(-8px, 0); }
-        50% { transform: translate(8px, 0); }
-        75% { transform: translate(-4px, 0); }
-        100% { transform: translate(0, 0); }
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
-  // ==========================================================================
-  // 4. AUTENTICACIÓN Y VALIDACIÓN DE FORMULARIO
-  // ==========================================================================
-  if (form) {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-
-      if (alertBox) alertBox.style.display = 'none';
-
-      // Capturar entradas buscando por ID o por tipo
-      const userEl = document.getElementById('usuario') || document.querySelector('input[type="text"]');
-      const passEl = document.getElementById('password') || document.querySelector('input[type="password"]');
-
-      const usuario = userEl ? userEl.value.trim() : '';
-      const password = passEl ? passEl.value.trim() : '';
-
-      // VALIDACIÓN LOCAL DIRECTA
-      if (usuario === '2025' && password === 'LaserPrint01') {
-        localStorage.setItem('adminAutenticado', 'true');
-        playRetroSFX('granted');
-
-        if (btnSubmit) {
-          btnSubmit.style.background = '#00ff66';
-          btnSubmit.style.color = '#000000';
-          btnSubmit.style.boxShadow = '0 0 15px #00ff66';
-          btnSubmit.innerHTML = '★ ACCESS GRANTED ★';
-        }
-
-        setTimeout(() => {
-          window.location.href = 'admin.html';
-        }, 600);
-      } else {
-        mostrarError('INVALID CREDENTIALS');
-      }
-    });
-  }
-});
+}
