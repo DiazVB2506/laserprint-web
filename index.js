@@ -148,15 +148,16 @@ function initRetroSFXSystem() {
 }
 
 /* ==========================================================================
-   2. CONTROL DE VIDEO DE PRESENTACIÓN (videos/presentacion3.mp4)
+/* ==========================================================================
+   2. CONTROL DE VIDEO DE PRESENTACIÓN (uploads/videos/presentacion3.mp4)
    ========================================================================== */
 
 function initVideoPlayback() {
   const videoElem = document.querySelector('.video-section video') || document.getElementById('presentacionVideo');
   if (videoElem) {
-    // Asignar ruta si no la tiene asignada correctamente en HTML
+    // Si no tiene asignado la ruta correcta, se la asignamos a uploads/videos/
     if (!videoElem.getAttribute('src')) {
-      videoElem.src = 'videos/presentacion3.mp4';
+      videoElem.src = 'uploads/videos/presentacion3.mp4';
     }
     videoElem.muted = true;
     videoElem.playsInline = true;
