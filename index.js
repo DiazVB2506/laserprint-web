@@ -371,7 +371,7 @@ function initLightbox() {
   if (!modal || !modalImg) return;
 
   document.body.addEventListener('click', function(e) {
-    if (e.target.matches('.carousel-slide-3d img')) {
+    if (e.target.matches('.carousel-slide-3d img, .carousel-img')) {
       const img = e.target;
       playArcadeSound('openModal');
       modal.style.display = 'flex';
@@ -785,14 +785,14 @@ const PixelUI = {
 
   toggleChat: function() {
     if (!this.chatWidget) return;
-    const isOpen = this.chatWidget.classList.contains('active') || this.chatWidget.style.display === 'flex';
+    const isOpen = this.chatWidget.classList.contains('active') || this.chatWidget.style.display === 'flex' || this.chatWidget.classList.contains('open');
     if (isOpen) this.ocultarChat(); else this.mostrarChat();
   },
 
   mostrarChat: function() {
     if (!this.chatWidget) return;
     playArcadeSound('openModal');
-    this.chatWidget.classList.add('active');
+    this.chatWidget.classList.add('active', 'open');
     this.chatWidget.style.display = 'flex';
     if (this.inputField) {
       const field = this.inputField;
@@ -803,7 +803,7 @@ const PixelUI = {
   ocultarChat: function() {
     if (!this.chatWidget) return;
     playArcadeSound('closeModal');
-    this.chatWidget.classList.remove('active');
+    this.chatWidget.classList.remove('active', 'open');
     this.chatWidget.style.display = 'none';
   },
 
@@ -873,7 +873,7 @@ const PixelUI = {
         return;
       }
 
-      if (qLower.includes('sticker') || qLower.includes('calcomania') || qLower.includes('etiqueta')) {
+      if (qLower.includes('sticker') || qLower.includes('etiqueta') || qLower.includes('calcomania')) {
         const m = datosMedidas.metrosLineales || datosMedidas.ancho;
         const res = CotizadorEngine.calcularVinilSticker(m);
         const msg = '<b>🏷️ COTIZACIÓN VINIL STICKER:</b><br><br>' +
@@ -886,11 +886,11 @@ const PixelUI = {
         return;
       }
 
-      if (qLower.includes('sublimacion') || qLower.includes('sublimar')) {
+      if (qLower.includes('sublim')) {
         const res = CotizadorEngine.calcularGranFormato('SUBLIMACION_M2', datosMedidas.ancho, datosMedidas.alto);
         const msg = '<b>📊 COTIZACIÓN SUBLIMACIÓN:</b><br><br>' +
-          '• Dimensiones: <b>' + datosMedidas.ancho + ' m x ' + datosMedidas.alto + ' m</b><br>' +
-          '• Área calculada: <b>' + res.areaM2Unidad + ' m²</b><br>' +
+          '• Medidas: <b>' + res.ancho + 'm x ' + res.alto + 'm</b> (' + res.areaM2Unidad + ' m²)<br>' +
+          '• Precio m²: <b>$' + res.precioM2 + ' MXN</b><br>' +
           '• Total estimado: <b style="color:#00f0ff; font-size: 1.1em;">$' + res.total + ' MXN</b>' +
           AVISO_COTIZACION_VARIA;
         this.appendMessage('bot', msg);
@@ -898,41 +898,43 @@ const PixelUI = {
         return;
       }
 
-      // Por defecto para lona u otros materiales en m²
+      // Por defecto para lonas / viniles impresos
       const res = CotizadorEngine.calcularGranFormato('LONA_440G', datosMedidas.ancho, datosMedidas.alto);
-      const msg = '<b>📊 COTIZACIÓN ESTIMADA (LONA IMPRESA):</b><br><br>' +
-        '• Dimensiones: <b>' + datosMedidas.ancho + ' m x ' + datosMedidas.alto + ' m</b><br>' +
-        '• Área calculada: <b>' + res.areaM2Unidad + ' m²</b><br>' +
+      const msg = '<b>📊 COTIZACIÓN LONA IMPRESA:</b><br><br>' +
+        '• Medidas: <b>' + res.ancho + 'm x ' + res.alto + 'm</b> (' + res.areaM2Unidad + ' m²)<br>' +
+        '• Precio m²: <b>$' + res.precioM2 + ' MXN</b><br>' +
         '• Total estimado: <b style="color:#00f0ff; font-size: 1.1em;">$' + res.total + ' MXN</b>' +
+        (res.aplicoMinimo ? '<br>⚠️ <i>Aplica cobro por mínimo de 1 m².</i>' : '') +
         AVISO_COTIZACION_VARIA;
       this.appendMessage('bot', msg);
       playArcadeSound('success');
       return;
     }
 
-    // 2. Búsqueda por palabras clave en la Base de Conocimiento
+    // 2. Coincidencia por palabras clave en la Base de Conocimiento
     for (let key in PIXEL_KNOWLEDGE_BASE) {
-      const topic = PIXEL_KNOWLEDGE_BASE[key];
-      for (let i = 0; i < topic.keywords.length; i++) {
-        if (qLower.includes(topic.keywords[i])) {
-          this.appendMessage('bot', topic.response);
-          playArcadeSound('success');
-          return;
-        }
+      const item = PIXEL_KNOWLEDGE_BASE[key];
+      const match = item.keywords.some(function(kw) { return qLower.includes(kw); });
+
+      if (match) {
+        this.appendMessage('bot', item.response);
+        playArcadeSound('success');
+        return;
       }
     }
 
-    // 3. Respuesta genérica
-    const defaultMsg = '<b>👾 PIXEL AI:</b> No estoy seguro de entender tu consulta exacta.<br><br>' +
-      'Puedes pedirme cotizaciones escribiendo medidas como <b>"2x1m lona"</b> o <b>"1 metro de dtf"</b>, o elegir una opción del menú.<br><br>' +
-      '👉 <a href="https://wa.me/' + NUMERO_WHATSAPP + '?text=Hola,%20tengo%20una%20duda%20sobre%20un%20servicio" target="_blank" style="color:#00f0ff; font-weight:bold; text-decoration:underline;">Hablar directamente con un asesor por WhatsApp</a>';
+    // 3. Respuesta por defecto
+    const defaultMsg = '🤖 No logré entender por completo tu solicitud.<br><br>' +
+      'Puedes escribir la medida que requieres cotizar (ej. <i>"lona 2x1m"</i>, <i>"1m de dtf"</i>) o contactarnos en directo por WhatsApp:<br><br>' +
+      '👉 <a href="https://wa.me/' + NUMERO_WHATSAPP + '?text=Hola,%20tengo%20una%20duda%20sobre%20un%20servicio" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Escribir a WhatsApp Directo</a>';
+
     this.appendMessage('bot', defaultMsg);
     playArcadeSound('error');
   }
 };
 
 /* ==========================================================================
-   9. INICIALIZACIÓN GLOBAL DE LA APLICACIÓN
+   9. INICIALIZACIÓN GLOBAL DEL SISTEMA AL CARGAR EL DOM
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -942,4 +944,6 @@ document.addEventListener('DOMContentLoaded', function() {
   cargarCarruselDinamico();
   initLightbox();
   PixelUI.init();
+
+  console.log('✅ [DISEÑO LASER PRINT] Interfaz y PIXEL AI v3.3 cargados exitosamente.');
 });
