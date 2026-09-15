@@ -1,217 +1,220 @@
-/* ==========================================================================
-   1. SINTETIZADOR DE SONIDOS EDITORIALES (WEB AUDIO API)
-   ========================================================================== */
-const SoundEffects = {
-  ctx: null,
+/**
+ * ==============================================================================
+ * DISEÑO LASER PRINT - CONTROL DE LOGIN & GESTIÓN DE TEMA EDITORIAL
+ * ==============================================================================
+ */
 
-  init() {
-    if (!this.ctx) {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (AudioContext) {
-        this.ctx = new AudioContext();
-      }
-    }
-    if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume();
-    }
-  },
-
-  // Sonido suave de interacción/click al cambiar tema
-  playClick() {
-    this.init();
-    if (!this.ctx) return;
-
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(600, this.ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(300, this.ctx.currentTime + 0.05);
-
-    gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
-
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start();
-    osc.stop(this.ctx.currentTime + 0.05);
-  },
-
-  // Sonido armónico de éxito al iniciar sesión
-  playSuccess() {
-    this.init();
-    if (!this.ctx) return;
-
-    const now = this.ctx.currentTime;
-    const osc1 = this.ctx.createOscillator();
-    const osc2 = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-
-    // Acorde suave C5 a G5
-    osc1.type = 'sine';
-    osc1.frequency.setValueAtTime(523.25, now); // C5
-    osc2.type = 'sine';
-    osc2.frequency.setValueAtTime(783.99, now + 0.08); // G5
-
-    gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.12, now + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-
-    osc1.connect(gain);
-    osc2.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc1.start(now);
-    osc1.stop(now + 0.4);
-    osc2.start(now + 0.08);
-    osc2.stop(now + 0.4);
-  },
-
-  // Sonido tenue de advertencia/error al equivocarse
-  playError() {
-    this.init();
-    if (!this.ctx) return;
-
-    const now = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(180, now);
-    osc.frequency.setValueAtTime(140, now + 0.1);
-
-    gain.gain.setValueAtTime(0.1, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start(now);
-    osc.stop(now + 0.25);
-  }
-};
-
-/* ==========================================================================
-   2. GESTIÓN DE TEMA DINÁMICO (LIGHT & DARK THEME)
-   ========================================================================== */
 document.addEventListener('DOMContentLoaded', () => {
-  const themeToggleBtn = document.getElementById('theme-toggle');
-  const themeIcon = document.getElementById('theme-icon');
-  const themeText = document.getElementById('theme-text');
+  const form = document.getElementById('loginForm') || document.querySelector('form');
+  const alertBox = document.getElementById('alertMessage');
+  const btnSubmit = document.getElementById('btnLogin') || document.querySelector('button[type="submit"]');
 
-  // Cargar tema guardado o preferencia del sistema
-  const savedTheme = localStorage.getItem('theme');
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  
-  if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-    document.documentElement.setAttribute('data-theme', 'dark');
-    if (themeIcon) themeIcon.textContent = '☀️';
-    if (themeText) themeText.textContent = 'Modo Claro';
-  } else {
-    document.documentElement.setAttribute('data-theme', 'light');
-    if (themeIcon) themeIcon.textContent = '🌙';
-    if (themeText) themeText.textContent = 'Modo Oscuro';
+  // ==========================================================================
+  // 1. SISTEMA DE GESTIÓN DE TEMA (PERSISTENCIA LIGHT / DARK)
+  // ==========================================================================
+  const THEME_KEY = 'theme';
+
+  function aplicarTemaGuardado() {
+    const temaGuardado = localStorage.getItem(THEME_KEY) || 'dark';
+    
+    // Aplicar atributo global de tema
+    document.documentElement.setAttribute('data-theme', temaGuardado);
+    
+    // Mantener compatibilidad con clases si fuera necesario
+    if (temaGuardado === 'dark') {
+      document.documentElement.classList.add('dark-theme');
+      document.documentElement.classList.remove('light-theme');
+    } else {
+      document.documentElement.classList.add('light-theme');
+      document.documentElement.classList.remove('dark-theme');
+    }
+
+    actualizarBotonTema(temaGuardado);
   }
 
-  // Evento de cambio de tema
+  function actualizarBotonTema(temaActual) {
+    const themeToggleBtn = document.getElementById('themeToggle') || document.querySelector('.theme-toggle-btn');
+    if (!themeToggleBtn) return;
+
+    if (temaActual === 'dark') {
+      themeToggleBtn.innerHTML = '<span>☀️</span> Modo Claro';
+    } else {
+      themeToggleBtn.innerHTML = '<span>🌙</span> Modo Oscuro';
+    }
+  }
+
+  function alternarTema() {
+    const temaActual = document.documentElement.getAttribute('data-theme') || 'dark';
+    const nuevoTema = temaActual === 'dark' ? 'light' : 'dark';
+    
+    localStorage.setItem(THEME_KEY, nuevoTema);
+    aplicarTemaGuardado();
+    playModernSFX('click');
+  }
+
+  // Cargar tema de inmediato
+  aplicarTemaGuardado();
+
+  // Escuchar conmutador de tema
+  const themeToggleBtn = document.getElementById('themeToggle') || document.querySelector('.theme-toggle-btn');
   if (themeToggleBtn) {
-    themeToggleBtn.addEventListener('click', () => {
-      SoundEffects.playClick();
-      
-      const currentTheme = document.documentElement.getAttribute('data-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    themeToggleBtn.addEventListener('click', alternarTema);
+  }
 
-      document.documentElement.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
+  // ==========================================================================
+  // 2. SINTETIZADOR AUDIO SUAVE & PROFESIONAL (WEB AUDIO API)
+  // ==========================================================================
+  let audioCtx = null;
 
-      if (themeIcon && themeText) {
-        if (newTheme === 'dark') {
-          themeIcon.textContent = '☀️';
-          themeText.textContent = 'Modo Claro';
-        } else {
-          themeIcon.textContent = '🌙';
-          themeText.textContent = 'Modo Oscuro';
-        }
+  function getAudioContext() {
+    if (!audioCtx) {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) audioCtx = new AudioContextClass();
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    return audioCtx;
+  }
+
+  function playModernSFX(type) {
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+
+      const now = ctx.currentTime;
+
+      if (type === 'click') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(580, now);
+        osc.frequency.exponentialRampToValueAtTime(320, now + 0.04);
+
+        gain.gain.setValueAtTime(0.06, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.04);
+
+      } else if (type === 'granted') {
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        // Acorde sutil C5 -> G5
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(523.25, now);
+        
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(783.99, now + 0.08);
+
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.1, now + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc1.start(now);
+        osc1.stop(now + 0.35);
+        osc2.start(now + 0.08);
+        osc2.stop(now + 0.35);
+
+      } else if (type === 'denied') {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.setValueAtTime(130, now + 0.08);
+
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.22);
       }
-    });
+    } catch (e) {
+      // Ignorar restricciones de reproducción de audio si interactúa antes de tiempo
+    }
   }
 
-  /* ==========================================================================
-     3. MANEJO DE FORMULARIO DE ACCESO Y ALERTAS
-     ========================================================================== */
-  const loginForm = document.getElementById('login-form');
-  const alertBox = document.getElementById('alert-message');
-
-  function showAlert(message) {
-    if (!alertBox) return;
-    alertBox.textContent = message;
-    alertBox.style.display = 'block';
-    SoundEffects.playError();
+  // ==========================================================================
+  // 3. ANIMACIONES Y ESTILOS DINÁMICOS
+  // ==========================================================================
+  if (!document.getElementById('shake-style')) {
+    const style = document.createElement('style');
+    style.id = 'shake-style';
+    style.innerHTML = `
+      .shake { animation: shakeError 0.35s ease-in-out; }
+      @keyframes shakeError {
+        0%, 100% { transform: translateX(0); }
+        20%, 60% { transform: translateX(-6px); }
+        40%, 80% { transform: translateX(6px); }
+      }
+    `;
+    document.head.appendChild(style);
   }
 
-  function hideAlert() {
-    if (!alertBox) return;
-    alertBox.style.display = 'none';
+  function mostrarError(mensaje) {
+    playModernSFX('denied');
+    if (alertBox) {
+      alertBox.textContent = mensaje;
+      alertBox.style.display = 'block';
+      alertBox.classList.remove('shake');
+      void alertBox.offsetWidth; // Forzar reflow para reiniciar la animación
+      alertBox.classList.add('shake');
+    } else {
+      alert(mensaje);
+    }
   }
 
-  if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
+  // ==========================================================================
+  // 4. AUTENTICACIÓN Y MANEJO DE INICIO DE SESIÓN
+  // ==========================================================================
+  if (form) {
+    form.addEventListener('submit', (e) => {
       e.preventDefault();
-      hideAlert();
 
-      const userInput = document.getElementById('username');
-      const passwordInput = document.getElementById('password');
-      const submitBtn = loginForm.querySelector('.button1');
+      if (alertBox) alertBox.style.display = 'none';
 
-      const username = userInput ? userInput.value.trim() : '';
-      const password = passwordInput ? passwordInput.value.trim() : '';
+      const userEl = document.getElementById('usuario') || document.querySelector('input[type="text"]');
+      const passEl = document.getElementById('password') || document.querySelector('input[type="password"]');
 
-      if (!username || !password) {
-        showAlert('Por favor, completa todos los campos.');
+      const usuario = userEl ? userEl.value.trim() : '';
+      const password = passEl ? passEl.value.trim() : '';
+
+      if (!usuario || !password) {
+        mostrarError('Por favor, ingresa tu usuario y contraseña.');
         return;
       }
 
-      try {
-        if (submitBtn) {
-          submitBtn.disabled = true;
-          submitBtn.textContent = 'Verificando...';
+      // Proceso de Verificación
+      if (usuario === '2025' && password === 'LaserPrint01') {
+        localStorage.setItem('adminAutenticado', 'true');
+        playModernSFX('granted');
+
+        if (btnSubmit) {
+          btnSubmit.disabled = true;
+          btnSubmit.textContent = 'Acceso Autorizado';
+          btnSubmit.style.backgroundColor = '#10B981'; // Verde sobrio
         }
 
-        // Simulación o petición Fetch a API backend
-        /*
-        const response = await fetch('/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
-        });
-        const data = await response.json();
-        */
-
-        // Validación de prueba / Ejemplo
         setTimeout(() => {
-          if (username === 'admin' || username === '2025') {
-            SoundEffects.playSuccess();
-            
-            // Redirección tras login exitoso
-            setTimeout(() => {
-              window.location.href = 'index.html'; // O tu panel de administración
-            }, 300);
-          } else {
-            showAlert('Credenciales incorrectas. Revisa tu usuario y contraseña.');
-            if (submitBtn) {
-              submitBtn.disabled = false;
-              submitBtn.textContent = 'Entrar';
-            }
-          }
-        }, 600);
+          window.location.href = 'admin.html';
+        }, 500);
 
-      } catch (error) {
-        showAlert('Error de conexión con el servidor. Intenta de nuevo.');
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Entrar';
-        }
+      } else {
+        mostrarError('Usuario o contraseña incorrectos.');
       }
     });
   }
