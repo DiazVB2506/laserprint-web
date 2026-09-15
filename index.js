@@ -4,7 +4,7 @@
  * ==============================================================================
  */
 
-const NUMERO_WHATSAPP = "5215500000000"; // Reemplaza con tu número a 10 dígitos más código de país
+const NUMERO_WHATSAPP = "5598788857"; // Reemplaza con tu número a 10 dígitos más código de país
 
 /* ==========================================================================
    1. SINTETIZADOR DE EFECTOS DE SONIDO EDITORIAL/RETRO (WEB AUDIO API)
