@@ -156,7 +156,7 @@ function initGifPlayback() {
   const gifImg = document.getElementById('gifPresentacion');
   if (gifImg) {
     const timestamp = new Date().getTime();
-    gifImg.src = `uploads/videos/presentacionreal.gif?v=${timestamp}`;
+    gifImg.src = `uploads/videos/presentacion1.gif?v=${timestamp}`;
   }
 }
 
