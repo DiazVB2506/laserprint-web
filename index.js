@@ -134,13 +134,13 @@ function playArcadeSound(type) {
 }
 
 function initRetroSFXSystem() {
-  document.addEventListener('mouseover', (e) => {
+  document.addEventListener('mouseover', function(e) {
     if (e.target.closest('.nav-btn, .carousel-btn, .whatsapp-btn, .dot, .mobile-menu-btn, .pixel-toggle-btn, .pixel-prompt-btn, .pixel-send-btn, .pixel-quick-btn')) {
       playArcadeSound('hover');
     }
   });
 
-  document.addEventListener('click', (e) => {
+  document.addEventListener('click', function(e) {
     if (e.target.closest('.nav-btn, .whatsapp-btn, .pixel-prompt-btn, .pixel-send-btn, .pixel-quick-btn')) {
       playArcadeSound('click');
     }
@@ -148,15 +148,20 @@ function initRetroSFXSystem() {
 }
 
 /* ==========================================================================
-   2. CONTROL DE VIDEO DE PRESENTACIÓN (REEMPLAZO DE GIF)
+   2. CONTROL DE VIDEO DE PRESENTACIÓN (videos/presentacion3.mp4)
    ========================================================================== */
 
 function initVideoPlayback() {
-  const videoElem = document.querySelector('.video-section video');
+  const videoElem = document.querySelector('.video-section video') || document.getElementById('presentacionVideo');
   if (videoElem) {
-    videoElem.play().catch(() => {
-      // Manejo de reproducciones bloqueadas por autopolítica del navegador
-      console.log('Autoplay suspendido por el navegador. Requiere interacción del usuario.');
+    // Asignar ruta si no la tiene asignada correctamente en HTML
+    if (!videoElem.getAttribute('src')) {
+      videoElem.src = 'videos/presentacion3.mp4';
+    }
+    videoElem.muted = true;
+    videoElem.playsInline = true;
+    videoElem.play().catch(function() {
+      console.log('Autoplay retenido por el navegador.');
     });
   }
 }
@@ -171,21 +176,21 @@ function initMobileMenu() {
 
   if (!menuBtn || !navLinks) return;
 
-  menuBtn.addEventListener('click', (e) => {
+  menuBtn.addEventListener('click', function(e) {
     e.stopPropagation();
     playArcadeSound('menu');
     navLinks.classList.toggle('active');
     menuBtn.classList.toggle('open');
   });
 
-  navLinks.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => {
+  navLinks.querySelectorAll('a').forEach(function(link) {
+    link.addEventListener('click', function() {
       navLinks.classList.remove('active');
       menuBtn.classList.remove('open');
     });
   });
 
-  document.addEventListener('click', (e) => {
+  document.addEventListener('click', function(e) {
     if (!navLinks.contains(e.target) && !menuBtn.contains(e.target)) {
       navLinks.classList.remove('active');
       menuBtn.classList.remove('open');
@@ -210,34 +215,34 @@ async function cargarCarruselDinamico() {
       const data = await response.json();
       if (data.productos && data.productos.length > 0) {
         imagenesFotos = data.productos
-          .filter(p => p.tipoArchivo === 'imagen' || !p.tipoArchivo)
-          .map(p => ({
-            url: p.archivoUrl ? (p.archivoUrl.startsWith('/') ? p.archivoUrl.slice(1) : p.archivoUrl) : `${BASE_URL}slide1.png`,
-            alt: p.nombre || 'Diseño Laser Print - Trabajo Destacado'
-          }));
+          .filter(function(p) { return p.tipoArchivo === 'imagen' || !p.tipoArchivo; })
+          .map(function(p) {
+            return {
+              url: p.archivoUrl ? (p.archivoUrl.startsWith('/') ? p.archivoUrl.slice(1) : p.archivoUrl) : (BASE_URL + 'slide1.png'),
+              alt: p.nombre || 'Diseño Laser Print - Trabajo Destacado'
+            };
+          });
       }
     }
   } catch (error) {
-    console.warn('⚡ [CARRUSEL] Servidor dinámico no disponible. Usando catálogo estático.');
+    console.warn('⚡ [CARRUSEL] Usando catálogo estático.');
   }
 
   if (imagenesFotos.length === 0) {
     imagenesFotos = [
-      { url: `${BASE_URL}slide1.png`, alt: 'Diseño Laser Print - Trabajo Destacado 1' },
-      { url: `${BASE_URL}slide2.png`, alt: 'Diseño Laser Print - Trabajo Destacado 2' },
-      { url: `${BASE_URL}slide3.png`, alt: 'Diseño Laser Print - Trabajo Destacado 3' },
-      { url: `${BASE_URL}slide4.png`, alt: 'Diseño Laser Print - Trabajo Destacado 4' },
-      { url: `${BASE_URL}slide5.png`, alt: 'Diseño Laser Print - Trabajo Destacado 5' }
+      { url: BASE_URL + 'slide1.png', alt: 'Diseño Laser Print - Trabajo Destacado 1' },
+      { url: BASE_URL + 'slide2.png', alt: 'Diseño Laser Print - Trabajo Destacado 2' },
+      { url: BASE_URL + 'slide3.png', alt: 'Diseño Laser Print - Trabajo Destacado 3' },
+      { url: BASE_URL + 'slide4.png', alt: 'Diseño Laser Print - Trabajo Destacado 4' },
+      { url: BASE_URL + 'slide5.png', alt: 'Diseño Laser Print - Trabajo Destacado 5' }
     ];
   }
 
-  track.innerHTML = imagenesFotos.map((item, index) => `
-    <div class="carousel-slide-3d" data-index="${index}">
-      <img src="${item.url}" 
-           alt="${item.alt}" 
-           onerror="this.onerror=null; this.src='https://via.placeholder.com/900x550/ffffff/0f4c81?text=TRABAJO+${index + 1}';">
-    </div>
-  `).join('');
+  track.innerHTML = imagenesFotos.map(function(item, index) {
+    return '<div class="carousel-slide-3d" data-index="' + index + '">' +
+      '<img src="' + item.url + '" alt="' + item.alt + '" onerror="this.onerror=null; this.src=\'https://via.placeholder.com/900x550/ffffff/0f4c81?text=TRABAJO+' + (index + 1) + '\';">' +
+    '</div>';
+  }).join('');
 
   initCarousel3D();
 }
@@ -259,11 +264,11 @@ function initCarousel3D() {
 
   if (dotsContainer) {
     dotsContainer.innerHTML = '';
-    slides.forEach((_, index) => {
+    slides.forEach(function(_, index) {
       const dot = document.createElement('div');
       dot.classList.add('dot');
       if (index === 0) dot.classList.add('active');
-      dot.addEventListener('click', () => {
+      dot.addEventListener('click', function() {
         playArcadeSound('carousel');
         moveToSlide(index);
         resetAutoplay();
@@ -275,7 +280,7 @@ function initCarousel3D() {
   const dots = dotsContainer ? Array.from(dotsContainer.children) : [];
 
   function update3DSlides() {
-    slides.forEach((slide, index) => {
+    slides.forEach(function(slide, index) {
       slide.classList.remove('active', 'prev', 'next', 'hidden');
 
       let offset = (index - currentIndex + totalSlides) % totalSlides;
@@ -291,7 +296,7 @@ function initCarousel3D() {
       }
     });
 
-    dots.forEach((dot, index) => {
+    dots.forEach(function(dot, index) {
       dot.classList.toggle('active', index === currentIndex);
     });
   }
@@ -302,7 +307,7 @@ function initCarousel3D() {
   }
 
   function startAutoplay() {
-    autoplayTimer = setInterval(() => {
+    autoplayTimer = setInterval(function() {
       moveToSlide(currentIndex + 1);
     }, 5000);
   }
@@ -313,7 +318,7 @@ function initCarousel3D() {
   }
 
   if (nextBtn) {
-    nextBtn.onclick = (e) => {
+    nextBtn.onclick = function(e) {
       e.stopPropagation();
       playArcadeSound('carousel');
       moveToSlide(currentIndex + 1);
@@ -322,7 +327,7 @@ function initCarousel3D() {
   }
 
   if (prevBtn) {
-    prevBtn.onclick = (e) => {
+    prevBtn.onclick = function(e) {
       e.stopPropagation();
       playArcadeSound('carousel');
       moveToSlide(currentIndex - 1);
@@ -333,11 +338,11 @@ function initCarousel3D() {
   let touchStartX = 0;
   let touchEndX = 0;
 
-  track.addEventListener('touchstart', (e) => {
+  track.addEventListener('touchstart', function(e) {
     touchStartX = e.changedTouches[0].screenX;
   }, { passive: true });
 
-  track.addEventListener('touchend', (e) => {
+  track.addEventListener('touchend', function(e) {
     touchEndX = e.changedTouches[0].screenX;
     if (touchStartX - touchEndX > 40) {
       playArcadeSound('carousel');
@@ -366,7 +371,7 @@ function initLightbox() {
 
   if (!modal || !modalImg) return;
 
-  document.body.addEventListener('click', (e) => {
+  document.body.addEventListener('click', function(e) {
     if (e.target.matches('.carousel-slide-3d img')) {
       const img = e.target;
       playArcadeSound('openModal');
@@ -377,7 +382,7 @@ function initLightbox() {
     }
   });
 
-  const hideModal = () => {
+  const hideModal = function() {
     playArcadeSound('closeModal');
     modal.style.display = 'none';
     document.body.style.overflow = 'auto';
@@ -387,11 +392,11 @@ function initLightbox() {
     closeModal.addEventListener('click', hideModal);
   }
 
-  window.addEventListener('click', (e) => {
+  window.addEventListener('click', function(e) {
     if (e.target === modal) hideModal();
   });
 
-  window.addEventListener('keydown', (e) => {
+  window.addEventListener('keydown', function(e) {
     if (e.key === 'Escape' && modal.style.display === 'flex') {
       hideModal();
     }
@@ -477,7 +482,8 @@ const LASER_PRINT_DB = {
 };
 
 const CotizadorEngine = {
-  calcularGranFormato: function(productoKey, anchoM, altoM, cantidad = 1) {
+  calcularGranFormato: function(productoKey, anchoM, altoM, cantidad) {
+    cantidad = cantidad || 1;
     let prod = LASER_PRINT_DB.categorias.GRAN_FORMATO.productos[productoKey];
     if (!prod && productoKey === 'SUBLIMACION_M2') {
       prod = LASER_PRINT_DB.categorias.SUBLIMACION.productos.SUBLIMACION_M2;
@@ -579,137 +585,137 @@ const CotizadorEngine = {
    7. BASE DE CONOCIMIENTO MAESTRA DE PIXEL AI
    ========================================================================== */
 
-const AVISO_COTIZACION_VARIA = `<br><br>⚠️ <i><b>Aviso importante:</b> El costo total estimado puede variar según especificaciones finales. El servicio de diseño tiene costo extra (puede variar dependiendo la complejidad). Para una cotización exacta dirígete a la sucursal o escríbenos vía WhatsApp.</i>`;
+const AVISO_COTIZACION_VARIA = '<br><br>⚠️ <i><b>Aviso importante:</b> El costo total estimado puede variar según especificaciones finales. El servicio de diseño tiene costo extra (puede variar dependiendo la complejidad). Para una cotización exacta dirígete a la sucursal o escríbenos vía WhatsApp.</i>';
 
 const PIXEL_KNOWLEDGE_BASE = {
   saludos: {
     keywords: ['hola', 'buenas', 'buenos dias', 'buenas tardes', 'buenas noches', 'saludos', 'hello', 'hey', 'hi'],
     title: '¡HOLA! BIENVENIDO',
-    response: `<b>✦ ASESOR LASER PRINT:</b> ¡Hola! 👋 Bienvenid@ a <b>Diseño Laser Print</b>.<br><br>
-    ¿En qué te puedo ayudar hoy? Escribe la medida que buscas cotizar o selecciona una opción rápida.<br><br>
-    🎨 <i>Ten en cuenta que si requieres servicio de diseño, este tiene un costo extra dependiendo la complejidad.</i>`
+    response: '<b>✦ ASESOR LASER PRINT:</b> ¡Hola! 👋 Bienvenid@ a <b>Diseño Laser Print</b>.<br><br>' +
+    '¿En qué te puedo ayudar hoy? Escribe la medida que buscas cotizar o selecciona una opción rápida.<br><br>' +
+    '🎨 <i>Ten en cuenta que si requieres servicio de diseño, este tiene un costo extra dependiendo la complejidad.</i>'
   },
   preparar_archivos: {
     keywords: ['como preparo mis archivos', 'preparar archivos', 'formato de archivo', 'formatos', 'preparo mis archivos', 'como mando mi archivo', 'como envio mi archivo', 'extensiones'],
     title: 'GUÍA DE PREPARACIÓN DE ARCHIVOS',
-    response: `<b>📁 GUÍA DE FORMATOS ACEPTADOS:</b><br><br>
-    • <b>DTF Textil / UV:</b> PNG, PDF SIN FONDO<br>
-    • <b>Stickers:</b> PDF, AI<br>
-    • <b>Lona:</b> JPEG, JPG, PDF, AI<br>
-    • <b>Sublimación:</b> PDF, AI<br>
-    • <b>Corte Láser:</b> DXF, AI, PDF EN VECTOR<br>
-    • <b>Coroplast:</b> PDF, AI<br><br>
-    🎨 <i>El diseño tiene costo extra y puede variar dependiendo el diseño.</i><br><br>
-    📲 Para enviarnos tus archivos directos o cotizar:<br>
-    👉 <a href="https://wa.me/${NUMERO_WHATSAPP}?text=Hola,%20quiero%20enviar%20mis%20archivos%20para%20revision" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Enviar archivos por WhatsApp</a>`
+    response: '<b>📁 GUÍA DE FORMATOS ACEPTADOS:</b><br><br>' +
+    '• <b>DTF Textil / UV:</b> PNG, PDF SIN FONDO<br>' +
+    '• <b>Stickers:</b> PDF, AI<br>' +
+    '• <b>Lona:</b> JPEG, JPG, PDF, AI<br>' +
+    '• <b>Sublimación:</b> PDF, AI<br>' +
+    '• <b>Corte Láser:</b> DXF, AI, PDF EN VECTOR<br>' +
+    '• <b>Coroplast:</b> PDF, AI<br><br>' +
+    '🎨 <i>El diseño tiene costo extra y puede variar dependiendo el diseño.</i><br><br>' +
+    '📲 Para enviarnos tus archivos directos o cotizar:<br>' +
+    '👉 <a href="https://wa.me/' + NUMERO_WHATSAPP + '?text=Hola,%20quiero%20enviar%20mis%20archivos%20para%20revision" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Enviar archivos por WhatsApp</a>'
   },
   volantes: {
     keywords: ['volante', 'volantes', 'flyer', 'flyers', 'propaganda'],
     title: 'VOLANTES PUBLICITARIOS',
-    response: `<b>📄 VOLANTES:</b><br><br>
-    Manejamos diferentes medidas para tus impresiones:<br>
-    • <b>Tamaño Carta</b><br>
-    • <b>Media Carta</b><br>
-    • <b>Un Cuarto de Carta (1/4)</b><br><br>
-    🎨 <i>El servicio de diseño tiene costo extra y varía según la complejidad del proyecto.</i><br><br>
-    📲 Obtén tu cotización exacta por WhatsApp:<br>
-    👉 <a href="https://wa.me/${NUMERO_WHATSAPP}?text=Hola,%20quiero%20cotizar%20volantes" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Cotizar Volantes por WhatsApp</a>`
+    response: '<b>📄 VOLANTES:</b><br><br>' +
+    'Manejamos diferentes medidas para tus impresiones:<br>' +
+    '• <b>Tamaño Carta</b><br>' +
+    '• <b>Media Carta</b><br>' +
+    '• <b>Un Cuarto de Carta (1/4)</b><br><br>' +
+    '🎨 <i>El servicio de diseño tiene costo extra y varía según la complejidad del proyecto.</i><br><br>' +
+    '📲 Obtén tu cotización exacta por WhatsApp:<br>' +
+    '👉 <a href="https://wa.me/' + NUMERO_WHATSAPP + '?text=Hola,%20quiero%20cotizar%20volantes" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Cotizar Volantes por WhatsApp</a>'
   },
   tarjetas_presentacion: {
     keywords: ['tarjeta', 'tarjetas', 'tarjetas de presentacion', 'tarjeta de presentacion', 'presentacion'],
     title: 'TARJETAS DE PRESENTACIÓN',
-    response: `<b>🎴 TARJETAS DE PRESENTACIÓN:</b><br><br>
-    Contamos con los mejores acabados profesionales:<br>
-    • <b>Laminadas</b><br>
-    • <b>Barniz a Registro</b><br><br>
-    🎨 <i>El diseño tiene un costo extra dependiendo la complejidad del diseño.</i><br><br>
-    📲 Solicita tu cotización directa por WhatsApp:<br>
-    👉 <a href="https://wa.me/${NUMERO_WHATSAPP}?text=Hola,%20quiero%20cotizar%20tarjetas%20de%20presentacion" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Cotizar Tarjetas por WhatsApp</a>`
+    response: '<b>🎴 TARJETAS DE PRESENTACIÓN:</b><br><br>' +
+    'Contamos con los mejores acabados profesionales:<br>' +
+    '• <b>Laminadas</b><br>' +
+    '• <b>Barniz a Registro</b><br><br>' +
+    '🎨 <i>El diseño tiene un costo extra dependiendo la complejidad del diseño.</i><br><br>' +
+    '📲 Solicita tu cotización directa por WhatsApp:<br>' +
+    '👉 <a href="https://wa.me/' + NUMERO_WHATSAPP + '?text=Hola,%20quiero%20cotizar%20tarjetas%20de%20presentacion" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Cotizar Tarjetas por WhatsApp</a>'
   },
   notas_remision: {
     keywords: ['nota', 'notas', 'notas de remision', 'nota de remision', 'remision', 'talonario', 'notitas'],
     title: 'NOTAS DE REMISIÓN',
-    response: `<b>📝 NOTAS DE REMISIÓN:</b><br><br>
-    Imprimimos tus notas de remisión personalizadas para tu negocio.<br><br>
-    🎨 <i>El diseño tiene costo extra que puede variar según lo requieras.</i><br><br>
-    📲 Para obtener una cotización rápida por WhatsApp:<br>
-    👉 <a href="https://wa.me/${NUMERO_WHATSAPP}?text=Hola,%20quiero%20cotizar%20notas%20de%20remision" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Cotizar Notas de Remisión por WhatsApp</a>`
+    response: '<b>📝 NOTAS DE REMISIÓN:</b><br><br>' +
+    'Imprimimos tus notas de remisión personalizadas para tu negocio.<br><br>' +
+    '🎨 <i>El diseño tiene costo extra que puede variar según lo requieras.</i><br><br>' +
+    '📲 Para obtener una cotización rápida por WhatsApp:<br>' +
+    '👉 <a href="https://wa.me/' + NUMERO_WHATSAPP + '?text=Hola,%20quiero%20cotizar%20notas%20de%20remision" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Cotizar Notas de Remisión por WhatsApp</a>'
   },
   whatsapp: {
     keywords: ['whatsapp', 'contacto', 'celular', 'telefono', 'hablar con alguien', 'cotizar por whatsapp', 'cotizacion whatsapp'],
     title: 'CONTACTO POR WHATSAPP',
-    response: `<b>📲 CONTACTO DIRECTO:</b><br><br>
-    Puedes realizar tu cotización y pedido en tiempo real platicando directamente con nosotros.<br><br>
-    👉 <a href="https://wa.me/${NUMERO_WHATSAPP}?text=Hola%20Dise%C3%B1o%20Laser%20Print,%20quiero%20cotizar%20un%20trabajo" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Haz clic aquí para abrir WhatsApp Directo</a>`
+    response: '<b>📲 CONTACTO DIRECTO:</b><br><br>' +
+    'Puedes realizar tu cotización y pedido en tiempo real platicando directamente con nosotros.<br><br>' +
+    '👉 <a href="https://wa.me/' + NUMERO_WHATSAPP + '?text=Hola%20Dise%C3%B1o%20Laser%20Print,%20quiero%20cotizar%20un%20trabajo" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Haz clic aquí para abrir WhatsApp Directo</a>'
   },
   horarios_ubicacion: {
     keywords: ['horario', 'horarios', 'abierto', 'hora', 'atienden', 'dias', 'sabado', 'domingo', 'abren', 'cierran', 'ubicacion', 'ubicación', 'donde estan', 'donde quedan', 'direccion', 'dirección', 'sucursal'],
     title: 'HORARIOS Y UBICACIÓN',
-    response: `<b>📍 HORARIOS Y UBICACIÓN:</b><br><br>
-    ⏰ <b>Horarios de atención:</b><br>
-    • <b>Lunes a Viernes:</b> 9:00 am a 6:00 pm<br>
-    • <b>Sábados:</b> 9:00 am a 2:00 pm<br>
-    • <b>Domingos:</b> Cerrado<br><br>
-    📍 <b>Ubicación:</b> Encuentra la dirección exacta con mapa interactivo en la sección inferior de nuestra página.`
+    response: '<b>📍 HORARIOS Y UBICACIÓN:</b><br><br>' +
+    '⏰ <b>Horarios de atención:</b><br>' +
+    '• <b>Lunes a Viernes:</b> 9:00 am a 6:00 pm<br>' +
+    '• <b>Sábados:</b> 9:00 am a 2:00 pm<br>' +
+    '• <b>Domingos:</b> Cerrado<br><br>' +
+    '📍 <b>Ubicación:</b> Encuentra la dirección exacta con mapa interactivo en la sección inferior de nuestra página.'
   },
   dtf_uv: {
     keywords: ['dtf uv', 'uv dtf', 'impresion uv', 'uv'],
     title: 'DTF UV - ATENCIÓN DIRECTA',
-    response: `<b>✨ DTF UV:</b><br><br>
-    Para cotizar <b>DTF UV</b> o recibir atención especializada de este material, por favor comunícate directamente con nuestro equipo vía WhatsApp.<br><br>
-    👉 <a href="https://wa.me/${NUMERO_WHATSAPP}?text=Hola,%20me%20interesa%20cotizar%20DTF%20UV" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Hablar con contacto directo por WhatsApp</a>`
+    response: '<b>✨ DTF UV:</b><br><br>' +
+    'Para cotizar <b>DTF UV</b> o recibir atención especializada de este material, por favor comunícate directamente con nuestro equipo vía WhatsApp.<br><br>' +
+    '👉 <a href="https://wa.me/' + NUMERO_WHATSAPP + '?text=Hola,%20me%20interesa%20cotizar%20DTF%20UV" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Hablar con contacto directo por WhatsApp</a>'
   },
   dtf_textil: {
     keywords: ['dtf', 'dtf textil', 'textil'],
     title: 'DTF TEXTIL',
-    response: `<b>👕 DTF TEXTIL:</b><br><br>
-    📏 <b>Formato:</b> El metro mide <b>57 cm de ancho x 100 cm de alto</b>.<br>
-    💵 <b>Costo:</b> <b>$230 MXN</b> por metro lineal.<br>
-    ⚠️ <b>Venta mínima:</b> Mínimo medio metro (0.5 m).<br>
-    📅 <b>Tiempo de entrega:</b> 2 a 3 días hábiles.<br><br>
-    💡 <i>Para cotizar escribe por ejemplo: <b>"1 metro de dtf textil"</b> o <b>"dtf textil 0.5m"</b>.</i>`
+    response: '<b>👕 DTF TEXTIL:</b><br><br>' +
+    '📏 <b>Formato:</b> El metro mide <b>57 cm de ancho x 100 cm de alto</b>.<br>' +
+    '💵 <b>Costo:</b> <b>$230 MXN</b> por metro lineal.<br>' +
+    '⚠️ <b>Venta mínima:</b> Mínimo medio metro (0.5 m).<br>' +
+    '📅 <b>Tiempo de entrega:</b> 2 a 3 días hábiles.<br><br>' +
+    '💡 <i>Para cotizar escribe por ejemplo: <b>"1 metro de dtf textil"</b> o <b>"dtf textil 0.5m"</b>.</i>'
   },
   vinil_sticker: {
     keywords: ['sticker', 'stickers', 'vinil sticker', 'etiquetas', 'calcomania', 'calcomanias'],
     title: 'VINIL PARA STICKER',
-    response: `<b>🏷️ VINIL PARA STICKERS:</b><br><br>
-    📏 <b>Formato:</b> El metro mide <b>1.5 m (150 cm) de ancho x 1 m (100 cm) de alto</b>.<br>
-    💵 <b>Costo:</b> <b>$450 MXN</b> por metro lineal.<br>
-    ⚠️ <b>Venta mínima:</b> Mínimo medio metro (0.5 m).<br>
-    📅 <b>Tiempo de entrega:</b> 2 a 3 días hábiles.<br><br>
-    💡 <i>Para cotizar escribe por ejemplo: <b>"1 metro de vinil sticker"</b> o <b>"vinil sticker 0.5m"</b>.</i>`
+    response: '<b>🏷️ VINIL PARA STICKERS:</b><br><br>' +
+    '📏 <b>Formato:</b> El metro mide <b>1.5 m (150 cm) de ancho x 1 m (100 cm) de alto</b>.<br>' +
+    '💵 <b>Costo:</b> <b>$450 MXN</b> por metro lineal.<br>' +
+    '⚠️ <b>Venta mínima:</b> Mínimo medio metro (0.5 m).<br>' +
+    '📅 <b>Tiempo de entrega:</b> 2 a 3 días hábiles.<br><br>' +
+    '💡 <i>Para cotizar escribe por ejemplo: <b>"1 metro de vinil sticker"</b> o <b>"vinil sticker 0.5m"</b>.</i>'
   },
   letreros_led: {
     keywords: ['led', 'letrero', 'letreros', 'letrero led', 'luz led', 'mdf + lona', 'mdf y acrilico', 'letrero mdf'],
     title: 'LETREROS CON LUZ LED',
-    response: `<b>💡 LETREROS LED:</b><br><br>
-    Manejamos letreros personalizados en <b>MDF + Lona</b>, <b>MDF</b> y <b>Acrílico</b>.<br><br>
-    📲 Cotízalo directamente por WhatsApp enviándonos tus referencias:<br>
-    👉 <a href="https://wa.me/${NUMERO_WHATSAPP}?text=Hola,%20me%20interesa%20cotizar%20un%20letrero%20LED" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Cotizar Letrero por WhatsApp</a>`
+    response: '<b>💡 LETREROS LED:</b><br><br>' +
+    'Manejamos letreros personalizados en <b>MDF + Lona</b>, <b>MDF</b> y <b>Acrílico</b>.<br><br>' +
+    '📲 Cotízalo directamente por WhatsApp enviándonos tus referencias:<br>' +
+    '👉 <a href="https://wa.me/' + NUMERO_WHATSAPP + '?text=Hola,%20me%20interesa%20cotizar%20un%20letrero%20LED" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Cotizar Letrero por WhatsApp</a>'
   },
   sublimacion: {
     keywords: ['sublimacion', 'sublimación', 'sublimar'],
     title: 'SUBLIMACIÓN',
-    response: `<b>📊 SUBLIMACIÓN:</b><br><br>
-    💵 <b>Costo:</b> <b>$250 MXN por m²</b>.<br>
-    📅 <b>Tiempo de entrega:</b> 2 a 3 días hábiles.<br><br>
-    💡 <i>Para un cálculo exacto escribe por ejemplo: <b>"sublimacion de 2x2m"</b>.</i>`
+    response: '<b>📊 SUBLIMACIÓN:</b><br><br>' +
+    '💵 <b>Costo:</b> <b>$250 MXN por m²</b>.<br>' +
+    '📅 <b>Tiempo de entrega:</b> 2 a 3 días hábiles.<br><br>' +
+    '💡 <i>Para un cálculo exacto escribe por ejemplo: <b>"sublimacion de 2x2m"</b>.</i>'
   },
   lona: {
     keywords: ['lona', 'lonas', 'lona impresa', 'publicidad exterior'],
     title: 'LONA IMPRESA',
-    response: `<b>📊 LONA IMPRESA:</b><br><br>
-    📐 <b>Regla de costo:</b> El precio base es de <b>$85 MXN por m²</b> (si tu diseño mide menos de 1 m², se cobra el m² completo).<br>
-    📅 <b>Tiempo de entrega:</b> 2 a 3 días hábiles.<br><br>
-    👉 <i>Escribe tus medidas como: <b>"lona de 1.5 x 2m"</b>.</i>`
+    response: '<b>📊 LONA IMPRESA:</b><br><br>' +
+    '📐 <b>Regla de costo:</b> El precio base es de <b>$85 MXN por m²</b> (si tu diseño mide menos de 1 m², se cobra el m² completo).<br>' +
+    '📅 <b>Tiempo de entrega:</b> 2 a 3 días hábiles.<br><br>' +
+    '👉 <i>Escribe tus medidas como: <b>"lona de 1.5 x 2m"</b>.</i>'
   },
   corte_laser: {
     keywords: ['corte laser', 'grabado laser', 'laser', 'corte mdf', 'acrilico 3mm', 'corte laser mdf'],
     title: 'CORTE Y GRABADO LÁSER',
-    response: `<b>✂️ CORTE & GRABADO LÁSER:</b><br><br>
-    Trabajamos MDF, Acrílico, Papel Cascarón y Cartón. (En Aluminio únicamente grabado).<br><br>
-    📲 Envíanos tu archivo para cotización directa:<br>
-    👉 <a href="https://wa.me/${NUMERO_WHATSAPP}?text=Hola,%20quiero%20cotizar%20un%20corte%20laser" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Enviar Archivo a WhatsApp</a>`
+    response: '<b>✂️ CORTE & GRABADO LÁSER:</b><br><br>' +
+    'Trabajamos MDF, Acrílico, Papel Cascarón y Cartón. (En Aluminio únicamente grabado).<br><br>' +
+    '📲 Envíanos tu archivo para cotización directa:<br>' +
+    '👉 <a href="https://wa.me/' + NUMERO_WHATSAPP + '?text=Hola,%20quiero%20cotizar%20un%20corte%20laser" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Enviar Archivo a WhatsApp</a>'
   }
 };
 
@@ -734,45 +740,46 @@ const PixelUI = {
   },
 
   bindEvents: function() {
+    const _this = this;
     const toggleElements = document.querySelectorAll('#pixelToggleBtn, .pixel-toggle-btn');
 
-    toggleElements.forEach(element => {
-      element.addEventListener('click', (e) => {
+    toggleElements.forEach(function(element) {
+      element.addEventListener('click', function(e) {
         e.preventDefault();
-        this.toggleChat();
+        _this.toggleChat();
       });
     });
 
     const closeBtn = document.getElementById('pixelCloseBtn');
     if (closeBtn) {
-      closeBtn.addEventListener('click', () => this.ocultarChat());
+      closeBtn.addEventListener('click', function() { _this.ocultarChat(); });
     }
 
     const form = document.getElementById('pixelChatForm');
     if (form) {
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', function(e) {
         e.preventDefault();
-        this.handleUserSubmit();
+        _this.handleUserSubmit();
       });
     }
 
     if (this.inputField) {
-      this.inputField.addEventListener('keydown', (e) => {
+      this.inputField.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
           e.preventDefault();
-          this.handleUserSubmit();
+          _this.handleUserSubmit();
         } else {
           playArcadeSound('typing');
         }
       });
     }
 
-    document.addEventListener('click', (e) => {
+    document.addEventListener('click', function(e) {
       const btn = e.target.closest('.pixel-prompt-btn, .pixel-quick-btn');
       if (btn) {
         e.preventDefault();
         const promptText = btn.getAttribute('data-prompt') || btn.innerText.trim();
-        this.enviarOpcion(promptText);
+        _this.enviarOpcion(promptText);
       }
     });
   },
@@ -788,7 +795,10 @@ const PixelUI = {
     playArcadeSound('openModal');
     this.chatWidget.classList.add('active');
     this.chatWidget.style.display = 'flex';
-    if (this.inputField) setTimeout(() => this.inputField.focus(), 150);
+    if (this.inputField) {
+      const field = this.inputField;
+      setTimeout(function() { field.focus(); }, 150);
+    }
   },
 
   ocultarChat: function() {
@@ -818,13 +828,14 @@ const PixelUI = {
   },
 
   procesarMensajeDirecto: function(queryText) {
+    const _this = this;
     this.appendMessage('user', queryText);
     playArcadeSound('click');
     this.isProcessing = true;
 
-    setTimeout(() => {
-      this.procesarRespuestaInteligente(queryText);
-      this.isProcessing = false;
+    setTimeout(function() {
+      _this.procesarRespuestaInteligente(queryText);
+      _this.isProcessing = false;
     }, 400);
   },
 
@@ -832,7 +843,7 @@ const PixelUI = {
     if (!this.chatBox) return;
 
     const msgDiv = document.createElement('div');
-    msgDiv.className = `pixel-msg ${sender === 'user' ? 'pixel-user-msg' : 'pixel-bot-msg'}`;
+    msgDiv.className = 'pixel-msg ' + (sender === 'user' ? 'pixel-user-msg' : 'pixel-bot-msg');
 
     const bubbleDiv = document.createElement('div');
     bubbleDiv.className = 'pixel-msg-bubble';
@@ -853,12 +864,12 @@ const PixelUI = {
       if (qLower.includes('dtf') || qLower.includes('textil')) {
         const m = datosMedidas.metrosLineales || datosMedidas.ancho;
         const res = CotizadorEngine.calcularDTFTextil(m);
-        const msg = `<b>👕 COTIZACIÓN DTF TEXTIL:</b><br><br>
-        • Metros calculados: <b>${res.metrosCobrados} m</b><br>
-        • Precio por metro: <b>$${res.precioPorMetro} MXN</b><br>
-        • Total estimado: <b style="color:#0f4c81; font-size:1.1em;">$${res.total} MXN</b>
-        ${res.aplicoMinimo ? '<br><i>(Aplica mínimo de compra de 0.5 metros)</i>' : ''}
-        ${AVISO_COTIZACION_VARIA}`;
+        const msg = '<b>👕 COTIZACIÓN DTF TEXTIL:</b><br><br>' +
+        '• Metros calculados: <b>' + res.metrosCobrados + ' m</b><br>' +
+        '• Precio por metro: <b>$' + res.precioPorMetro + ' MXN</b><br>' +
+        '• Total estimado: <b style="color:#0f4c81; font-size:1.1em;">$' + res.total + ' MXN</b>' +
+        (res.aplicoMinimo ? '<br><i>(Aplica mínimo de compra de 0.5 metros)</i>' : '') +
+        AVISO_COTIZACION_VARIA;
         this.appendMessage('bot', msg);
         playArcadeSound('success');
         return;
@@ -867,12 +878,12 @@ const PixelUI = {
       if (qLower.includes('sticker') || qLower.includes('vinil sticker')) {
         const m = datosMedidas.metrosLineales || datosMedidas.ancho;
         const res = CotizadorEngine.calcularVinilSticker(m);
-        const msg = `<b>🏷️ COTIZACIÓN VINIL STICKER:</b><br><br>
-        • Metros calculados: <b>${res.metrosCobrados} m</b><br>
-        • Precio por metro: <b>$${res.precioPorMetro} MXN</b><br>
-        • Total estimado: <b style="color:#0f4c81; font-size:1.1em;">$${res.total} MXN</b>
-        ${res.aplicoMinimo ? '<br><i>(Aplica mínimo de compra de 0.5 metros)</i>' : ''}
-        ${AVISO_COTIZACION_VARIA}`;
+        const msg = '<b>🏷️ COTIZACIÓN VINIL STICKER:</b><br><br>' +
+        '• Metros calculados: <b>' + res.metrosCobrados + ' m</b><br>' +
+        '• Precio por metro: <b>$' + res.precioPorMetro + ' MXN</b><br>' +
+        '• Total estimado: <b style="color:#0f4c81; font-size:1.1em;">$' + res.total + ' MXN</b>' +
+        (res.aplicoMinimo ? '<br><i>(Aplica mínimo de compra de 0.5 metros)</i>' : '') +
+        AVISO_COTIZACION_VARIA;
         this.appendMessage('bot', msg);
         playArcadeSound('success');
         return;
@@ -880,12 +891,12 @@ const PixelUI = {
 
       if (qLower.includes('sublimacion') || qLower.includes('sublimación')) {
         const res = CotizadorEngine.calcularGranFormato('SUBLIMACION_M2', datosMedidas.ancho, datosMedidas.alto);
-        const msg = `<b>📊 COTIZACIÓN SUBLIMACIÓN:</b><br><br>
-        • Medida: <b>${datosMedidas.ancho} x ${datosMedidas.alto} m</b> (${res.areaM2Unidad} m²)<br>
-        • Precio m²: <b>$${res.precioM2} MXN</b><br>
-        • Total estimado: <b style="color:#0f4c81; font-size:1.1em;">$${res.total} MXN</b>
-        ${res.aplicoMinimo ? '<br><i>(Aplica mínimo de cobro)</i>' : ''}
-        ${AVISO_COTIZACION_VARIA}`;
+        const msg = '<b>📊 COTIZACIÓN SUBLIMACIÓN:</b><br><br>' +
+        '• Medida: <b>' + datosMedidas.ancho + ' x ' + datosMedidas.alto + ' m</b> (' + res.areaM2Unidad + ' m²)<br>' +
+        '• Precio m²: <b>$' + res.precioM2 + ' MXN</b><br>' +
+        '• Total estimado: <b style="color:#0f4c81; font-size:1.1em;">$' + res.total + ' MXN</b>' +
+        (res.aplicoMinimo ? '<br><i>(Aplica mínimo de cobro)</i>' : '') +
+        AVISO_COTIZACION_VARIA;
         this.appendMessage('bot', msg);
         playArcadeSound('success');
         return;
@@ -893,12 +904,12 @@ const PixelUI = {
 
       // Por defecto para medidas genéricas (Lona / Vinil)
       const res = CotizadorEngine.calcularGranFormato('LONA_440G', datosMedidas.ancho, datosMedidas.alto);
-      const msg = `<b>📊 COTIZACIÓN DE LONA IMPRESA:</b><br><br>
-      • Medida: <b>${datosMedidas.ancho} x ${datosMedidas.alto} m</b> (${res.areaM2Unidad} m²)<br>
-      • Precio m²: <b>$${res.precioM2} MXN</b><br>
-      • Total estimado: <b style="color:#0f4c81; font-size:1.1em;">$${res.total} MXN</b>
-      ${res.aplicoMinimo ? '<br><i>(Aplica cobro mínimo de 1 m²)</i>' : ''}
-      ${AVISO_COTIZACION_VARIA}`;
+      const msg = '<b>📊 COTIZACIÓN DE LONA IMPRESA:</b><br><br>' +
+      '• Medida: <b>' + datosMedidas.ancho + ' x ' + datosMedidas.alto + ' m</b> (' + res.areaM2Unidad + ' m²)<br>' +
+      '• Precio m²: <b>$' + res.precioM2 + ' MXN</b><br>' +
+      '• Total estimado: <b style="color:#0f4c81; font-size:1.1em;">$' + res.total + ' MXN</b>' +
+      (res.aplicoMinimo ? '<br><i>(Aplica cobro mínimo de 1 m²)</i>' : '') +
+      AVISO_COTIZACION_VARIA;
       this.appendMessage('bot', msg);
       playArcadeSound('success');
       return;
@@ -907,7 +918,7 @@ const PixelUI = {
     // 2. Búsqueda por palabras clave en la Base de Conocimiento
     for (const key in PIXEL_KNOWLEDGE_BASE) {
       const item = PIXEL_KNOWLEDGE_BASE[key];
-      const match = item.keywords.some(kw => qLower.includes(kw));
+      const match = item.keywords.some(function(kw) { return qLower.includes(kw); });
       if (match) {
         this.appendMessage('bot', item.response);
         playArcadeSound('success');
@@ -916,8 +927,8 @@ const PixelUI = {
     }
 
     // 3. Respuesta por defecto
-    const defaultMsg = `✦ No estoy seguro de entender tus datos exactos. Puedes consultar directamente vía WhatsApp para atender tu pedido de forma personalizada.<br><br>
-    👉 <a href="https://wa.me/${NUMERO_WHATSAPP}?text=Hola,%20quisiera%20cotizar%20lo%20siguiente:%20${encodeURIComponent(query)}" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Consultar por WhatsApp</a>`;
+    const defaultMsg = '✦ No estoy seguro de entender tus datos exactos. Puedes consultar directamente vía WhatsApp para atender tu pedido de forma personalizada.<br><br>' +
+    '👉 <a href="https://wa.me/' + NUMERO_WHATSAPP + '?text=Hola,%20quisiera%20cotizar%20lo%20siguiente:%20' + encodeURIComponent(query) + '" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Consultar por WhatsApp</a>';
     this.appendMessage('bot', defaultMsg);
     playArcadeSound('error');
   }
@@ -927,7 +938,7 @@ const PixelUI = {
    9. INICIALIZACIÓN GLOBAL DE COMPONENTES
    ========================================================================== */
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
   initRetroSFXSystem();
   initVideoPlayback();
   initMobileMenu();
