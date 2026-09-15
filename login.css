@@ -1,7 +1,7 @@
 /* ==========================================================================
-   1. SYSTEM RESET & PALETAS DINÁMICAS EDITORIAL (LIGHT & DARK THEME)
+   1. TIPOGRAFÍA Y VARIABLES AMBIENTALES
    ========================================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,700;1,6..96,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 
 *,
 *::before,
@@ -11,266 +11,237 @@
   box-sizing: border-box;
 }
 
-/* TEMA CLARO (Default) */
+/* PALETA CLARA GLASSMETHALIC */
 :root,
 [data-theme="light"] {
-  --bg-body: #FFFFFF;
-  --bg-surface: #F9F8F6;
-  --bg-card: #FFFFFF;
-  --bg-input: #FFFFFF;
+  --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
+  --glass-card: rgba(255, 255, 255, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.8);
+  --glass-input: rgba(255, 255, 255, 0.6);
+  --glass-input-border: rgba(203, 213, 225, 0.5);
 
-  --text-primary: #111111;
-  --text-secondary: #555555;
-  --text-muted: #888888;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
 
-  --accent-color: #0F4C81;
-  --accent-hover: #0A355C;
-  --accent-soft: rgba(15, 76, 129, 0.06);
+  --accent-color: #0284c7;
+  --accent-hover: #0369a1;
+  --accent-glow: rgba(2, 132, 199, 0.25);
 
-  --border-color: #EAEAEA;
-  --border-focus: #0F4C81;
-  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.04);
-  --shadow-hover: 0 18px 40px rgba(0, 0, 0, 0.08);
+  --shadow-glass: 0 20px 50px rgba(0, 0, 0, 0.06);
+  --shadow-input: 0 2px 10px rgba(0, 0, 0, 0.02);
 
-  --font-heading: 'Playfair Display', Georgia, serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: 'Bodoni Moda', serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
 
-  --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* TEMA OSCURO */
+/* PALETA OSCURA GLASSMETHALIC */
 [data-theme="dark"] {
-  --bg-body: #0D0F12;
-  --bg-surface: #16191E;
-  --bg-card: #1A1D24;
-  --bg-input: #12141A;
+  --bg-gradient: linear-gradient(135deg, #090d16 0%, #0f172a 50%, #050811 100%);
+  --glass-card: rgba(15, 23, 42, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-input: rgba(15, 23, 42, 0.5);
+  --glass-input-border: rgba(255, 255, 255, 0.08);
 
-  --text-primary: #F0F2F5;
-  --text-secondary: #A0A5B1;
-  --text-muted: #6C727F;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #64748b;
 
-  --accent-color: #38BDF8;
-  --accent-hover: #0284C7;
-  --accent-soft: rgba(56, 189, 248, 0.1);
+  --accent-color: #38bdf8;
+  --accent-hover: #7dd3fc;
+  --accent-glow: rgba(56, 189, 248, 0.3);
 
-  --border-color: #262B35;
-  --border-focus: #38BDF8;
-  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.4);
-  --shadow-hover: 0 18px 40px rgba(0, 0, 0, 0.6);
+  --shadow-glass: 0 25px 60px rgba(0, 0, 0, 0.5);
+  --shadow-input: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 /* ==========================================================================
-   2. ESTRUCTURA Y LAYOUT CENTRADO
+   2. ESTRUCTURA Y AMBIENTE
    ========================================================================== */
 html, body {
   width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
-  background-color: var(--bg-body);
-  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 body {
+  background: var(--bg-gradient);
   color: var(--text-primary);
   font-family: var(--font-body);
-  font-size: 1.05rem;
-  line-height: 1.6;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: clamp(1.5rem, 4vw, 3rem);
+  padding: 1.5rem;
   position: relative;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Ocultar resplandores neón arcade antiguos */
-.bg-glow {
-  display: none;
+/* Esferas de luz ambiental para resaltar el efecto Glassmorphism */
+body::before,
+body::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+body::before {
+  width: 350px;
+  height: 350px;
+  background: rgba(56, 189, 248, 0.15);
+  top: 10%;
+  left: 15%;
+}
+
+body::after {
+  width: 400px;
+  height: 400px;
+  background: rgba(14, 165, 233, 0.12);
+  bottom: 10%;
+  right: 15%;
 }
 
 /* ==========================================================================
-   3. BOTÓN CONMUTADOR DE TEMA
+   3. BOTÓN SWITCH DE TEMA
    ========================================================================== */
 .theme-toggle-btn {
   position: fixed;
   top: 24px;
   right: 24px;
-  z-index: 1000;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
+  z-index: 100;
+  background: var(--glass-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
   color: var(--text-primary);
-  padding: 10px 18px;
-  border-radius: 30px;
+  padding: 10px 20px;
+  border-radius: 40px;
   display: flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
   font-family: var(--font-body);
-  font-size: 0.88rem;
-  font-weight: 500;
-  box-shadow: var(--shadow-soft);
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-glass);
   transition: var(--transition-smooth);
 }
 
 .theme-toggle-btn:hover {
-  background: var(--accent-soft);
-  border-color: var(--accent-color);
-  color: var(--accent-color);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-hover);
+  border-color: var(--accent-color);
+  box-shadow: 0 10px 25px var(--accent-glow);
 }
 
 /* ==========================================================================
-   4. CONTENEDOR PRINCIPAL SPLIT EDITORIAL
+   4. ESTRUCTURA COMPACTA MONOLÍTICA
    ========================================================================== */
 .login-split-container {
   position: relative;
   z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   width: 100%;
-  max-width: 1000px;
-  gap: clamp(2rem, 5vw, 4.5rem);
+  max-width: 460px;
   margin: auto;
 }
 
-/* ==========================================================================
-   5. SECCIÓN LOGO Y SELLO EDITORIAL
-   ========================================================================== */
-.brand-side {
+.form-side {
   width: 100%;
+}
+
+/* TARJETA GLASSMORPHISM */
+.card {
+  background: var(--glass-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 28px;
+  padding: clamp(2rem, 5vw, 3rem);
+  box-shadow: var(--shadow-glass);
+  transition: var(--transition-smooth);
+}
+
+.brand-side {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  margin-bottom: 2rem;
 }
 
 .logo-hero-link {
   display: inline-block;
-  text-decoration: none;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1rem;
   transition: var(--transition-smooth);
 }
 
 .logo-hero-link:hover {
-  opacity: 0.85;
+  transform: scale(1.03);
 }
 
 .hero-logo-img {
-  width: 100%;
-  max-width: clamp(160px, 28vw, 240px);
+  width: 85px;
   height: auto;
-  object-fit: contain;
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.06));
 }
 
 .brand-title-outside {
   font-family: var(--font-heading);
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 600;
+  font-size: 2.1rem;
+  font-weight: 700;
   letter-spacing: -0.5px;
   color: var(--text-primary);
-  margin-bottom: 0.6rem;
-  text-shadow: none;
+  margin-bottom: 0.25rem;
 }
 
 .brand-quote-outside {
-  font-family: var(--font-heading);
-  font-style: italic;
-  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  font-size: 0.9rem;
   color: var(--text-secondary);
-  max-width: 440px;
-  line-height: 1.5;
   font-weight: 400;
 }
 
 /* ==========================================================================
-   6. TARJETA EDITORIAL DE ACCESO
+   5. FORMULARIO E INPUTS
    ========================================================================== */
-.form-side {
-  width: 100%;
-  max-width: 440px;
-}
-
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  box-shadow: var(--shadow-soft);
-  padding: clamp(2rem, 4vw, 2.8rem);
-  transition: var(--transition-smooth);
-}
-
-.card:hover {
-  box-shadow: var(--shadow-hover);
-  border-color: var(--border-focus);
-}
-
-.card2 {
-  background: transparent;
-  padding: 0;
-  border: none;
-}
-
 .form {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.2rem;
 }
 
 #heading {
-  text-align: center;
-  font-family: var(--font-heading);
-  font-size: clamp(1.4rem, 2.5vw, 1.8rem);
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 0.5rem;
-  letter-spacing: -0.3px;
-  text-shadow: none;
+  display: none; /* Oculto ya que el título está en el header integrado */
 }
 
-/* ==========================================================================
-   7. MENSAJES DE ALERTA
-   ========================================================================== */
-.alert-message {
-  display: none;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-family: var(--font-body);
-  font-size: 0.88rem;
-  font-weight: 500;
-  line-height: 1.4;
-  text-align: center;
-  background-color: rgba(239, 68, 68, 0.08);
-  color: #EF4444;
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  box-shadow: none;
-}
-
-/* ==========================================================================
-   8. CAMPOS DE ENTRADA Y FORMULARIO
-   ========================================================================== */
 .field {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  background-color: var(--bg-input);
-  box-shadow: none;
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: 1px solid var(--glass-input-border);
+  background: var(--glass-input);
+  box-shadow: var(--shadow-input);
   transition: var(--transition-smooth);
 }
 
 .field:focus-within {
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+[data-theme="dark"] .field:focus-within {
+  background: rgba(15, 23, 42, 0.8);
 }
 
 .input-icon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   fill: var(--text-muted);
   transition: var(--transition-smooth);
   flex-shrink: 0;
@@ -287,99 +258,63 @@ body {
   width: 100%;
   color: var(--text-primary);
   font-family: var(--font-body);
-  font-size: 0.98rem;
-  font-weight: 400;
+  font-size: 0.95rem;
+  font-weight: 500;
 }
 
 .input-field::placeholder {
   color: var(--text-muted);
-  font-family: var(--font-body);
+  font-weight: 400;
 }
 
 /* ==========================================================================
-   9. BOTONES EDITORIALES DE ACCESO Y RETORNO
+   6. BOTONES Y ACCIONES
    ========================================================================== */
-.form .btn {
-  display: flex;
-  justify-content: center;
-  margin-top: 0.5rem;
-}
-
 .button1 {
   width: 100%;
-  padding: 14px 20px;
+  padding: 15px;
+  margin-top: 0.5rem;
   background: var(--accent-color);
   color: #FFFFFF !important;
   border: none;
   font-family: var(--font-body);
   font-weight: 600;
   font-size: 0.95rem;
-  letter-spacing: 0.3px;
-  border-radius: 8px;
+  border-radius: 14px;
   cursor: pointer;
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 8px 20px var(--accent-glow);
   transition: var(--transition-smooth);
-}
-
-[data-theme="dark"] .button1 {
-  color: #0D0F12 !important;
 }
 
 .button1:hover {
   background: var(--accent-hover);
-  box-shadow: 0 6px 20px rgba(15, 76, 129, 0.25);
   transform: translateY(-2px);
-}
-
-.button1:active {
-  transform: translateY(0);
-  box-shadow: none;
+  box-shadow: 0 12px 28px var(--accent-glow);
 }
 
 .button-back {
   display: block;
   text-align: center;
-  margin-top: 0.4rem;
-  padding: 10px;
-  color: var(--text-secondary);
-  font-family: var(--font-body);
-  font-size: 0.88rem;
+  margin-top: 0.8rem;
+  padding: 8px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
   font-weight: 500;
   text-decoration: none;
-  border-radius: 8px;
-  border: 1px solid transparent;
   transition: var(--transition-smooth);
 }
 
 .button-back:hover {
   color: var(--text-primary);
-  background: var(--bg-surface);
-  border-color: var(--border-color);
 }
 
-/* ==========================================================================
-   10. RESPONSIVE DESIGN (DESKTOP SPLIT)
-   ========================================================================== */
-@media (min-width: 850px) {
-  .login-split-container {
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .brand-side {
-    flex: 1;
-    align-items: flex-start;
-    text-align: left;
-  }
-
-  .form-side {
-    flex: 1;
-  }
-}
-
-@media (max-width: 849px) {
-  .brand-side {
-    align-items: center;
-    text-align: center;
-  }
+.alert-message {
+  display: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  text-align: center;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }
