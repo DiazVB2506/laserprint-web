@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="index.css?v=1.1">
+  <link rel="stylesheet" href="index.css?v=1.2">
 </head>
 <body>
 
@@ -44,6 +44,9 @@
         <li><a href="cortelaser.html" class="nav-btn">CORTE LASER</a></li>
         <li><a href="vinil.html" class="nav-btn">VINIL</a></li>
         <li><a href="login.html" class="nav-btn btn-admin">Iniciar Sesión Admin</a></li>
+        <li>
+          <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Cambiar tema">🌙</button>
+        </li>
       </ul>
     </nav>
   </header>
@@ -185,6 +188,28 @@
       <button type="submit" id="pixelSendBtn" class="pixel-send-btn">ENVIAR</button>
     </form>
   </div>
+
+  <script>
+    // Conmutador dinámico de tema Claro / Oscuro
+    document.addEventListener('DOMContentLoaded', () => {
+      const themeToggleBtn = document.getElementById('themeToggleBtn');
+      const savedTheme = localStorage.getItem('theme') || 'light';
+
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      if (themeToggleBtn) {
+        themeToggleBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+      }
+
+      themeToggleBtn?.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        themeToggleBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+      });
+    });
+  </script>
 
   <script src="index.js" defer></script>
 </body>
