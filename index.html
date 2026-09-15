@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Diseño Laser Print - Inicio</title>
 
-  <meta name="google-site-verification" content="6fQEs5RK94f_O7tvIjwfMnkYx1IQotWOUE_pENHjqmU" />
+  <meta name="google-site-verification" content="6fQEs5RK94f_O7tvIjwfMnkYx1IQotWOUE_pENHjqmU">
   <meta name="description" content="Diseño Laser Print: Imprenta digital, corte láser de alta precisión, vinil impreso, DTF y sublimación. Soluciones visuales profesionales.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://diazvb2506.github.io/laserprint-web/">
@@ -57,11 +57,10 @@
 
   <section class="video-section">
     <div class="video-container glass-card" id="videoWrapper">
-      <img id="gifPresentacion" 
-           src="uploads/videos/presentacion3.mp4" 
-           alt="Presentación Diseño Laser Print" 
-           class="hero-gif-img" 
-           onerror="this.onerror=null; this.src='https://via.placeholder.com/1200x675/111/00f0ff?text=Dise%C3%B1o+LaserPrint+Presentacion';">
+      <video id="presentacionVideo" class="hero-gif-img" autoplay loop muted playsinline preload="auto">
+        <source src="videos/presentacion3.mp4" type="video/mp4">
+        Tu navegador no soporta la reproducción de video HTML5.
+      </video>
     </div>
   </section>
 
@@ -90,7 +89,7 @@
       
       <div class="map-container">
         <iframe 
-          src="https://maps.google.com/maps?q=Calz.+S.+Mateo+27-A,+San+Juan+Bosco+1,+52946+Cdad.+L%C3%B3pez+Mateos,+M%C3%A9x.&t=&z=16&ie=UTF8&iwloc=&output=embed" 
+          src="https://maps.google.com/maps?q=Calz.%20S.%20Mateo%2027-A,%20San%20Juan%20Bosco%201,%2052946%20Cdad.%20L%C3%B3pez%20Mateos,%20M%C3%A9x.&t=&z=16&ie=UTF8&iwloc=&output=embed" 
           width="100%" 
           height="400" 
           style="border:0;" 
@@ -111,7 +110,7 @@
       <div class="whatsapp-info">
         <h3>💬 ¡Contáctanos por WhatsApp!</h3>
         <p>Cotiza tus proyectos de imprenta, corte láser o vinil al instante.</p>
-        <a href="https://wa.me/5598788857" target="_blank" rel="noopener noreferrer" class="whatsapp-btn">
+        <a href="https://wa.me/5215598788857" target="_blank" rel="noopener noreferrer" class="whatsapp-btn">
           <span>Abrir Chat de WhatsApp</span>
         </a>
       </div>
@@ -138,9 +137,9 @@
   </footer>
 
   <div id="imageModal" class="image-modal">
-    <span class="image-modal-close" id="closeModal">×</span>
-    <img class="image-modal-content" id="imgModalAmpliada" alt="Vista ampliada">
-    <div id="captionModal" class="image-modal-caption"></div>
+    <span class="image-modal-close" id="modalClose">×</span>
+    <img class="image-modal-content" id="modalImg" alt="Vista ampliada">
+    <div id="modalCaption" class="image-modal-caption"></div>
   </div>
 
   <button id="pixelToggleBtn" class="pixel-toggle-btn" aria-label="Hablar con PIXEL IA">
@@ -181,10 +180,10 @@
       <button class="pixel-prompt-btn" data-prompt="whatsapp">💬 Cotizar por WhatsApp</button>
     </div>
 
-    <div class="pixel-chat-form">
+    <form class="pixel-chat-form" id="pixelChatForm">
       <input type="text" id="pixelInput" class="pixel-input" placeholder="Escribe tu duda a PIXEL..." autocomplete="off">
-      <button type="button" id="pixelSendBtn" class="pixel-send-btn">ENVIAR</button>
-    </div>
+      <button type="submit" id="pixelSendBtn" class="pixel-send-btn">ENVIAR</button>
+    </form>
   </div>
 
   <script src="index.js"></script>
