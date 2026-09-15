@@ -1,7 +1,7 @@
 /* ==========================================================================
-   1. RESET, FUENTES Y VARIABLES GLOBALES (RETRO CYBERPUNK ARCADE STYLING)
+   1. VARIABLES GLOBALES & PALETA DE COLORES (MINIMALISTA Y PROFESIONAL)
    ========================================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 
 *,
 *::before,
@@ -12,169 +12,137 @@
 }
 
 :root {
-  /* Paleta Neon Arcade 8-Bit (Modo Oscuro por Defecto) */
-  --bg-dark-main: #06050e;
-  --bg-pattern-line: rgba(0, 240, 255, 0.05);
-
-  --arcade-cyan: #00f0ff;
-  --arcade-pink: #ff007f;
-  --arcade-yellow: #ffe600;
-  --arcade-green: #39ff14;
-  --arcade-purple: #9d4edd;
-  --arcade-red: #ff3366;
-
-  /* Contenedores y Cajas Retro */
-  --retro-bg-card: rgba(13, 14, 25, 0.95);
-  --input-bg: #090a14;
-  --card-border: var(--arcade-cyan);
-  --card-shadow: var(--arcade-pink);
-
-  /* Fuentes Retro */
-  --font-pixel: 'Press Start 2P', monospace;
-  --font-terminal: 'VT323', monospace;
-
-  /* Textos */
-  --text-primary: #ffffff;
-  --text-secondary: #00f0ff;
-  --text-brand-quote: var(--arcade-yellow);
+  /* Modos por Defecto: TEMA OSCURO MINIMALISTA */
+  --bg-main: #0b0f19;
+  --bg-gradient: radial-gradient(circle at 50% 0%, #1e293b 0%, #0b0f19 70%);
   
-  /* Filtro de Logo */
-  --logo-filter: drop-shadow(0 0 10px var(--arcade-cyan));
+  --card-bg: rgba(18, 24, 38, 0.75);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
 
-  /* Opacidad de Scanlines CRT */
-  --crt-opacity: 0.35;
+  --input-bg: rgba(255, 255, 255, 0.03);
+  --input-border: rgba(255, 255, 255, 0.12);
+  --input-focus-border: #3b82f6;
+  --input-focus-glow: rgba(59, 130, 246, 0.25);
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  --accent-color: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-text: #ffffff;
+
+  --font-family: 'Plus Jakarta Sans', sans-serif;
+  --radius-lg: 16px;
+  --radius-md: 10px;
 }
 
 /* ==========================================================================
-   TEMA CLARO (LIGHT THEME OVERRIDES)
+   TEMA CLARO (LIGHT THEME)
    ========================================================================== */
 .light-theme,
 html.light-theme,
 body.light-theme {
-  --bg-dark-main: #f0f4f8;
-  --bg-pattern-line: rgba(15, 76, 129, 0.08);
+  --bg-main: #f8fafc;
+  --bg-gradient: radial-gradient(circle at 50% 0%, #e2e8f0 0%, #f8fafc 70%);
 
-  --retro-bg-card: #ffffff;
-  --input-bg: #e2e8f0;
+  --card-bg: rgba(255, 255, 255, 0.85);
+  --card-border: rgba(226, 232, 240, 0.8);
+  --card-shadow: 0 20px 40px -15px rgba(148, 163, 184, 0.25);
+
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+  --input-focus-border: #2563eb;
+  --input-focus-glow: rgba(37, 99, 235, 0.15);
 
   --text-primary: #0f172a;
-  --text-secondary: #0077b6;
-  --text-brand-quote: #d97706;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
 
-  --card-border: #0077b6;
-  --card-shadow: #b5179e;
-
-  --logo-filter: drop-shadow(0 4px 8px rgba(0, 119, 182, 0.3));
-  --crt-opacity: 0.08;
+  --accent-color: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-text: #ffffff;
 }
 
+/* ==========================================================================
+   2. ESTRUCTURA BASE DE LA PÁGINA
+   ========================================================================== */
 html, body {
   width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
-  overflow-x: hidden;
 }
 
 body {
-  font-family: var(--font-terminal);
-  font-size: 1.35rem;
-  letter-spacing: 1px;
+  font-family: var(--font-family);
+  background-color: var(--bg-main);
+  background-image: var(--bg-gradient);
+  color: var(--text-primary);
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: var(--bg-dark-main);
-  position: relative;
-  color: var(--text-primary);
-  padding: clamp(1rem, 3vw, 2.5rem);
-  background-image: 
-    linear-gradient(var(--bg-pattern-line) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
-  background-size: 30px 30px;
+  padding: clamp(1.5rem, 4vw, 3rem);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* ==========================================================================
-   2. OVERLAY CRT SCANLINES (EFECTO MONITOR DE TUBO RETRO)
-   ========================================================================== */
-body::before {
-  content: " ";
-  display: block;
-  position: fixed;
-  top: 0; left: 0; bottom: 0; right: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, var(--crt-opacity)) 50%), 
-              linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-  z-index: 999;
-  background-size: 100% 4px, 6px 100%;
-  pointer-events: none;
-  transition: background 0.3s ease;
-}
-
-/* Ambient Glow de Retroalimentación Neon */
+/* Fondo decorativo difuminado sobrio */
 .bg-glow {
   position: fixed;
-  width: clamp(250px, 45vw, 650px);
-  height: clamp(250px, 45vw, 650px);
+  width: 500px;
+  height: 500px;
   border-radius: 50%;
-  filter: blur(130px);
+  filter: blur(140px);
   z-index: 0;
-  opacity: 0.25;
+  opacity: 0.12;
   pointer-events: none;
-  animation: floatBg 12s ease-in-out infinite alternate;
 }
 
 .ambient-cyan {
-  background: var(--arcade-cyan);
+  background: #3b82f6;
   top: -10%;
   left: -10%;
 }
 
 .ambient-magenta {
-  background: var(--arcade-pink);
+  background: #6366f1;
   bottom: -10%;
   right: -10%;
-  animation-delay: -6s;
-}
-
-@keyframes floatBg {
-  0% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(30px, 40px) scale(1.1); }
-  100% { transform: translate(-20px, 20px) scale(0.95); }
 }
 
 /* ==========================================================================
-   3. BOTÓN TOGGLE DE TEMA (CLARO / OSCURO)
+   3. BOTÓN TOGGLE DE TEMA
    ========================================================================== */
 .theme-toggle-btn {
   position: fixed;
-  top: 1.2rem;
-  right: 1.2rem;
-  z-index: 1000;
-  background: var(--retro-bg-card);
-  border: 2px solid var(--card-border);
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 10;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   color: var(--text-primary);
-  font-family: var(--font-pixel);
-  font-size: 0.7rem;
-  padding: 0.6rem 0.9rem;
+  font-family: var(--font-family);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.6rem 1rem;
+  border-radius: 30px;
   cursor: pointer;
-  box-shadow: 3px 3px 0px var(--card-shadow);
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  transition: all 0.15s ease;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
 }
 
 .theme-toggle-btn:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 5px 5px 0px var(--arcade-cyan);
-}
-
-.theme-toggle-btn:active {
-  transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0px var(--arcade-cyan);
+  transform: translateY(-2px);
+  border-color: var(--input-focus-border);
 }
 
 /* ==========================================================================
-   4. ESTRUCTURA PRINCIPAL (LAYOUT ADAPTABLE MOBILE-FIRST)
+   4. LAYOUT PRINCIPAL
    ========================================================================== */
 .login-split-container {
   position: relative;
@@ -184,13 +152,13 @@ body::before {
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 1100px;
-  gap: clamp(2rem, 4vw, 4rem);
+  max-width: 960px;
+  gap: clamp(2rem, 5vw, 4rem);
   margin: auto;
 }
 
 /* ==========================================================================
-   5. SECCIÓN MARCA Y LOGOTIPO
+   5. SECCIÓN LOGO Y MARCA
    ========================================================================== */
 .brand-side {
   width: 100%;
@@ -198,242 +166,178 @@ body::before {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  animation: fadeInDown 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .logo-hero-link {
   display: inline-block;
   text-decoration: none;
-  margin-bottom: clamp(0.5rem, 1.5vw, 1.2rem);
+  margin-bottom: 1rem;
 }
 
 .hero-logo-img {
   width: 100%;
-  max-width: clamp(150px, 30vw, 380px);
+  max-width: clamp(140px, 25vw, 220px);
   height: auto;
-  max-height: clamp(100px, 20vh, 220px);
   object-fit: contain;
-  filter: var(--logo-filter);
-  image-rendering: pixelated;
-  transition: transform 0.2s ease, filter 0.2s ease;
-  animation: floatLogo 4s ease-in-out infinite alternate;
+  transition: transform 0.3s ease;
 }
 
 .hero-logo-img:hover {
-  transform: scale(1.08) rotate(-2deg);
-  filter: drop-shadow(0 0 18px var(--arcade-pink));
+  transform: scale(1.03);
 }
 
 .brand-title-outside {
-  font-family: var(--font-pixel);
-  font-size: clamp(1.2rem, 3.2vw, 2.3rem);
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
   font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  margin-bottom: 0.6rem;
-  text-shadow: 4px 4px 0px var(--arcade-pink);
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
 }
 
 .brand-quote-outside {
-  font-family: var(--font-terminal);
-  font-size: clamp(1.1rem, 2vw, 1.4rem);
-  color: var(--text-brand-quote);
-  letter-spacing: 1px;
-  max-width: 480px;
-  line-height: 1.3;
-}
-
-@keyframes floatLogo {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-10px); }
-}
-
-@keyframes fadeInDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
+  font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+  color: var(--text-secondary);
+  font-weight: 400;
+  max-width: 420px;
+  line-height: 1.5;
 }
 
 /* ==========================================================================
-   6. SECCIÓN FORMULARIO Y TARJETA RETRO ARCADE
+   6. TARJETA DE FORMULARIO
    ========================================================================== */
 .form-side {
   width: 100%;
-  max-width: clamp(320px, 90vw, 460px);
-  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 420px;
 }
 
 .card {
-  position: relative;
-  background: var(--retro-bg-card);
-  border: 3px solid var(--card-border);
-  border-radius: 0px;
-  padding: 0px;
-  width: 100%;
-  box-shadow: 8px 8px 0px var(--card-shadow), 0 0 20px rgba(0, 240, 255, 0.15);
-  transition: all 0.2s ease;
-}
-
-.card:hover {
-  box-shadow: 10px 10px 0px var(--card-shadow), 0 0 30px rgba(0, 240, 255, 0.3);
-}
-
-.card2 {
-  border-radius: 0px;
-  overflow: visible;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: clamp(1.8rem, 4vw, 2.5rem);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: clamp(1rem, 2vh, 1.4rem);
-  padding: clamp(1.5rem, 4vw, 2.5rem);
-  background: transparent;
+  gap: 1.25rem;
 }
 
 #heading {
   text-align: center;
-  margin-bottom: 0.5rem;
-  color: var(--text-brand-quote);
-  font-family: var(--font-pixel);
-  font-size: clamp(0.9rem, 2vw, 1.15rem);
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-shadow: 2px 2px 0px var(--arcade-pink);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
 }
 
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ==========================================================================
-   7. ALERTAS Y MENSAJES DE ERROR ARCADE
-   ========================================================================== */
+/* Mensajes de Alerta */
 .alert-message {
-  display: none;
-  padding: 0.8rem;
-  border-radius: 0px;
-  font-family: var(--font-pixel);
-  font-size: 0.65rem;
-  line-height: 1.4;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 500;
   text-align: center;
-  background-color: #000;
-  color: var(--arcade-red);
-  border: 2px solid var(--arcade-red);
-  box-shadow: 3px 3px 0px var(--arcade-red);
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 /* ==========================================================================
-   8. CAMPOS DE ENTRADA (INPUTS 8-BIT)
+   7. INPUTS Y CAMPOS DE TEXTO
    ========================================================================== */
 .field {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
-  border-radius: 0px;
-  padding: clamp(0.7rem, 1.5vh, 0.9rem) 1rem;
-  border: 2px solid var(--card-border);
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--input-border);
   background-color: var(--input-bg);
-  box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.2);
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
 }
 
 .field:focus-within {
-  border-color: var(--arcade-pink);
-  box-shadow: 4px 4px 0px var(--card-border);
+  border-color: var(--input-focus-border);
+  box-shadow: 0 0 0 4px var(--input-focus-glow);
 }
 
 .input-icon {
-  height: 1.2rem;
-  width: 1.2rem;
-  fill: var(--text-secondary);
-  transition: fill 0.15s ease;
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: var(--text-muted);
+  transition: fill 0.2s ease;
   flex-shrink: 0;
 }
 
 .field:focus-within .input-icon {
-  fill: var(--arcade-pink);
+  fill: var(--input-focus-border);
 }
 
 .input-field {
-  background: none;
+  background: transparent;
   border: none;
   outline: none;
   width: 100%;
   color: var(--text-primary);
-  font-size: 1.3rem;
-  font-family: var(--font-terminal);
-  letter-spacing: 1px;
+  font-family: var(--font-family);
+  font-size: 0.95rem;
 }
 
 .input-field::placeholder {
-  color: rgba(150, 150, 150, 0.6);
-  font-family: var(--font-terminal);
+  color: var(--text-muted);
 }
 
 /* ==========================================================================
-   9. BOTONES Y NAVEGACIÓN ARCADE
+   8. BOTONES Y NAVEGACIÓN
    ========================================================================== */
-.form .btn {
-  display: flex;
-  justify-content: center;
-  margin-top: 0.4rem;
-}
-
 .button1 {
   width: 100%;
-  padding: 1rem 1.2rem;
-  background: var(--arcade-green);
-  color: #000;
-  border: 2px solid #000;
-  font-family: var(--font-pixel);
-  font-weight: 700;
-  font-size: clamp(0.75rem, 1.5vw, 0.85rem);
-  border-radius: 0px;
+  padding: 0.85rem 1.5rem;
+  background-color: var(--accent-color);
+  color: var(--accent-text);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-family);
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 4px 4px 0px var(--card-border);
-  transition: all 0.1s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
 }
 
 .button1:hover {
-  background: var(--arcade-cyan);
-  color: #000;
-  box-shadow: 6px 6px 0px var(--arcade-pink);
-  transform: translate(-2px, -2px);
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
 }
 
 .button1:active {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0px var(--arcade-pink);
+  transform: translateY(0);
 }
 
 .button-back {
   display: block;
   text-align: center;
-  margin-top: 0.4rem;
-  padding: 0.6rem;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
   color: var(--text-secondary);
-  font-family: var(--font-pixel);
-  font-size: 0.6rem;
   text-decoration: none;
-  border-radius: 0px;
-  border: 2px solid transparent;
-  transition: all 0.1s ease;
+  font-weight: 500;
+  transition: color 0.2s ease;
 }
 
 .button-back:hover {
-  color: var(--text-primary);
-  background-color: var(--input-bg);
-  border-color: var(--card-border);
-  box-shadow: 3px 3px 0px var(--card-border);
+  color: var(--accent-color);
 }
 
 /* ==========================================================================
-   10. MEDIA QUERIES (RESPONSIVIDAD RETRO)
+   9. RESPONSIVIDAD (PANTALLAS GRANDES)
    ========================================================================== */
-
-/* Tablets y Desktops (Pantallas anchas) -> Cambio a 2 Columnas */
 @media (min-width: 850px) {
   .login-split-container {
     flex-direction: row;
@@ -442,59 +346,11 @@ body::before {
 
   .brand-side {
     flex: 1;
-    animation-name: fadeInLeft;
+    align-items: flex-start;
+    text-align: left;
   }
 
   .form-side {
     flex: 1;
-    animation-name: fadeInRight;
-  }
-
-  @keyframes fadeInLeft {
-    from { opacity: 0; transform: translateX(-30px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-
-  @keyframes fadeInRight {
-    from { opacity: 0; transform: translateX(30px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-}
-
-/* Pantallas ultra anchas / 4K */
-@media (min-width: 1600px) {
-  .login-split-container {
-    max-width: 1300px;
-    gap: 6rem;
-  }
-
-  .form-side {
-    max-width: 480px;
-  }
-}
-
-/* Teléfonos en horizontal (Mobile Landscape) */
-@media (max-height: 550px) and (orientation: landscape) {
-  body {
-    padding: 0.5rem 1rem;
-    align-items: flex-start;
-  }
-
-  .login-split-container {
-    flex-direction: row;
-    gap: 1.5rem;
-  }
-
-  .brand-quote-outside {
-    display: none;
-  }
-
-  .hero-logo-img {
-    max-height: 90px;
-  }
-
-  .form {
-    padding: 1rem 1.2rem;
-    gap: 0.8rem;
   }
 }
