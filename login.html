@@ -8,12 +8,32 @@
   <!-- FAVICON PARA PESTAÑA DEL NAVEGADOR -->
   <link rel="icon" type="image/png" href="uploads/fotos/LOGOTIPO.png">
 
-  <link rel="stylesheet" href="login.css">
+  <!-- FUENTES RETRO ARCADE -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Playfair+Display:ital,wght@1,600&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+  <!-- HOJA DE ESTILOS -->
+  <link rel="stylesheet" href="login.css?v=2.0">
+
+  <!-- SCRIPT ANTI-PARPADEO DE TEMA (Ejecución inmediata) -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      if (savedTheme === 'light') {
+        document.documentElement.classList.add('light-theme');
+      } else {
+        document.documentElement.classList.add('dark-theme');
+      }
+    })();
+  </script>
 </head>
 <body>
+
+  <!-- BOTÓN TOGGLE MODO CLARO / OSCURO -->
+  <button type="button" class="theme-toggle-btn" id="themeToggle" title="Cambiar tema">
+    <span>☯</span> Modo
+  </button>
 
   <!-- Luces neón de fondo -->
   <div class="bg-glow ambient-cyan"></div>
