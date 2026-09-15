@@ -1,385 +1,218 @@
 /* ==========================================================================
-   1. SYSTEM RESET & PALETAS DINÁMICAS EDITORIAL (LIGHT & DARK THEME)
+   1. SINTETIZADOR DE SONIDOS EDITORIALES (WEB AUDIO API)
    ========================================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap');
+const SoundEffects = {
+  ctx: null,
 
-*,
-*::before,
-*::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+  init() {
+    if (!this.ctx) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (AudioContext) {
+        this.ctx = new AudioContext();
+      }
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  },
 
-/* TEMA CLARO (Default) */
-:root,
-[data-theme="light"] {
-  --bg-body: #FFFFFF;
-  --bg-surface: #F9F8F6;
-  --bg-card: #FFFFFF;
-  --bg-input: #FFFFFF;
+  // Sonido suave de interacción/click al cambiar tema
+  playClick() {
+    this.init();
+    if (!this.ctx) return;
 
-  --text-primary: #111111;
-  --text-secondary: #555555;
-  --text-muted: #888888;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
 
-  --accent-color: #0F4C81;
-  --accent-hover: #0A355C;
-  --accent-soft: rgba(15, 76, 129, 0.06);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(300, this.ctx.currentTime + 0.05);
 
-  --border-color: #EAEAEA;
-  --border-focus: #0F4C81;
-  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.04);
-  --shadow-hover: 0 18px 40px rgba(0, 0, 0, 0.08);
+    gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
 
-  --font-heading: 'Playfair Display', Georgia, serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
 
-  --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
+    osc.start();
+    osc.stop(this.ctx.currentTime + 0.05);
+  },
 
-/* TEMA OSCURO */
-[data-theme="dark"] {
-  --bg-body: #0D0F12;
-  --bg-surface: #16191E;
-  --bg-card: #1A1D24;
-  --bg-input: #12141A;
+  // Sonido armónico de éxito al iniciar sesión
+  playSuccess() {
+    this.init();
+    if (!this.ctx) return;
 
-  --text-primary: #F0F2F5;
-  --text-secondary: #A0A5B1;
-  --text-muted: #6C727F;
+    const now = this.ctx.currentTime;
+    const osc1 = this.ctx.createOscillator();
+    const osc2 = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
 
-  --accent-color: #38BDF8;
-  --accent-hover: #0284C7;
-  --accent-soft: rgba(56, 189, 248, 0.1);
+    // Acorde suave C5 a G5
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(523.25, now); // C5
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(783.99, now + 0.08); // G5
 
-  --border-color: #262B35;
-  --border-focus: #38BDF8;
-  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.4);
-  --shadow-hover: 0 18px 40px rgba(0, 0, 0, 0.6);
-}
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.12, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc1.start(now);
+    osc1.stop(now + 0.4);
+    osc2.start(now + 0.08);
+    osc2.stop(now + 0.4);
+  },
+
+  // Sonido tenue de advertencia/error al equivocarse
+  playError() {
+    this.init();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(180, now);
+    osc.frequency.setValueAtTime(140, now + 0.1);
+
+    gain.gain.setValueAtTime(0.1, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.25);
+  }
+};
 
 /* ==========================================================================
-   2. ESTRUCTURA Y LAYOUT CENTRADO
+   2. GESTIÓN DE TEMA DINÁMICO (LIGHT & DARK THEME)
    ========================================================================== */
-html, body {
-  width: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
-  background-color: var(--bg-body);
-  transition: background-color 0.4s ease, color 0.4s ease;
-}
+document.addEventListener('DOMContentLoaded', () => {
+  const themeToggleBtn = document.getElementById('theme-toggle');
+  const themeIcon = document.getElementById('theme-icon');
+  const themeText = document.getElementById('theme-text');
 
-body {
-  color: var(--text-primary);
-  font-family: var(--font-body);
-  font-size: 1.05rem;
-  line-height: 1.6;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: clamp(1.5rem, 4vw, 3rem);
-  position: relative;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* Ocultar resplandores neón arcade antiguos */
-.bg-glow {
-  display: none;
-}
-
-/* ==========================================================================
-   3. BOTÓN CONMUTADOR DE TEMA
-   ========================================================================== */
-.theme-toggle-btn {
-  position: fixed;
-  top: 24px;
-  right: 24px;
-  z-index: 1000;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  padding: 10px 18px;
-  border-radius: 30px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-family: var(--font-body);
-  font-size: 0.88rem;
-  font-weight: 500;
-  box-shadow: var(--shadow-soft);
-  transition: var(--transition-smooth);
-}
-
-.theme-toggle-btn:hover {
-  background: var(--accent-soft);
-  border-color: var(--accent-color);
-  color: var(--accent-color);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-hover);
-}
-
-/* ==========================================================================
-   4. CONTENEDOR PRINCIPAL SPLIT EDITORIAL
-   ========================================================================== */
-.login-split-container {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 1000px;
-  gap: clamp(2rem, 5vw, 4.5rem);
-  margin: auto;
-}
-
-/* ==========================================================================
-   5. SECCIÓN LOGO Y SELLO EDITORIAL
-   ========================================================================== */
-.brand-side {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.logo-hero-link {
-  display: inline-block;
-  text-decoration: none;
-  margin-bottom: 1.2rem;
-  transition: var(--transition-smooth);
-}
-
-.logo-hero-link:hover {
-  opacity: 0.85;
-}
-
-.hero-logo-img {
-  width: 100%;
-  max-width: clamp(160px, 28vw, 240px);
-  height: auto;
-  object-fit: contain;
-}
-
-.brand-title-outside {
-  font-family: var(--font-heading);
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 600;
-  letter-spacing: -0.5px;
-  color: var(--text-primary);
-  margin-bottom: 0.6rem;
-  text-shadow: none;
-}
-
-.brand-quote-outside {
-  font-family: var(--font-heading);
-  font-style: italic;
-  font-size: clamp(1.05rem, 2vw, 1.25rem);
-  color: var(--text-secondary);
-  max-width: 440px;
-  line-height: 1.5;
-  font-weight: 400;
-}
-
-/* ==========================================================================
-   6. TARJETA EDITORIAL DE ACCESO
-   ========================================================================== */
-.form-side {
-  width: 100%;
-  max-width: 440px;
-}
-
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  box-shadow: var(--shadow-soft);
-  padding: clamp(2rem, 4vw, 2.8rem);
-  transition: var(--transition-smooth);
-}
-
-.card:hover {
-  box-shadow: var(--shadow-hover);
-  border-color: var(--border-focus);
-}
-
-.card2 {
-  background: transparent;
-  padding: 0;
-  border: none;
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-#heading {
-  text-align: center;
-  font-family: var(--font-heading);
-  font-size: clamp(1.4rem, 2.5vw, 1.8rem);
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 0.5rem;
-  letter-spacing: -0.3px;
-  text-shadow: none;
-}
-
-/* ==========================================================================
-   7. MENSAJES DE ALERTA
-   ========================================================================== */
-.alert-message {
-  display: none;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-family: var(--font-body);
-  font-size: 0.88rem;
-  font-weight: 500;
-  line-height: 1.4;
-  text-align: center;
-  background-color: rgba(239, 68, 68, 0.08);
-  color: #EF4444;
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  box-shadow: none;
-}
-
-/* ==========================================================================
-   8. CAMPOS DE ENTRADA Y FORMULARIO
-   ========================================================================== */
-.field {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  background-color: var(--bg-input);
-  box-shadow: none;
-  transition: var(--transition-smooth);
-}
-
-.field:focus-within {
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.input-icon {
-  width: 20px;
-  height: 20px;
-  fill: var(--text-muted);
-  transition: var(--transition-smooth);
-  flex-shrink: 0;
-}
-
-.field:focus-within .input-icon {
-  fill: var(--accent-color);
-}
-
-.input-field {
-  background: transparent;
-  border: none;
-  outline: none;
-  width: 100%;
-  color: var(--text-primary);
-  font-family: var(--font-body);
-  font-size: 0.98rem;
-  font-weight: 400;
-}
-
-.input-field::placeholder {
-  color: var(--text-muted);
-  font-family: var(--font-body);
-}
-
-/* ==========================================================================
-   9. BOTONES EDITORIALES DE ACCESO Y RETORNO
-   ========================================================================== */
-.form .btn {
-  display: flex;
-  justify-content: center;
-  margin-top: 0.5rem;
-}
-
-.button1 {
-  width: 100%;
-  padding: 14px 20px;
-  background: var(--accent-color);
-  color: #FFFFFF !important;
-  border: none;
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 0.95rem;
-  letter-spacing: 0.3px;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: var(--shadow-soft);
-  transition: var(--transition-smooth);
-}
-
-[data-theme="dark"] .button1 {
-  color: #0D0F12 !important;
-}
-
-.button1:hover {
-  background: var(--accent-hover);
-  box-shadow: 0 6px 20px rgba(15, 76, 129, 0.25);
-  transform: translateY(-2px);
-}
-
-.button1:active {
-  transform: translateY(0);
-  box-shadow: none;
-}
-
-.button-back {
-  display: block;
-  text-align: center;
-  margin-top: 0.4rem;
-  padding: 10px;
-  color: var(--text-secondary);
-  font-family: var(--font-body);
-  font-size: 0.88rem;
-  font-weight: 500;
-  text-decoration: none;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  transition: var(--transition-smooth);
-}
-
-.button-back:hover {
-  color: var(--text-primary);
-  background: var(--bg-surface);
-  border-color: var(--border-color);
-}
-
-/* ==========================================================================
-   10. RESPONSIVE DESIGN (DESKTOP SPLIT)
-   ========================================================================== */
-@media (min-width: 850px) {
-  .login-split-container {
-    flex-direction: row;
-    align-items: center;
+  // Cargar tema guardado o preferencia del sistema
+  const savedTheme = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  
+  if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    if (themeIcon) themeIcon.textContent = '☀️';
+    if (themeText) themeText.textContent = 'Modo Claro';
+  } else {
+    document.documentElement.setAttribute('data-theme', 'light');
+    if (themeIcon) themeIcon.textContent = '🌙';
+    if (themeText) themeText.textContent = 'Modo Oscuro';
   }
 
-  .brand-side {
-    flex: 1;
-    align-items: flex-start;
-    text-align: left;
+  // Evento de cambio de tema
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      SoundEffects.playClick();
+      
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+
+      if (themeIcon && themeText) {
+        if (newTheme === 'dark') {
+          themeIcon.textContent = '☀️';
+          themeText.textContent = 'Modo Claro';
+        } else {
+          themeIcon.textContent = '🌙';
+          themeText.textContent = 'Modo Oscuro';
+        }
+      }
+    });
   }
 
-  .form-side {
-    flex: 1;
-  }
-}
+  /* ==========================================================================
+     3. MANEJO DE FORMULARIO DE ACCESO Y ALERTAS
+     ========================================================================== */
+  const loginForm = document.getElementById('login-form');
+  const alertBox = document.getElementById('alert-message');
 
-@media (max-width: 849px) {
-  .brand-side {
-    align-items: center;
-    text-align: center;
+  function showAlert(message) {
+    if (!alertBox) return;
+    alertBox.textContent = message;
+    alertBox.style.display = 'block';
+    SoundEffects.playError();
   }
-}
+
+  function hideAlert() {
+    if (!alertBox) return;
+    alertBox.style.display = 'none';
+  }
+
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideAlert();
+
+      const userInput = document.getElementById('username');
+      const passwordInput = document.getElementById('password');
+      const submitBtn = loginForm.querySelector('.button1');
+
+      const username = userInput ? userInput.value.trim() : '';
+      const password = passwordInput ? passwordInput.value.trim() : '';
+
+      if (!username || !password) {
+        showAlert('Por favor, completa todos los campos.');
+        return;
+      }
+
+      try {
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Verificando...';
+        }
+
+        // Simulación o petición Fetch a API backend
+        /*
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await response.json();
+        */
+
+        // Validación de prueba / Ejemplo
+        setTimeout(() => {
+          if (username === 'admin' || username === '2025') {
+            SoundEffects.playSuccess();
+            
+            // Redirección tras login exitoso
+            setTimeout(() => {
+              window.location.href = 'index.html'; // O tu panel de administración
+            }, 300);
+          } else {
+            showAlert('Credenciales incorrectas. Revisa tu usuario y contraseña.');
+            if (submitBtn) {
+              submitBtn.disabled = false;
+              submitBtn.textContent = 'Entrar';
+            }
+          }
+        }, 600);
+
+      } catch (error) {
+        showAlert('Error de conexión con el servidor. Intenta de nuevo.');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Entrar';
+        }
+      }
+    });
+  }
+});
