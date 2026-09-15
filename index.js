@@ -4,7 +4,7 @@
  * ==============================================================================
  */
 
-const NUMERO_WHATSAPP = "5598788857"; // Reemplaza con tu número a 10 dígitos más código de país
+const NUMERO_WHATSAPP = "5215598788857"; // Número corregido con código de país 521
 
 /* ==========================================================================
    1. SINTETIZADOR DE EFECTOS DE SONIDO EDITORIAL/RETRO (WEB AUDIO API)
@@ -148,14 +148,12 @@ function initRetroSFXSystem() {
 }
 
 /* ==========================================================================
-/* ==========================================================================
    2. CONTROL DE VIDEO DE PRESENTACIÓN (uploads/videos/presentacion3.mp4)
    ========================================================================== */
 
 function initVideoPlayback() {
   const videoElem = document.querySelector('.video-section video') || document.getElementById('presentacionVideo');
   if (videoElem) {
-    // Si no tiene asignado la ruta correcta, se la asignamos a uploads/videos/
     if (!videoElem.getAttribute('src')) {
       videoElem.src = 'uploads/videos/presentacion3.mp4';
     }
@@ -866,77 +864,75 @@ const PixelUI = {
         const m = datosMedidas.metrosLineales || datosMedidas.ancho;
         const res = CotizadorEngine.calcularDTFTextil(m);
         const msg = '<b>👕 COTIZACIÓN DTF TEXTIL:</b><br><br>' +
-        '• Metros calculados: <b>' + res.metrosCobrados + ' m</b><br>' +
-        '• Precio por metro: <b>$' + res.precioPorMetro + ' MXN</b><br>' +
-        '• Total estimado: <b style="color:#0f4c81; font-size:1.1em;">$' + res.total + ' MXN</b>' +
-        (res.aplicoMinimo ? '<br><i>(Aplica mínimo de compra de 0.5 metros)</i>' : '') +
-        AVISO_COTIZACION_VARIA;
+          '• Metros calculados: <b>' + res.metrosCobrados + ' m</b><br>' +
+          '• Precio por metro: <b>$' + res.precioPorMetro + ' MXN</b><br>' +
+          '• Total estimado: <b style="color:#00f0ff; font-size: 1.1em;">$' + res.total + ' MXN</b>' +
+          AVISO_COTIZACION_VARIA;
         this.appendMessage('bot', msg);
         playArcadeSound('success');
         return;
       }
 
-      if (qLower.includes('sticker') || qLower.includes('vinil sticker')) {
+      if (qLower.includes('sticker') || qLower.includes('calcomania') || qLower.includes('etiqueta')) {
         const m = datosMedidas.metrosLineales || datosMedidas.ancho;
         const res = CotizadorEngine.calcularVinilSticker(m);
         const msg = '<b>🏷️ COTIZACIÓN VINIL STICKER:</b><br><br>' +
-        '• Metros calculados: <b>' + res.metrosCobrados + ' m</b><br>' +
-        '• Precio por metro: <b>$' + res.precioPorMetro + ' MXN</b><br>' +
-        '• Total estimado: <b style="color:#0f4c81; font-size:1.1em;">$' + res.total + ' MXN</b>' +
-        (res.aplicoMinimo ? '<br><i>(Aplica mínimo de compra de 0.5 metros)</i>' : '') +
-        AVISO_COTIZACION_VARIA;
+          '• Metros calculados: <b>' + res.metrosCobrados + ' m</b><br>' +
+          '• Precio por metro: <b>$' + res.precioPorMetro + ' MXN</b><br>' +
+          '• Total estimado: <b style="color:#00f0ff; font-size: 1.1em;">$' + res.total + ' MXN</b>' +
+          AVISO_COTIZACION_VARIA;
         this.appendMessage('bot', msg);
         playArcadeSound('success');
         return;
       }
 
-      if (qLower.includes('sublimacion') || qLower.includes('sublimación')) {
+      if (qLower.includes('sublimacion') || qLower.includes('sublimar')) {
         const res = CotizadorEngine.calcularGranFormato('SUBLIMACION_M2', datosMedidas.ancho, datosMedidas.alto);
         const msg = '<b>📊 COTIZACIÓN SUBLIMACIÓN:</b><br><br>' +
-        '• Medida: <b>' + datosMedidas.ancho + ' x ' + datosMedidas.alto + ' m</b> (' + res.areaM2Unidad + ' m²)<br>' +
-        '• Precio m²: <b>$' + res.precioM2 + ' MXN</b><br>' +
-        '• Total estimado: <b style="color:#0f4c81; font-size:1.1em;">$' + res.total + ' MXN</b>' +
-        (res.aplicoMinimo ? '<br><i>(Aplica mínimo de cobro)</i>' : '') +
-        AVISO_COTIZACION_VARIA;
+          '• Dimensiones: <b>' + datosMedidas.ancho + ' m x ' + datosMedidas.alto + ' m</b><br>' +
+          '• Área calculada: <b>' + res.areaM2Unidad + ' m²</b><br>' +
+          '• Total estimado: <b style="color:#00f0ff; font-size: 1.1em;">$' + res.total + ' MXN</b>' +
+          AVISO_COTIZACION_VARIA;
         this.appendMessage('bot', msg);
         playArcadeSound('success');
         return;
       }
 
-      // Por defecto para medidas genéricas (Lona / Vinil)
+      // Por defecto para lona u otros materiales en m²
       const res = CotizadorEngine.calcularGranFormato('LONA_440G', datosMedidas.ancho, datosMedidas.alto);
-      const msg = '<b>📊 COTIZACIÓN DE LONA IMPRESA:</b><br><br>' +
-      '• Medida: <b>' + datosMedidas.ancho + ' x ' + datosMedidas.alto + ' m</b> (' + res.areaM2Unidad + ' m²)<br>' +
-      '• Precio m²: <b>$' + res.precioM2 + ' MXN</b><br>' +
-      '• Total estimado: <b style="color:#0f4c81; font-size:1.1em;">$' + res.total + ' MXN</b>' +
-      (res.aplicoMinimo ? '<br><i>(Aplica cobro mínimo de 1 m²)</i>' : '') +
-      AVISO_COTIZACION_VARIA;
+      const msg = '<b>📊 COTIZACIÓN ESTIMADA (LONA IMPRESA):</b><br><br>' +
+        '• Dimensiones: <b>' + datosMedidas.ancho + ' m x ' + datosMedidas.alto + ' m</b><br>' +
+        '• Área calculada: <b>' + res.areaM2Unidad + ' m²</b><br>' +
+        '• Total estimado: <b style="color:#00f0ff; font-size: 1.1em;">$' + res.total + ' MXN</b>' +
+        AVISO_COTIZACION_VARIA;
       this.appendMessage('bot', msg);
       playArcadeSound('success');
       return;
     }
 
     // 2. Búsqueda por palabras clave en la Base de Conocimiento
-    for (const key in PIXEL_KNOWLEDGE_BASE) {
-      const item = PIXEL_KNOWLEDGE_BASE[key];
-      const match = item.keywords.some(function(kw) { return qLower.includes(kw); });
-      if (match) {
-        this.appendMessage('bot', item.response);
-        playArcadeSound('success');
-        return;
+    for (let key in PIXEL_KNOWLEDGE_BASE) {
+      const topic = PIXEL_KNOWLEDGE_BASE[key];
+      for (let i = 0; i < topic.keywords.length; i++) {
+        if (qLower.includes(topic.keywords[i])) {
+          this.appendMessage('bot', topic.response);
+          playArcadeSound('success');
+          return;
+        }
       }
     }
 
-    // 3. Respuesta por defecto
-    const defaultMsg = '✦ No estoy seguro de entender tus datos exactos. Puedes consultar directamente vía WhatsApp para atender tu pedido de forma personalizada.<br><br>' +
-    '👉 <a href="https://wa.me/' + NUMERO_WHATSAPP + '?text=Hola,%20quisiera%20cotizar%20lo%20siguiente:%20' + encodeURIComponent(query) + '" target="_blank" style="color:#0f4c81; font-weight:bold; text-decoration:underline;">Consultar por WhatsApp</a>';
+    // 3. Respuesta genérica
+    const defaultMsg = '<b>👾 PIXEL AI:</b> No estoy seguro de entender tu consulta exacta.<br><br>' +
+      'Puedes pedirme cotizaciones escribiendo medidas como <b>"2x1m lona"</b> o <b>"1 metro de dtf"</b>, o elegir una opción del menú.<br><br>' +
+      '👉 <a href="https://wa.me/' + NUMERO_WHATSAPP + '?text=Hola,%20tengo%20una%20duda%20sobre%20un%20servicio" target="_blank" style="color:#00f0ff; font-weight:bold; text-decoration:underline;">Hablar directamente con un asesor por WhatsApp</a>';
     this.appendMessage('bot', defaultMsg);
     playArcadeSound('error');
   }
 };
 
 /* ==========================================================================
-   9. INICIALIZACIÓN GLOBAL DE COMPONENTES
+   9. INICIALIZACIÓN GLOBAL DE LA APLICACIÓN
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', function() {
