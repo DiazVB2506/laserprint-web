@@ -1,16 +1,75 @@
+/**
+ * ==============================================================================
+ * DISEÑO LASER PRINT - CONTROL DE LOGIN & GESTIÓN DE TEMA ("THEME ENGINE")
+ * ==============================================================================
+ */
+
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('loginForm') || document.querySelector('form');
   const alertBox = document.getElementById('alertMessage');
   const btnSubmit = document.getElementById('btnLogin') || document.querySelector('button[type="submit"]');
 
   // ==========================================================================
-  // AUDIO SYNTHESIZER RETRO 8-BIT
+  // 1. SISTEMA DE GESTIÓN DE TEMA (PERSISTENCIA CLARO / OSCURO)
   // ==========================================================================
+  const THEME_KEY = 'theme'; // Clave en localStorage
+
+  function aplicarTemaGuardado() {
+    // Si no hay tema guardado, se puede definir 'dark' por defecto
+    const temaGuardado = localStorage.getItem(THEME_KEY) || 'dark';
+    
+    if (temaGuardado === 'dark') {
+      document.documentElement.classList.add('dark-theme');
+      document.documentElement.classList.remove('light-theme');
+      document.body.classList.add('dark-theme');
+      document.body.classList.remove('light-theme');
+    } else {
+      document.documentElement.classList.add('light-theme');
+      document.documentElement.classList.remove('dark-theme');
+      document.body.classList.add('light-theme');
+      document.body.classList.remove('dark-theme');
+    }
+  }
+
+  function alternarTema() {
+    const esOscuro = document.documentElement.classList.contains('dark-theme') || document.body.classList.contains('dark-theme');
+    const nuevoTema = esOscuro ? 'light' : 'dark';
+    
+    localStorage.setItem(THEME_KEY, nuevoTema);
+    aplicarTemaGuardado();
+    playRetroSFX('click');
+  }
+
+  // Aplicar inmediatamente el tema recordado
+  aplicarTemaGuardado();
+
+  // Escuchar botón de alternar tema (si existe en el DOM)
+  const themeToggleBtn = document.getElementById('themeToggle') || document.querySelector('.theme-toggle');
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', alternarTema);
+  }
+
+  // ==========================================================================
+  // 2. SINTETIZADOR AUDIO RETRO 8-BIT (WEB AUDIO API)
+  // ==========================================================================
+  let audioCtx = null;
+
+  function getAudioContext() {
+    if (!audioCtx) {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) audioCtx = new AudioContextClass();
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    return audioCtx;
+  }
+
   function playRetroSFX(type) {
     try {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContext) return;
-      const ctx = new AudioContext();
+      const ctx = getAudioContext();
+      if (!ctx) return;
+
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
 
@@ -46,7 +105,9 @@ document.addEventListener('DOMContentLoaded', () => {
         osc.start(now);
         osc.stop(now + 0.25);
       }
-    } catch (e) {}
+    } catch (e) {
+      // Ignorar errores de audio
+    }
   }
 
   if (btnSubmit) {
@@ -59,14 +120,16 @@ document.addEventListener('DOMContentLoaded', () => {
       alertBox.textContent = `[SYSTEM ERROR]: ${mensaje.toUpperCase()}`;
       alertBox.style.display = 'block';
       alertBox.classList.remove('shake');
-      void alertBox.offsetWidth;
+      void alertBox.offsetWidth; // Force reflow para reiniciar animación
       alertBox.classList.add('shake');
     } else {
       alert(`[ACCESS DENIED]: ${mensaje}`);
     }
   }
 
-  // Estilos dinámicos para efectos retro
+  // ==========================================================================
+  // 3. ESTILOS DINÁMICOS Y ANIMACIONES RETRO
+  // ==========================================================================
   if (!document.getElementById('spinner-style')) {
     const style = document.createElement('style');
     style.id = 'spinner-style';
@@ -83,7 +146,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.head.appendChild(style);
   }
 
-  // Procesar inicio de sesión local directo
+  // ==========================================================================
+  // 4. AUTENTICACIÓN Y VALIDACIÓN DE FORMULARIO
+  // ==========================================================================
   if (form) {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
