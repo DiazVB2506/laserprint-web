@@ -1,116 +1,231 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-MX">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LaserPrint Arcade - DTF TEXTIL / UV</title>
+  <title>DTF Textil y UV en Atizapán | Diseño Laser Print</title>
 
-  <!-- FAVICON -->
-  <link rel="icon" type="image/png" href="uploads/fotos/LOGOTIPO.png">
-
-  <!-- FUENTES RETRO & TECH -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-
-  <!-- PDF.JS LIBRARY -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <!-- Tema antes de pintar (mismo que el inicio) -->
   <script>
-    if (typeof pdfjsLib !== 'undefined') {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    }
+    (function () {
+      try {
+        var t = localStorage.getItem('theme');
+        if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
   </script>
 
-  <!-- ESTILOS ARCADE DE LA SECCIÓN -->
-  <link rel="stylesheet" href="dtf.css">
+  <meta name="description" content="Impresión DTF textil y DTF UV en Cd. López Mateos, Atizapán. Rollo de 57 cm, colores vivos y resistentes al lavado. Mira nuestros trabajos y cotiza por WhatsApp.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0a0a12">
+  <link rel="canonical" href="https://diazvb2506.github.io/laserprint-web/dtf.html">
+
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_MX">
+  <meta property="og:site_name" content="Diseño Laser Print">
+  <meta property="og:title" content="DTF Textil y UV | Diseño Laser Print">
+  <meta property="og:description" content="Playeras, sudaderas, gorras y stickers UV con colores que duran. Cotiza por WhatsApp.">
+  <meta property="og:url" content="https://diazvb2506.github.io/laserprint-web/dtf.html">
+  <meta property="og:image" content="https://diazvb2506.github.io/laserprint-web/uploads/fotos/LOGOTIPO.png">
+
+  <link rel="icon" type="image/png" href="uploads/fotos/LOGOTIPO.png">
+  <link rel="apple-touch-icon" href="uploads/fotos/LOGOTIPO.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://res.cloudinary.com">
+  <link rel="preconnect" href="https://laserprint-api.onrender.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <!-- Estilo base del sitio (encabezado, pie, tema) + estilo de la sección -->
+  <link rel="stylesheet" href="index.css?v=1.5">
+  <link rel="stylesheet" href="dtf.css?v=1.0">
 </head>
-<body data-categoria="DTF TEXTIL / UV">
 
-  <!-- ENCABEZADO ESTILO HUD / ARCADE -->
-  <header class="retro-header">
-    <div class="header-logo-container">
-      <a href="index.html">
-        <img src="uploads/fotos/LOGOTIPO.png" alt="LaserPrint Logo" class="logo-img" id="mainLogo">
+<!--
+  PARA REUTILIZAR EN OTRA SECCIÓN (lona, vinil…):
+  copia este archivo, cambia data-categoria (exactamente como en el panel),
+  data-titulo, data-whatsapp, los textos del encabezado y el enlace activo del menú.
+  dtf.css y dtf.js funcionan igual para todas.
+-->
+<body data-categoria="DTF TEXTIL / UV"
+      data-titulo="DTF Textil / UV"
+      data-whatsapp="Hola Laser Print, quiero cotizar DTF">
+
+  <div class="bg-glow ambient-cyan" aria-hidden="true"></div>
+  <div class="bg-glow ambient-magenta" aria-hidden="true"></div>
+
+  <!-- ===== Encabezado (igual que el inicio) ===== -->
+  <header class="glass-header">
+    <nav class="nav-container" aria-label="Menú principal">
+      <a href="index.html" class="logo" aria-label="Diseño Laser Print, ir al inicio">
+        <img src="uploads/fotos/LOGOTIPO.png" alt="Diseño Laser Print" class="logo-img"
+             onerror="this.onerror=null; this.src='https://placehold.co/260x100/111111/00f0ff?text=DISE%C3%91O+LASERPRINT';">
       </a>
-    </div>
 
-    <!-- MENÚ MÓVIL TOGGLE -->
-    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir Menú">
-      <span></span><span></span><span></span>
-    </button>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú" aria-controls="navLinks" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
 
-    <nav id="navLinks">
-      <a href="index.html" class="nav-btn arcade-sound-hover">INICIO</a>
-      <a href="dtf.html" class="nav-btn active arcade-sound-hover">DTF TEXTIL / UV</a>
-      <a href="sublimacion.html" class="nav-btn arcade-sound-hover">SUBLIMACIÓN</a>
-      <a href="lona.html" class="nav-btn arcade-sound-hover">LONA</a>
-      <a href="coroplast.html" class="nav-btn arcade-sound-hover">COROPLAST</a>
-      <a href="cortelaser.html" class="nav-btn arcade-sound-hover">CORTE LÁSER</a>
-      <a href="vinil.html" class="nav-btn arcade-sound-hover">VINIL</a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html" class="nav-btn">Inicio</a></li>
+        <li><a href="dtf.html" class="nav-btn active" aria-current="page">DTF TEXTIL / UV</a></li>
+        <li><a href="sublimacion.html" class="nav-btn">SUBLIMACIÓN</a></li>
+        <li><a href="lona.html" class="nav-btn">LONA</a></li>
+        <li><a href="coroplast.html" class="nav-btn">COROPLAST</a></li>
+        <li><a href="cortelaser.html" class="nav-btn">CORTE LÁSER</a></li>
+        <li><a href="vinil.html" class="nav-btn">VINIL</a></li>
+        <li><a href="login.html" class="nav-btn btn-admin" rel="nofollow">Iniciar Sesión Admin</a></li>
+        <li><button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Cambiar tema claro u oscuro">🌙</button></li>
+      </ul>
     </nav>
   </header>
 
-  <main class="main-container">
-    <!-- TITULO NEÓN ARCADE -->
-    <section class="hero-section">
-      <h1 class="pixel-title">SELECT CATEGORY: DTF TEXTIL / UV</h1>
-      <p class="pixel-subtitle">STAGE 01 - IMPRESIÓN DE ALTA RESOLUCIÓN Y ADHERENCIA</p>
+  <main>
+    <!-- ===== Portada de la sección ===== -->
+    <section class="seccion-hero">
+      <nav class="migas" aria-label="Ruta">
+        <a href="index.html">Inicio</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">DTF Textil / UV</span>
+      </nav>
+
+      <p class="kicker">Impresión directa a película</p>
+      <h1 class="seccion-titulo">DTF <span class="text-gradient">Textil</span> y UV</h1>
+      <p class="seccion-lead">
+        Colores vivos que aguantan el lavado, en algodón, poliéster, mezclas y casi cualquier tela.
+        Con DTF UV, stickers que pegas en vasos, termos, cascos o lo que imagines.
+      </p>
+
+      <ul class="datos" aria-label="Datos del servicio">
+        <li><strong>$230</strong><span>por metro lineal</span></li>
+        <li><strong>57 cm</strong><span>de ancho de rollo</span></li>
+        <li><strong>½ m</strong><span>compra mínima</span></li>
+        <li><strong>2–3 días</strong><span>hábiles de entrega</span></li>
+      </ul>
+
+      <div class="hero-acciones">
+        <a class="btn-cta" id="ctaWhatsapp" href="https://wa.me/5215598788857?text=Hola%20Laser%20Print%2C%20quiero%20cotizar%20DTF" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>
+          Cotizar por WhatsApp
+        </a>
+        <a class="btn-sec" href="#trabajos">Ver trabajos ↓</a>
+      </div>
     </section>
 
-    <!-- PESTAÑAS DE NAVEGACIÓN DIRECTA -->
-    <div class="tabs-container">
-      <button class="tab-btn active arcade-sound-btn" data-tab="imagenes">
-        <span class="tab-icon">🖼️</span> GALERÍA
-      </button>
-      <button class="tab-btn arcade-sound-btn" data-tab="videos">
-        <span class="tab-icon">🎬</span> DEMOS VIDEO
-      </button>
-      <button class="tab-btn arcade-sound-btn" data-tab="pdfs">
-        <span class="tab-icon">📄</span> CATÁLOGOS PDF
-      </button>
-    </div>
-
-    <!-- SECCIÓN IMÁGENES -->
-    <section id="sec-imagenes" class="media-section">
-      <h2 class="section-title"><span>🖼️</span> MUESTRAS DE TRABAJO (GALERÍA)</h2>
-      <div id="gridImagenes" class="pixel-grid"></div>
+    <!-- ===== Cómo funciona ===== -->
+    <section class="pasos" aria-labelledby="tituloPasos">
+      <h2 id="tituloPasos" class="sr-only">Cómo funciona</h2>
+      <ol>
+        <li>
+          <span class="paso-num">01</span>
+          <h3>Envía tu diseño</h3>
+          <p>En <b>PNG o PDF sin fondo</b>. Si no tienes diseño, te lo hacemos (con costo extra).</p>
+        </li>
+        <li>
+          <span class="paso-num">02</span>
+          <h3>Lo imprimimos</h3>
+          <p>Acomodamos tus diseños en el rollo de 57 cm para que aproveches cada centímetro.</p>
+        </li>
+        <li>
+          <span class="paso-num">03</span>
+          <h3>Lo aplicas</h3>
+          <p>Con plancha, sobre la prenda que quieras. El DTF UV se pega directo, sin calor.</p>
+        </li>
+      </ol>
     </section>
 
-    <!-- SECCIÓN VIDEOS -->
-    <section id="sec-videos" class="media-section" style="display: none;">
-      <h2 class="section-title"><span>🎬</span> PROCESOS Y DEMOSTRACIONES (VIDEOS)</h2>
-      <div id="gridVideos" class="pixel-grid"></div>
+    <!-- ===== Trabajos ===== -->
+    <section class="trabajos" id="trabajos" aria-labelledby="tituloTrabajos">
+      <div class="trabajos-header">
+        <div>
+          <h2 id="tituloTrabajos" class="section-title">Nuestros trabajos</h2>
+          <p class="trabajos-sub" id="trabajosResumen" aria-live="polite">Cargando trabajos…</p>
+        </div>
+
+        <div class="filtros" id="filtros" role="toolbar" aria-label="Filtrar trabajos" hidden>
+          <button type="button" class="filtro activo" data-filtro="todo" aria-pressed="true">Todo <span></span></button>
+          <button type="button" class="filtro" data-filtro="imagen" aria-pressed="false">Fotos <span></span></button>
+          <button type="button" class="filtro" data-filtro="video" aria-pressed="false">Videos <span></span></button>
+          <button type="button" class="filtro" data-filtro="pdf" aria-pressed="false">Catálogos <span></span></button>
+        </div>
+      </div>
+
+      <!-- El mosaico se llena desde dtf.js -->
+      <div class="mosaico" id="mosaico" aria-busy="true"></div>
+
+      <!-- Tarjetas de información que se intercalan entre los trabajos.
+           Edita su texto libremente; aparecen cuando hay suficientes publicaciones. -->
+      <template id="notasMosaico">
+        <div class="pieza nota">
+          <span class="nota-grande">$230</span>
+          <p class="nota-texto">por metro lineal de DTF textil. Acomoda varios diseños en el mismo metro y ahorra.</p>
+        </div>
+        <div class="pieza nota clara">
+          <span class="nota-grande">¿Y el tuyo?</span>
+          <p class="nota-texto">Mándanos tu diseño en PNG sin fondo y te cotizamos hoy mismo.</p>
+          <a data-whatsapp href="#" target="_blank" rel="noopener noreferrer">Cotizar mi diseño</a>
+        </div>
+      </template>
     </section>
 
-    <!-- SECCIÓN PDFS -->
-    <section id="sec-pdfs" class="media-section" style="display: none;">
-      <h2 class="section-title"><span>📄</span> DOCUMENTOS Y PLANTILLAS (CATÁLOGOS PDF)</h2>
-      <div id="gridPdfs" class="pixel-grid"></div>
+    <!-- ===== Llamado final ===== -->
+    <section class="cta-banda">
+      <div>
+        <h2>¿Tienes un diseño en mente?</h2>
+        <p>Mándanos tu archivo y te decimos cuánto sale en minutos.</p>
+      </div>
+      <a class="btn-cta" id="ctaWhatsapp2" href="https://wa.me/5215598788857?text=Hola%20Laser%20Print%2C%20quiero%20cotizar%20DTF" target="_blank" rel="noopener noreferrer">
+        Escribir por WhatsApp
+      </a>
     </section>
   </main>
 
-  <!-- LIGHTBOX / VISOR MODAL RETRO -->
-  <div id="mediaModal" class="pixel-modal" style="display: none;">
-    <span class="close-modal arcade-sound-btn" id="closeModal">&times;</span>
-    <div class="modal-content-wrapper">
-      <div id="modalBody"></div>
-      <p id="captionModal" class="modal-caption"></p>
+  <!-- ===== Pie (igual que el inicio) ===== -->
+  <footer class="glass-footer">
+    <div class="footer-content">
+      <div class="footer-social">
+        <a href="https://www.facebook.com/PON_AQUI_TU_LINK" target="_blank" rel="noopener noreferrer" aria-label="Facebook de Laser Print">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.5 1.6-1.5h1.7V4.4c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.4H7.7V14h2.7v8h3.1z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/laserprint678/" target="_blank" rel="noopener noreferrer" aria-label="Instagram de Laser Print">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="https://www.tiktok.com/@laserprint2026" target="_blank" rel="noopener noreferrer" aria-label="TikTok de Laser Print">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M16.6 3c.4 2.2 1.9 3.8 4 4v3.1c-1.5 0-2.9-.5-4-1.2V15a6 6 0 1 1-6-6c.3 0 .6 0 .9.1v3.2a2.9 2.9 0 1 0 2 2.7V3h3.1z"/></svg>
+        </a>
+      </div>
+      <div class="footer-contact">
+        <a href="tel:+525598788857">📞 +52 55 9878 8857</a>
+        <span class="footer-separator">|</span>
+        <a href="mailto:laserprint678@gmail.com">✉️ laserprint678@gmail.com</a>
+      </div>
+      <p class="footer-rights">© <span id="year">2026</span> Diseño Laser Print. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- ===== Visor ===== -->
+  <div class="visor" id="visor" role="dialog" aria-modal="true" aria-labelledby="visorTitulo" hidden>
+    <button type="button" class="visor-cerrar" id="visorCerrar" aria-label="Cerrar">✕</button>
+    <button type="button" class="visor-nav visor-prev" id="visorPrev" aria-label="Anterior">‹</button>
+    <button type="button" class="visor-nav visor-next" id="visorNext" aria-label="Siguiente">›</button>
+
+    <div class="visor-caja">
+      <div class="visor-media" id="visorMedia"></div>
+      <aside class="visor-info">
+        <p class="visor-contador" id="visorContador"></p>
+        <h2 id="visorTitulo"></h2>
+        <p class="visor-precio" id="visorPrecio"></p>
+        <p class="visor-desc" id="visorDesc"></p>
+        <div class="visor-acciones">
+          <a class="btn-cta" id="visorWhatsapp" target="_blank" rel="noopener noreferrer">Quiero uno así</a>
+          <a class="btn-sec" id="visorAbrir" target="_blank" rel="noopener noreferrer" hidden>Abrir PDF</a>
+        </div>
+      </aside>
     </div>
   </div>
 
-  <!-- CONTROL DE FALLBACK PARA LOGO -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const logo = document.getElementById('mainLogo');
-      if (logo) {
-        logo.addEventListener('error', () => {
-          logo.src = 'https://via.placeholder.com/150x50/000/00f0ff?text=LASERPRINT';
-        });
-      }
-    });
-  </script>
-
-  <!-- LÓGICA DE CONTROL -->
-  <script src="dtf.js"></script>
+  <script src="dtf.js?v=1.0" defer></script>
 </body>
 </html>
