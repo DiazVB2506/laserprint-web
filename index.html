@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-MX">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -54,7 +54,26 @@
       "addressRegion": "Estado de México",
       "postalCode": "52946",
       "addressCountry": "MX"
-    }
+    },
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "opens": "09:00",
+        "closes": "18:00"
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": "Saturday",
+        "opens": "09:00",
+        "closes": "14:00"
+      }
+    ],
+    "sameAs": [
+      "https://www.facebook.com/PON_AQUI_TU_LINK",
+      "https://www.instagram.com/laserprint678/",
+      "https://www.tiktok.com/@laserprint2026"
+    ]
   }
   </script>
 
@@ -66,149 +85,169 @@
 </head>
 <body>
 
-  <div class="bg-glow ambient-cyan"></div>
-  <div class="bg-glow ambient-magenta"></div>
+  <div class="bg-glow ambient-cyan" aria-hidden="true"></div>
+  <div class="bg-glow ambient-magenta" aria-hidden="true"></div>
 
   <header class="glass-header">
-    <nav class="nav-container">
-      <a href="index.html" class="logo">
-        <img src="https://raw.githubusercontent.com/diazvb2506/laserprint-web/main/uploads/fotos/LOGOTIPO.png" alt="Diseño Laser Print Logo" class="logo-img" onerror="this.onerror=null; this.src='https://via.placeholder.com/260x100/111/00f0ff?text=DISE%C3%B1O+LASERPRINT';">
+    <nav class="nav-container" aria-label="Menú principal">
+      <a href="index.html" class="logo" aria-label="Diseño Laser Print, ir al inicio">
+        <img src="uploads/fotos/LOGOTIPO.png" alt="Diseño Laser Print" class="logo-img"
+             onerror="this.onerror=null; this.src='https://placehold.co/260x100/111111/00f0ff?text=DISE%C3%91O+LASERPRINT';">
       </a>
 
-      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú">
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú" aria-controls="navLinks" aria-expanded="false">
         <span></span>
         <span></span>
         <span></span>
       </button>
 
       <ul class="nav-links" id="navLinks">
-        <li><a href="index.html" class="nav-btn active">Inicio</a></li>
+        <li><a href="index.html" class="nav-btn active" aria-current="page">Inicio</a></li>
         <li><a href="dtf.html" class="nav-btn">DTF TEXTIL / UV</a></li>
-        <li><a href="sublimacion.html" class="nav-btn">SUBLIMACION</a></li>
+        <li><a href="sublimacion.html" class="nav-btn">SUBLIMACIÓN</a></li>
         <li><a href="lona.html" class="nav-btn">LONA</a></li>
         <li><a href="coroplast.html" class="nav-btn">COROPLAST</a></li>
-        <li><a href="cortelaser.html" class="nav-btn">CORTE LASER</a></li>
+        <li><a href="cortelaser.html" class="nav-btn">CORTE LÁSER</a></li>
         <li><a href="vinil.html" class="nav-btn">VINIL</a></li>
-        <li><a href="login.html" class="nav-btn btn-admin">Iniciar Sesión Admin</a></li>
+        <li><a href="login.html" class="nav-btn btn-admin" rel="nofollow">Iniciar Sesión Admin</a></li>
         <li>
-          <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Cambiar tema">🌙</button>
+          <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Cambiar tema claro u oscuro">🌙</button>
         </li>
       </ul>
     </nav>
   </header>
 
-  <section class="hero-section">
-    <div class="hero-content">
-      <h1 class="hero-title">Bienvenidos a <span class="text-gradient">Diseño Laser Print</span></h1>
-      <p class="hero-subtitle">Imprenta digital, corte de alta precisión y soluciones visuales de otro nivel.</p>
-    </div>
-  </section>
+  <main>
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1 class="hero-title">Bienvenidos a <span class="text-gradient">Diseño Laser Print</span></h1>
+        <p class="hero-subtitle">Imprenta digital, corte de alta precisión y soluciones visuales de otro nivel.</p>
+      </div>
+    </section>
 
-  <section class="video-section">
-    <div class="video-container glass-card" id="videoWrapper">
-      <video id="presentacionVideo" class="hero-gif-img" autoplay loop muted playsinline preload="auto">
-        <source src="uploads/videos/presentacion4.mp4" type="video/mp4">
-        Tu navegador no soporta la reproducción de video HTML5.
-      </video>
-    </div>
-  </section>
+    <section class="video-section" aria-label="Video de presentación">
+      <div class="video-container glass-card" id="videoWrapper">
+        <video id="presentacionVideo" class="hero-gif-img" autoplay loop muted playsinline preload="metadata">
+          <source src="uploads/videos/presentacion4.mp4" type="video/mp4">
+          Tu navegador no soporta la reproducción de video HTML5.
+        </video>
+      </div>
+    </section>
 
-  <section class="carousel-section">
-    <h2 class="section-title">Nuestros Trabajos Destacados</h2>
-    
-    <p class="carousel-hint">💡 <i>Haz clic en cualquier imagen para verla en pantalla completa.</i></p>
+    <section class="carousel-section" aria-labelledby="trabajosTitulo">
+      <h2 class="section-title" id="trabajosTitulo">Nuestros Trabajos Destacados</h2>
 
-    <div class="carousel-wrapper glass-card">
-      <button class="carousel-btn prev-btn" id="prevBtn" aria-label="Anterior">❮</button>
-      
-      <div class="carousel-track-container">
-        <div class="carousel-track" id="carouselTrack">
+      <p class="carousel-hint">💡 <i>Haz clic en cualquier imagen para verla en pantalla completa.</i></p>
+
+      <div class="carousel-wrapper glass-card">
+        <button class="carousel-btn prev-btn" id="prevBtn" aria-label="Trabajo anterior">❮</button>
+
+        <div class="carousel-track-container">
+          <div class="carousel-track" id="carouselTrack"></div>
+        </div>
+
+        <button class="carousel-btn next-btn" id="nextBtn" aria-label="Trabajo siguiente">❯</button>
+      </div>
+      <div class="carousel-dots" id="carouselDots"></div>
+    </section>
+
+    <section class="location-section" aria-labelledby="ubicacionTitulo">
+      <h2 class="section-title" id="ubicacionTitulo">Nuestra Ubicación</h2>
+      <div class="location-card glass-card">
+        <p class="location-address">📍 Calz. S. Mateo 27-A, San Juan Bosco 1, 52946 Cdad. López Mateos, Méx.</p>
+        <p class="location-hours">🕘 <b>Lunes a viernes:</b> 9:00 a.m. – 6:00 p.m. &nbsp;·&nbsp; <b>Sábados:</b> 9:00 a.m. – 2:00 p.m.</p>
+
+        <div class="map-container">
+          <iframe
+            title="Mapa de ubicación de Diseño Laser Print"
+            src="https://maps.google.com/maps?q=Calz.+S.+Mateo+27-A,+San+Juan+Bosco+1,+52946+Cdad.+L%C3%B3pez+Mateos,+M%C3%A9x.&t=&z=16&ie=UTF8&iwloc=&output=embed"
+            width="100%"
+            height="400"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade">
+          </iframe>
+        </div>
+
+        <div class="streetview-note">
+          ⚠️ <b>Nota importante:</b> La fachada en Google Maps / Street View aún no se encuentra actualizada. Si giras la vista de la calle, la fachada aparecerá registrada anteriormente como local de hules.
         </div>
       </div>
+    </section>
 
-      <button class="carousel-btn next-btn" id="nextBtn" aria-label="Siguiente">❯</button>
-    </div>
-    <div class="carousel-dots" id="carouselDots"></div>
-  </section>
+    <section class="whatsapp-section" aria-label="Contacto por WhatsApp">
+      <div class="whatsapp-card glass-card">
+        <div class="whatsapp-info">
+          <h3>💬 ¡Contáctanos por WhatsApp!</h3>
+          <p>Cotiza tus proyectos de imprenta, corte láser o vinil al instante.</p>
+          <a href="https://wa.me/5215598788857?text=Hola%20Laser%20Print%2C%20quiero%20cotizar%20un%20trabajo"
+             target="_blank" rel="noopener noreferrer" class="whatsapp-btn">
+            <span>Abrir Chat de WhatsApp</span>
+          </a>
+        </div>
 
-  <section class="location-section">
-    <h2 class="section-title">Nuestra Ubicación</h2>
-    <div class="location-card glass-card">
-      <p class="location-address">📍 Calz. S. Mateo 27-A, San Juan Bosco 1, 52946 Cdad. López Mateos, Méx.</p>
-      
-      <div class="map-container">
-        <iframe 
-          src="https://maps.google.com/maps?q=Calz.+S.+Mateo+27-A,+San+Juan+Bosco+1,+52946+Cdad.+L%C3%B3pez+Mateos,+M%C3%A9x.&t=&z=16&ie=UTF8&iwloc=&output=embed" 
-          width="100%" 
-          height="400" 
-          style="border:0;" 
-          allowfullscreen="" 
-          loading="lazy" 
-          referrerpolicy="no-referrer-when-downgrade">
-        </iframe>
+        <div class="whatsapp-qr-container">
+          <img src="uploads/fotos/qr.png"
+               alt="Código QR para escribir por WhatsApp a Diseño Laser Print"
+               class="whatsapp-qr"
+               width="180" height="180"
+               loading="lazy"
+               onerror="this.onerror=null; this.src='https://placehold.co/180x180/111111/00f0ff?text=QR+WhatsApp';">
+          <span class="qr-label">Escanea para enviar mensaje</span>
+        </div>
       </div>
-
-      <div class="streetview-note">
-        ⚠️ <b>Nota importante:</b> La fachada en Google Maps / Street View aún no se encuentra actualizada. Si giras la vista de la calle, la fachada aparecerá registrada anteriormente como local de hules.
-      </div>
-    </div>
-  </section>
-
-  <section class="whatsapp-section">
-    <div class="whatsapp-card glass-card">
-      <div class="whatsapp-info">
-        <h3>💬 ¡Contáctanos por WhatsApp!</h3>
-        <p>Cotiza tus proyectos de imprenta, corte láser o vinil al instante.</p>
-        <a href="https://wa.me/5215598788857" target="_blank" rel="noopener noreferrer" class="whatsapp-btn">
-          <span>Abrir Chat de WhatsApp</span>
-        </a>
-      </div>
-      
-      <div class="whatsapp-qr-container">
-        <img src="uploads/fotos/qr.png" 
-             alt="Código QR WhatsApp Diseño Laser Print" 
-             class="whatsapp-qr"
-             onerror="this.onerror=null; this.src='https://via.placeholder.com/180x180/111/00f0ff?text=QR+WhatsApp';">
-        <span class="qr-label">Escanea para enviar mensaje</span>
-      </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
   <footer class="glass-footer">
     <div class="footer-content">
-      <p class="footer-rights">© 2026 Diseño Laser Print. Todos los derechos reservados.</p>
-      <div class="footer-contact">
-        <span>📞 Teléfono: +52 55 9878 8857</span>
-        <span class="footer-separator">|</span>
-        <span>✉️ Correo: laserprint678@gmail.com</span>
+      <div class="footer-social">
+        <a href="https://www.facebook.com/PON_AQUI_TU_LINK" target="_blank" rel="noopener noreferrer" aria-label="Facebook de Laser Print">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.5 1.6-1.5h1.7V4.4c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.4H7.7V14h2.7v8h3.1z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/laserprint678/" target="_blank" rel="noopener noreferrer" aria-label="Instagram de Laser Print">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="https://www.tiktok.com/@laserprint2026" target="_blank" rel="noopener noreferrer" aria-label="TikTok de Laser Print">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M16.6 3c.4 2.2 1.9 3.8 4 4v3.1c-1.5 0-2.9-.5-4-1.2V15a6 6 0 1 1-6-6c.3 0 .6 0 .9.1v3.2a2.9 2.9 0 1 0 2 2.7V3h3.1z"/></svg>
+        </a>
       </div>
+
+      <div class="footer-contact">
+        <a href="tel:+525598788857">📞 +52 55 9878 8857</a>
+        <span class="footer-separator">|</span>
+        <a href="mailto:laserprint678@gmail.com">✉️ laserprint678@gmail.com</a>
+      </div>
+
+      <p class="footer-rights">© <span id="year">2026</span> Diseño Laser Print. Todos los derechos reservados.</p>
     </div>
   </footer>
 
-  <div id="imageModal" class="image-modal">
-    <span class="image-modal-close" id="modalClose">×</span>
+  <div id="imageModal" class="image-modal" role="dialog" aria-modal="true" aria-label="Imagen ampliada">
+    <button type="button" class="image-modal-close" id="modalClose" aria-label="Cerrar imagen">×</button>
     <img class="image-modal-content" id="modalImg" alt="Vista ampliada">
     <div id="modalCaption" class="image-modal-caption"></div>
   </div>
 
-  <button id="pixelToggleBtn" class="pixel-toggle-btn" aria-label="Hablar con PIXEL IA">
-    <div class="pixel-avatar-icon">👾</div>
+  <button id="pixelToggleBtn" class="pixel-toggle-btn" aria-label="Hablar con PIXEL IA" aria-controls="pixelChatWidget">
+    <div class="pixel-avatar-icon" aria-hidden="true">👾</div>
     <span class="pixel-pulse-badge">ONLINE</span>
   </button>
 
-  <div id="pixelChatWidget" class="pixel-chat-widget">
+  <div id="pixelChatWidget" class="pixel-chat-widget" role="dialog" aria-label="Chat con PIXEL AI">
     <div class="pixel-chat-header">
       <div class="pixel-header-info">
-        <span class="pixel-header-avatar">👾</span>
+        <span class="pixel-header-avatar" aria-hidden="true">👾</span>
         <div>
           <h3 class="pixel-title">PIXEL AI</h3>
           <p class="pixel-subtitle">La IA Oficial de Diseño Laser Print</p>
         </div>
       </div>
-      <button id="pixelCloseBtn" class="pixel-close-btn" aria-label="Cerrar Chat">✕</button>
+      <button id="pixelCloseBtn" class="pixel-close-btn" aria-label="Cerrar chat">✕</button>
     </div>
 
-    <div id="pixelChatMessages" class="pixel-chat-messages">
+    <div id="pixelChatMessages" class="pixel-chat-messages" aria-live="polite">
       <div class="pixel-msg pixel-bot-msg">
         <div class="pixel-msg-bubble">
           ¡Hola! Soy <b>PIXEL</b>, La IA Oficial de <b>Diseño Laser Print</b>. 🕹️✨<br><br>
@@ -230,26 +269,44 @@
     </div>
 
     <form class="pixel-chat-form" id="pixelChatForm">
-      <input type="text" id="pixelInput" class="pixel-input" placeholder="Escribe tu duda a PIXEL..." autocomplete="off">
+      <input type="text" id="pixelInput" class="pixel-input" placeholder="Escribe tu duda a PIXEL..." autocomplete="off" aria-label="Escribe tu mensaje para PIXEL">
       <button type="submit" id="pixelSendBtn" class="pixel-send-btn">ENVIAR</button>
     </form>
   </div>
 
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('themeToggleBtn');
-    const root = document.documentElement;
-    const setIcon = () => { if (btn) btn.textContent = root.dataset.theme === 'dark' ? '☀️' : '🌙'; };
-    setIcon();
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Año automático en el footer
+      const year = document.getElementById('year');
+      if (year) year.textContent = new Date().getFullYear();
 
-    btn?.addEventListener('click', () => {
-      const nuevo = root.dataset.theme === 'dark' ? 'light' : 'dark';
-      root.dataset.theme = nuevo;
-      try { localStorage.setItem('theme', nuevo); } catch (e) {}
+      // Botón de tema claro / oscuro
+      const btn = document.getElementById('themeToggleBtn');
+      const root = document.documentElement;
+      const setIcon = () => { if (btn) btn.textContent = root.dataset.theme === 'dark' ? '☀️' : '🌙'; };
       setIcon();
+
+      btn?.addEventListener('click', () => {
+        const nuevo = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        root.dataset.theme = nuevo;
+        try { localStorage.setItem('theme', nuevo); } catch (e) {}
+        setIcon();
+      });
+
+      // Accesibilidad del menú móvil: avisa si está abierto o cerrado
+      const menuBtn = document.getElementById('mobileMenuBtn');
+      menuBtn?.addEventListener('click', () => {
+        const abierto = menuBtn.getAttribute('aria-expanded') === 'true';
+        menuBtn.setAttribute('aria-expanded', String(!abierto));
+        menuBtn.setAttribute('aria-label', abierto ? 'Abrir menú' : 'Cerrar menú');
+      });
+
+      // Cerrar la imagen ampliada con la tecla Esc
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') document.getElementById('modalClose')?.click();
+      });
     });
-  });
-</script>
+  </script>
 
   <script src="index.js" defer></script>
 </body>
