@@ -1,470 +1,773 @@
-/* ==========================================================================
-   LASERPRINT ARCADE - ADMIN DASHBOARD ENGINE (PRODUCTION)
-   ========================================================================== */
+/**
+ * ==============================================================================
+ * DISEÑO LASER PRINT — admin.js v4.0
+ * Panel de administración: subir, editar y eliminar publicaciones.
+ * ==============================================================================
+ *
+ * ⚠️ IMPORTANTE: la revisión de sesión de este archivo NO protege nada.
+ * La protección real se agrega en el servidor (laserprint-backend).
+ * Cuando esté lista, solo hay que completar la función authHeaders().
+ */
+(function () {
+  'use strict';
 
-// Validar autenticación cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', () => {
-  const isAuth = localStorage.getItem('adminAutenticado') === 'true' || localStorage.getItem('adminToken');
-  if (!isAuth) {
-    window.location.href = 'login.html';
-    return;
-  }
-  
-  cargarPublicaciones();
+  /* ==========================================================================
+     0. CONFIGURACIÓN
+     ========================================================================== */
 
-  // Evento formulario de subida
-  const form = document.getElementById('uploadForm');
-  if (form) form.addEventListener('submit', guardarPublicacion);
+  try {
+    if (localStorage.getItem('adminAutenticado') !== 'true' && !localStorage.getItem('adminToken')) {
+      window.location.replace('login.html');
+      return;
+    }
+  } catch (e) {}
 
-  // Evento formulario de edición
-  const editForm = document.getElementById('editForm');
-  if (editForm) editForm.addEventListener('submit', guardarEdicion);
+  const API_ORIGEN = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+    ? 'http://localhost:5000'
+    : 'https://laserprint-api.onrender.com';
+  const API_URL = API_ORIGEN + '/api/productos';
 
-  // Cerrar sesión
-  const logoutBtn = document.getElementById('logoutBtn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
-      playRetroSFX('click');
-      localStorage.removeItem('adminAutenticado');
-      localStorage.removeItem('adminToken');
-      window.location.href = 'login.html';
+  // Los valores deben coincidir EXACTAMENTE con los que guarda el servidor
+  const CATEGORIAS = {
+    'DTF TEXTIL / UV': 'DTF Textil / UV',
+    'SUBLIMACION': 'Sublimación',
+    'LONA': 'Lona',
+    'COROPLAST': 'Coroplast',
+    'CORTE LASER': 'Corte Láser',
+    'VINIL': 'Vinil'
+  };
+
+  const MAX_MB = 15;   // aviso si el archivo es más pesado
+
+  const formatoMXN = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+
+  const estado = {
+    productos: [],
+    categoria: 'TODAS',
+    busqueda: ''
+  };
+
+  const $ = function (id) { return document.getElementById(id); };
+
+  /* ==========================================================================
+     1. UTILIDADES
+     ========================================================================== */
+
+  function escapeHTML(str) {
+    return str === null || str === undefined ? '' : String(str).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
 
-  // 1. EVENTOS DE PESTAÑAS DE CATEGORÍA
-  const tabButtons = document.querySelectorAll('.tab-btn');
-  tabButtons.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      playRetroSFX('click');
-      tabButtons.forEach(b => b.classList.remove('active'));
-      e.target.classList.add('active');
-      categoriaActiva = e.target.getAttribute('data-cat');
-      renderizarTabla();
+  function normalizar(texto) {
+    return String(texto || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+
+  function etiquetaCategoria(valor) {
+    return CATEGORIAS[valor] || valor || 'Sin sección';
+  }
+
+  function urlArchivo(ruta) {
+    if (!ruta) return '';
+    if (/^https?:\/\//i.test(ruta)) return ruta;
+    return API_ORIGEN + '/' + String(ruta).replace(/^\/+/, '');
+  }
+
+  function tipoDe(p) {
+    const t = normalizar(p.tipoArchivo);
+    const u = normalizar(p.archivoUrl);
+    if (/video|mp4/.test(t) || /\.mp4(\?|$)/.test(u)) return 'video';
+    if (/pdf/.test(t) || /\.pdf(\?|$)/.test(u)) return 'pdf';
+    if (/imag|jpe?g|png|webp|gif|avif/.test(t) || /\.(jpe?g|png|webp|gif|avif)(\?|$)/.test(u)) return 'imagen';
+    return 'archivo';
+  }
+
+  const ICONO_TIPO = { imagen: '🖼️', video: '🎬', pdf: '📄', archivo: '📎' };
+  const NOMBRE_TIPO = { imagen: 'Imagen', video: 'Video', pdf: 'PDF', archivo: 'Archivo' };
+
+  function tamanoLegible(bytes) {
+    if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  function idDe(p) {
+    return String(p._id || p.id || '');
+  }
+
+  /**
+   * Encabezados de seguridad para el servidor.
+   * Hoy va vacío porque el servidor todavía no pide nada.
+   * Cuando el servidor tenga login, aquí se manda el pase (token).
+   */
+  function authHeaders() {
+    return {};
+  }
+
+  /** Lee la respuesta del servidor aunque no sea JSON */
+  async function leerRespuesta(res) {
+    try { return await res.json(); } catch (e) { return {}; }
+  }
+
+  /* ==========================================================================
+     2. SONIDOS (un solo reproductor; antes se creaba uno por clic
+        y el navegador dejaba de sonar después de varios)
+     ========================================================================== */
+
+  const Sonido = {
+    ctx: null,
+    activo: (function () { try { return localStorage.getItem('pixelSonido') !== 'off'; } catch (e) { return true; } })(),
+
+    play: function (tipo) {
+      if (!this.activo) return;
+      try {
+        if (!this.ctx) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (!AC) return;
+          this.ctx = new AC();
+        }
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+
+        const ctx = this.ctx;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain).connect(ctx.destination);
+        const now = ctx.currentTime;
+        let dur = 0.06;
+
+        if (tipo === 'click') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(520, now);
+          osc.frequency.exponentialRampToValueAtTime(760, now + 0.05);
+          gain.gain.setValueAtTime(0.04, now);
+        } else if (tipo === 'save') {
+          dur = 0.3;
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, now);
+          osc.frequency.setValueAtTime(659.25, now + 0.08);
+          osc.frequency.setValueAtTime(783.99, now + 0.16);
+          gain.gain.setValueAtTime(0.06, now);
+        } else if (tipo === 'delete') {
+          dur = 0.18;
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(320, now);
+          osc.frequency.linearRampToValueAtTime(120, now + dur);
+          gain.gain.setValueAtTime(0.06, now);
+        } else if (tipo === 'error') {
+          dur = 0.18;
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(200, now);
+          osc.frequency.setValueAtTime(150, now + 0.08);
+          gain.gain.setValueAtTime(0.06, now);
+        }
+
+        gain.gain.linearRampToValueAtTime(0.001, now + dur);
+        osc.start(now);
+        osc.stop(now + dur + 0.01);
+      } catch (e) {}
+    }
+  };
+
+  /* ==========================================================================
+     3. TEMA CLARO / OSCURO (comparte la preferencia con el sitio)
+     ========================================================================== */
+
+  function initTema() {
+    const btn = $('themeToggle');
+    const root = document.documentElement;
+    if (!btn) return;
+
+    const pintar = function () {
+      btn.textContent = root.dataset.theme === 'dark' ? '☀️' : '🌙';
+    };
+    pintar();
+
+    btn.addEventListener('click', function () {
+      const nuevo = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = nuevo;
+      try { localStorage.setItem('theme', nuevo); } catch (e) {}
+      pintar();
     });
-  });
+  }
 
-  // 2. EVENTOS DEL BUSCADOR CON AUTOCOMPLETADO
-  const searchInput = document.getElementById('searchInput');
-  const suggestionsBox = document.getElementById('searchSuggestions');
+  /* ==========================================================================
+     4. NOTIFICACIONES
+     ========================================================================== */
 
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-      busquedaTexto = e.target.value.trim().toLowerCase();
-      renderizarTabla();
-      mostrarSugerencias(busquedaTexto);
+  function notificar(mensaje, tipo) {
+    tipo = tipo || 'exito';
+    const cont = $('toastContainer');
+    if (!cont) return;
+
+    const el = document.createElement('div');
+    el.className = 'toast toast-' + tipo;
+    el.setAttribute('role', tipo === 'error' ? 'alert' : 'status');
+
+    const icono = document.createElement('span');
+    icono.setAttribute('aria-hidden', 'true');
+    icono.textContent = tipo === 'error' ? '⚠️' : '✅';
+
+    const texto = document.createElement('span');
+    texto.textContent = mensaje;
+
+    el.appendChild(icono);
+    el.appendChild(texto);
+    cont.appendChild(el);
+
+    requestAnimationFrame(function () { el.classList.add('visible'); });
+    setTimeout(function () {
+      el.classList.remove('visible');
+      setTimeout(function () { el.remove(); }, 300);
+    }, tipo === 'error' ? 5500 : 3500);
+  }
+
+  /* ==========================================================================
+     5. CARGA Y TABLA
+     ========================================================================== */
+
+  function mensajeTabla(tipo, html) {
+    const tabla = $('tabla');
+    if (!tabla) return;
+    tabla.innerHTML = '<tr><td colspan="6" class="estado-tabla estado-' + tipo + '">' + html + '</td></tr>';
+  }
+
+  async function cargar() {
+    mensajeTabla('cargando', '<span class="spinner" aria-hidden="true"></span>&nbsp; Cargando publicaciones…');
+    const resumen = $('resumenLista');
+    if (resumen) resumen.textContent = 'Cargando…';
+
+    // El servidor gratuito de Render se duerme: avisamos si tarda
+    const avisoLento = setTimeout(function () {
+      mensajeTabla('cargando', '<span class="spinner" aria-hidden="true"></span>&nbsp; Despertando el servidor… la primera carga puede tardar hasta un minuto.');
+    }, 5000);
+
+    try {
+      const res = await fetch(API_URL + '?limit=500', { headers: authHeaders() });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      estado.productos = Array.isArray(data) ? data : (data.productos || []);
+      actualizarConteos();
+      render();
+    } catch (error) {
+      console.error('Error al cargar publicaciones:', error);
+      mensajeTabla('error',
+        '<span class="estado-icono" aria-hidden="true">🔌</span>' +
+        'No se pudo conectar con el servidor. ' +
+        '<button type="button" class="btn-link" data-action="reintentar">Reintentar</button>');
+      if (resumen) resumen.textContent = 'Sin conexión';
+    } finally {
+      clearTimeout(avisoLento);
+    }
+  }
+
+  function filtrados() {
+    const q = normalizar(estado.busqueda);
+    return estado.productos.filter(function (p) {
+      const okCat = estado.categoria === 'TODAS' || p.categoria === estado.categoria;
+      const okTexto = !q || normalizar(p.nombre).includes(q) || normalizar(p.descripcion).includes(q);
+      return okCat && okTexto;
+    });
+  }
+
+  function filaHTML(p) {
+    const id = escapeHTML(idDe(p));
+    const tipo = tipoDe(p);
+    const url = urlArchivo(p.archivoUrl);
+
+    const vista = (tipo === 'imagen' && url)
+      ? '<img class="thumb" src="' + escapeHTML(url) + '" alt="" loading="lazy" decoding="async" data-tipo="' + tipo + '">'
+      : '<span class="thumb" aria-hidden="true">' + ICONO_TIPO[tipo] + '</span>';
+
+    const tienePrecio = p.precio !== null && p.precio !== undefined && p.precio !== '' && !isNaN(Number(p.precio));
+    const precio = tienePrecio
+      ? '<span class="precio">' + formatoMXN.format(Number(p.precio)) + '</span>'
+      : '<span class="muted">—</span>';
+
+    const desc = p.descripcion ? String(p.descripcion) : '';
+
+    return '<tr>' +
+      '<td data-label="Vista">' + vista + '</td>' +
+      '<td data-label="Nombre" class="cell-nombre"><strong>' + escapeHTML(p.nombre || 'Sin nombre') + '</strong>' +
+        (desc ? '<span class="desc">' + escapeHTML(desc) + '</span>' : '') + '</td>' +
+      '<td data-label="Sección"><span class="badge-cat">' + escapeHTML(etiquetaCategoria(p.categoria)) + '</span></td>' +
+      '<td data-label="Precio">' + precio + '</td>' +
+      '<td data-label="Tipo"><span class="badge-file t-' + tipo + '">' + NOMBRE_TIPO[tipo] + '</span></td>' +
+      '<td data-label="Acciones"><div class="acciones">' +
+        '<button type="button" class="btn-edit" data-action="editar" data-id="' + id + '">Editar</button>' +
+        '<button type="button" class="btn-del" data-action="eliminar" data-id="' + id + '">Eliminar</button>' +
+      '</div></td>' +
+    '</tr>';
+  }
+
+  function render() {
+    const tabla = $('tabla');
+    if (!tabla) return;
+
+    const lista = filtrados();
+    const resumen = $('resumenLista');
+    if (resumen) {
+      const total = estado.productos.length;
+      resumen.textContent = lista.length === total
+        ? total + (total === 1 ? ' publicación' : ' publicaciones')
+        : 'Mostrando ' + lista.length + ' de ' + total;
+    }
+
+    if (!estado.productos.length) {
+      mensajeTabla('vacio', '<span class="estado-icono" aria-hidden="true">🗂️</span>Todavía no hay publicaciones. Sube la primera con el formulario de arriba.');
+      return;
+    }
+    if (!lista.length) {
+      mensajeTabla('vacio', '<span class="estado-icono" aria-hidden="true">🔍</span>No hay publicaciones con ese filtro.');
+      return;
+    }
+
+    tabla.innerHTML = lista.map(filaHTML).join('');
+  }
+
+  function actualizarConteos() {
+    document.querySelectorAll('.tab-btn').forEach(function (btn) {
+      const cat = btn.getAttribute('data-cat');
+      const n = cat === 'TODAS'
+        ? estado.productos.length
+        : estado.productos.filter(function (p) { return p.categoria === cat; }).length;
+      const span = btn.querySelector('.count');
+      if (span) span.textContent = n;
+    });
+  }
+
+  function initTabla() {
+    const tabla = $('tabla');
+    if (!tabla) return;
+
+    // Botones de cada fila (un solo listener para toda la tabla)
+    tabla.addEventListener('click', function (e) {
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      const accion = btn.getAttribute('data-action');
+      const id = btn.getAttribute('data-id');
+      if (accion === 'editar') abrirEdicion(id);
+      else if (accion === 'eliminar') eliminar(id, btn);
+      else if (accion === 'reintentar') cargar();
     });
 
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.search-box') && suggestionsBox) {
-        suggestionsBox.style.display = 'none';
+    // Si una miniatura no carga, se cambia por un ícono
+    tabla.addEventListener('error', function (e) {
+      if (e.target.tagName === 'IMG' && e.target.classList.contains('thumb')) {
+        const icono = document.createElement('span');
+        icono.className = 'thumb';
+        icono.setAttribute('aria-hidden', 'true');
+        icono.textContent = ICONO_TIPO.imagen;
+        e.target.replaceWith(icono);
+      }
+    }, true);
+  }
+
+  /* ==========================================================================
+     6. PESTAÑAS Y BUSCADOR
+     ========================================================================== */
+
+  function initFiltros() {
+    const botones = document.querySelectorAll('.tab-btn');
+    botones.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        Sonido.play('click');
+        botones.forEach(function (b) {
+          b.classList.remove('active');
+          b.setAttribute('aria-pressed', 'false');
+        });
+        btn.classList.add('active');
+        btn.setAttribute('aria-pressed', 'true');
+        estado.categoria = btn.getAttribute('data-cat');
+        render();
+      });
+    });
+
+    const input = $('searchInput');
+    const lista = $('searchSuggestions');
+    if (!input) return;
+
+    function cerrarSugerencias() {
+      if (lista) lista.style.display = 'none';
+    }
+
+    input.addEventListener('input', function () {
+      estado.busqueda = input.value.trim();
+      render();
+      mostrarSugerencias();
+    });
+
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        if (lista && lista.style.display === 'block') cerrarSugerencias();
+        else { input.value = ''; estado.busqueda = ''; render(); }
+      }
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.search-box')) cerrarSugerencias();
+    });
+
+    function mostrarSugerencias() {
+      if (!lista) return;
+      const q = normalizar(estado.busqueda);
+      if (!q) { cerrarSugerencias(); return; }
+
+      const coincidencias = estado.productos
+        .filter(function (p) { return normalizar(p.nombre).includes(q); })
+        .slice(0, 5);
+
+      if (!coincidencias.length) { cerrarSugerencias(); return; }
+
+      lista.innerHTML = '';
+      coincidencias.forEach(function (p) {
+        const li = document.createElement('li');
+        li.setAttribute('role', 'option');
+        const nombre = document.createElement('span');
+        nombre.textContent = p.nombre;
+        const cat = document.createElement('small');
+        cat.textContent = etiquetaCategoria(p.categoria);
+        li.appendChild(nombre);
+        li.appendChild(cat);
+        li.addEventListener('click', function () {
+          input.value = p.nombre;
+          estado.busqueda = p.nombre;
+          cerrarSugerencias();
+          render();
+        });
+        lista.appendChild(li);
+      });
+      lista.style.display = 'block';
+    }
+  }
+
+  /* ==========================================================================
+     7. VISTA PREVIA DEL ARCHIVO Y CONTADOR DE CARACTERES
+     ========================================================================== */
+
+  function mostrarPreview(caja, opciones) {
+    if (!caja) return;
+    caja.innerHTML = '';
+
+    if (!opciones) { caja.hidden = true; return; }
+
+    let visual;
+    if (opciones.tipo === 'imagen' && opciones.url) {
+      visual = document.createElement('img');
+      visual.src = opciones.url;
+      visual.alt = '';
+    } else {
+      visual = document.createElement('span');
+      visual.className = 'file-icon';
+      visual.setAttribute('aria-hidden', 'true');
+      visual.textContent = ICONO_TIPO[opciones.tipo] || ICONO_TIPO.archivo;
+    }
+
+    const info = document.createElement('div');
+    info.className = 'file-info';
+    const nombre = document.createElement('strong');
+    nombre.textContent = opciones.nombre;
+    const detalle = document.createElement('span');
+    detalle.textContent = opciones.detalle || '';
+    if (opciones.aviso) detalle.className = 'aviso';
+
+    info.appendChild(nombre);
+    info.appendChild(detalle);
+    caja.appendChild(visual);
+    caja.appendChild(info);
+    caja.hidden = false;
+  }
+
+  function tipoDeArchivo(file) {
+    if (file.type.startsWith('image/')) return 'imagen';
+    if (file.type.startsWith('video/')) return 'video';
+    if (file.type === 'application/pdf') return 'pdf';
+    return 'archivo';
+  }
+
+  function enlazarPreview(input, caja) {
+    if (!input || !caja) return;
+    let urlTemporal = null;
+
+    input.addEventListener('change', function () {
+      if (urlTemporal) { URL.revokeObjectURL(urlTemporal); urlTemporal = null; }
+      const file = input.files && input.files[0];
+      if (!file) { mostrarPreview(caja, null); return; }
+
+      const tipo = tipoDeArchivo(file);
+      if (tipo === 'imagen') urlTemporal = URL.createObjectURL(file);
+
+      const pesado = file.size > MAX_MB * 1024 * 1024;
+      mostrarPreview(caja, {
+        tipo: tipo,
+        url: urlTemporal,
+        nombre: file.name,
+        detalle: tamanoLegible(file.size) + (pesado ? ' — archivo pesado, podría tardar o fallar' : ''),
+        aviso: pesado
+      });
+    });
+
+    // Arrastrar y soltar: resalta la zona
+    const zona = input.closest('.dropzone');
+    if (zona) {
+      ['dragenter', 'dragover'].forEach(function (ev) {
+        zona.addEventListener(ev, function () { zona.classList.add('arrastrando'); });
+      });
+      ['dragleave', 'drop'].forEach(function (ev) {
+        zona.addEventListener(ev, function () { zona.classList.remove('arrastrando'); });
+      });
+    }
+  }
+
+  function initContadores() {
+    document.querySelectorAll('.char-count').forEach(function (cont) {
+      const campo = $(cont.getAttribute('data-for'));
+      if (!campo) return;
+      const max = Number(campo.getAttribute('maxlength')) || 0;
+      const pintar = function () {
+        const n = campo.value.length;
+        cont.textContent = max ? n + ' / ' + max : String(n);
+        cont.classList.toggle('limite', max && n > max * 0.9);
+      };
+      campo.addEventListener('input', pintar);
+      campo.form && campo.form.addEventListener('reset', function () { setTimeout(pintar, 0); });
+      cont._pintar = pintar;
+      pintar();
+    });
+  }
+
+  function refrescarContadores() {
+    document.querySelectorAll('.char-count').forEach(function (c) { if (c._pintar) c._pintar(); });
+  }
+
+  /* ==========================================================================
+     8. CREAR
+     ========================================================================== */
+
+  function initCrear() {
+    const form = $('uploadForm');
+    if (!form) return;
+
+    enlazarPreview($('archivo'), $('filePreview'));
+    form.addEventListener('reset', function () { mostrarPreview($('filePreview'), null); });
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const btn = $('btnSubmit');
+      const textoOriginal = btn ? btn.textContent : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner" aria-hidden="true"></span> Subiendo…';
+      }
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: authHeaders(),
+          body: new FormData(form)
+        });
+        const data = await leerRespuesta(res);
+
+        if (res.ok) {
+          Sonido.play('save');
+          notificar('Publicación subida correctamente.');
+          form.reset();
+          cargar();
+        } else {
+          Sonido.play('error');
+          notificar('No se pudo guardar: ' + (data.error || data.mensaje || 'error ' + res.status), 'error');
+        }
+      } catch (error) {
+        Sonido.play('error');
+        notificar('Sin conexión con el servidor. Intenta de nuevo en un momento.', 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = textoOriginal;
+        }
       }
     });
   }
 
-  // Cerrar Modal de Edición
-  const closeModalBtn = document.getElementById('closeModalBtn');
-  const btnCancelEdit = document.getElementById('btnCancelEdit');
-  if (closeModalBtn) closeModalBtn.addEventListener('click', () => { playRetroSFX('click'); cerrarModal(); });
-  if (btnCancelEdit) btnCancelEdit.addEventListener('click', () => { playRetroSFX('click'); cerrarModal(); });
-});
+  /* ==========================================================================
+     9. EDITAR
+     ========================================================================== */
 
-// Endpoint backend en Render / Desarrollo local
-const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? 'http://localhost:5000/api/productos'
-  : 'https://laserprint-api.onrender.com/api/productos';
+  let focoAntesDelModal = null;
 
-const formatoMXN = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
-
-// Estado global
-let productosGlobales = [];
-let categoriaActiva = 'TODAS';
-let busquedaTexto = '';
-
-// ==========================================================================
-// AUDIO SYNTHESIZER RETRO 8-BIT
-// ==========================================================================
-function playRetroSFX(type) {
-  try {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) return;
-    const ctx = new AudioContext();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    const now = ctx.currentTime;
-
-    if (type === 'click') {
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(400, now);
-      osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
-      gain.gain.setValueAtTime(0.1, now);
-      gain.gain.linearRampToValueAtTime(0.01, now + 0.05);
-      osc.start(now);
-      osc.stop(now + 0.05);
-    } else if (type === 'save') {
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(261.63, now);
-      osc.frequency.setValueAtTime(329.63, now + 0.08);
-      osc.frequency.setValueAtTime(392.00, now + 0.16);
-      osc.frequency.setValueAtTime(523.25, now + 0.24);
-      gain.gain.setValueAtTime(0.12, now);
-      gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
-      osc.start(now);
-      osc.stop(now + 0.35);
-    } else if (type === 'delete') {
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(300, now);
-      osc.frequency.linearRampToValueAtTime(80, now + 0.2);
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
-      osc.start(now);
-      osc.stop(now + 0.2);
+  function abrirEdicion(id) {
+    const p = estado.productos.find(function (x) { return idDe(x) === String(id); });
+    if (!p) {
+      notificar('No se encontró esa publicación. Recarga la página.', 'error');
+      return;
     }
-  } catch (e) {}
-}
 
-/**
- * Carga inicial de datos desde el backend
- */
-async function cargarPublicaciones() {
-  const tablaBody = document.getElementById('tabla');
-  if (!tablaBody) return;
+    Sonido.play('click');
+    $('editId').value = idDe(p);
+    $('editNombre').value = p.nombre || '';
+    $('editDescripcion').value = p.descripcion || '';
+    $('editPrecio').value = (p.precio !== null && p.precio !== undefined) ? p.precio : '';
+    $('editCategoria').value = CATEGORIAS[p.categoria] ? p.categoria : 'LONA';
+    $('editArchivo').value = '';
+    refrescarContadores();
 
-  tablaBody.innerHTML = `
-    <tr>
-      <td colspan="5" style="text-align:center; padding: 2.5rem; color: #00f3ff; font-size: 0.85rem;">
-        👾 CARGANDO DATOS DEL SISTEMA...
-      </td>
-    </tr>`;
+    // Muestra el archivo actual
+    const tipo = tipoDe(p);
+    mostrarPreview($('editFilePreview'), p.archivoUrl ? {
+      tipo: tipo,
+      url: urlArchivo(p.archivoUrl),
+      nombre: 'Archivo actual',
+      detalle: 'Se conserva si no eliges uno nuevo'
+    } : null);
 
-  try {
-    const res = await fetch(`${API_URL}?limit=500`);
-    if (!res.ok) throw new Error('Error al obtener datos');
-
-    const data = await res.json();
-    productosGlobales = Array.isArray(data) ? data : (data.productos || []);
-    renderizarTabla();
-  } catch (error) {
-    console.error('Error al cargar publicaciones:', error);
-    tablaBody.innerHTML = `
-      <tr>
-        <td colspan="5" style="text-align:center; color: #ff0055; padding: 2rem; font-size: 0.85rem;">
-          ❌ ERROR DE CONEXIÓN: SERVER OFFLINE O RUTA NO ENCONTRADA.
-        </td>
-      </tr>`;
-  }
-}
-
-/**
- * Renderiza la tabla filtrada por Pestaña Activa y Texto de Búsqueda
- */
-function renderizarTabla() {
-  const tablaBody = document.getElementById('tabla');
-  if (!tablaBody) return;
-
-  const filtrados = productosGlobales.filter(prod => {
-    const coincideCategoria = (categoriaActiva === 'TODAS') || (prod.categoria === categoriaActiva);
-    const coincideTexto = !busquedaTexto || 
-      (prod.nombre && prod.nombre.toLowerCase().includes(busquedaTexto)) ||
-      (prod.descripcion && prod.descripcion.toLowerCase().includes(busquedaTexto));
-
-    return coincideCategoria && coincideTexto;
-  });
-
-  tablaBody.innerHTML = '';
-
-  if (filtrados.length === 0) {
-    tablaBody.innerHTML = `
-      <tr>
-        <td colspan="5" style="text-align:center; padding: 2.5rem; color: #ffe600; font-size: 0.85rem;">
-          🕹️ NO DATA FOUND // SIN REGISTROS
-        </td>
-      </tr>`;
-    return;
+    focoAntesDelModal = document.activeElement;
+    const modal = $('editModal');
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function () { $('editNombre').focus(); }, 50);
   }
 
-  filtrados.forEach(prod => {
-    const precioTexto = (prod.precio !== null && prod.precio !== undefined && prod.precio !== '') 
-      ? `${formatoMXN.format(prod.precio)}` 
-      : 'N/A';
-
-    const tipoExt = prod.tipoArchivo ? prod.tipoArchivo.toUpperCase() : 'UNKNOWN';
-    
-    let badgeClass = 'badge-file';
-    if (tipoExt.includes('IMAGE') || tipoExt.includes('IMAGEN') || tipoExt.includes('JPG') || tipoExt.includes('PNG')) badgeClass += ' badge-img';
-    else if (tipoExt.includes('VIDEO') || tipoExt.includes('MP4')) badgeClass += ' badge-video';
-    else if (tipoExt.includes('PDF')) badgeClass += ' badge-pdf';
-
-    const prodId = prod._id || prod.id;
-
-    const fila = document.createElement('tr');
-    fila.innerHTML = `
-      <td><strong style="color: #ffffff;">${escapeHTML(prod.nombre)}</strong></td>
-      <td><span class="badge-cat">${escapeHTML(prod.categoria)}</span></td>
-      <td><strong style="color: #00ff66;">${precioTexto}</strong></td>
-      <td><span class="${badgeClass}">${tipoExt}</span></td>
-      <td>
-        <div style="display: flex; gap: 0.6rem;">
-          <button onclick="abrirModalEdicion('${prodId}')" class="btn-edit" title="Editar registro">EDIT</button>
-          <button onclick="eliminarProducto('${prodId}')" class="btn-del" title="Eliminar registro">DEL</button>
-        </div>
-      </td>
-    `;
-    tablaBody.appendChild(fila);
-  });
-}
-
-/**
- * Sugerencias estilo autocompletado Arcade
- */
-function mostrarSugerencias(texto) {
-  const suggestionsBox = document.getElementById('searchSuggestions');
-  if (!suggestionsBox) return;
-
-  if (!texto) {
-    suggestionsBox.style.display = 'none';
-    return;
+  function cerrarModal() {
+    const modal = $('editModal');
+    if (!modal || !modal.classList.contains('active')) return;
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+    if (focoAntesDelModal && focoAntesDelModal.focus) focoAntesDelModal.focus();
   }
 
-  const coincidencias = productosGlobales.filter(p => p.nombre && p.nombre.toLowerCase().includes(texto)).slice(0, 5);
+  function initEditar() {
+    const form = $('editForm');
+    const modal = $('editModal');
+    if (!form || !modal) return;
 
-  if (coincidencias.length === 0) {
-    suggestionsBox.style.display = 'none';
-    return;
-  }
+    enlazarPreview($('editArchivo'), $('editFilePreview'));
 
-  suggestionsBox.innerHTML = '';
-  coincidencias.forEach(item => {
-    const li = document.createElement('li');
-    li.innerHTML = `<span>> ${escapeHTML(item.nombre)}</span> <small>[${item.categoria}]</small>`;
-    li.addEventListener('click', () => {
-      playRetroSFX('click');
-      document.getElementById('searchInput').value = item.nombre;
-      busquedaTexto = item.nombre.toLowerCase();
-      suggestionsBox.style.display = 'none';
-      renderizarTabla();
-    });
-    suggestionsBox.appendChild(li);
-  });
-
-  suggestionsBox.style.display = 'block';
-}
-
-/**
- * Guardar nueva publicación
- */
-async function guardarPublicacion(e) {
-  e.preventDefault();
-  playRetroSFX('click');
-  const btnSubir = document.getElementById('btnSubmit');
-  const textoOriginal = btnSubir ? btnSubir.innerText : 'GUARDAR';
-  
-  if (btnSubir) {
-    btnSubir.disabled = true;
-    btnSubir.innerText = 'UPLOADING...';
-  }
-
-  const formData = new FormData(e.target);
-
-  try {
-    const res = await fetch(API_URL, { method: 'POST', body: formData });
-    const data = await res.json();
-
-    if (res.ok) {
-      playRetroSFX('save');
-      mostrarNotificacion('DATA SAVED SUCCESSFULLY', 'exito');
-      e.target.reset();
-      cargarPublicaciones();
-    } else {
-      mostrarNotificacion('ERROR: ' + (data.error || 'SAVE FAILED'), 'error');
-    }
-  } catch (error) {
-    mostrarNotificacion('SERVER CONNECTION ERROR', 'error');
-  } finally {
-    if (btnSubir) {
-      btnSubir.disabled = false;
-      btnSubir.innerText = textoOriginal;
-    }
-  }
-}
-
-/**
- * FUNCIONES DE EDICIÓN
- */
-window.abrirModalEdicion = function(id) {
-  playRetroSFX('click');
-  
-  // Buscar producto garantizando la coincidencia con _id o id
-  const prod = productosGlobales.find(p => String(p._id || p.id) === String(id));
-  if (!prod) {
-    mostrarNotificacion('ERROR: REGISTRO NO ENCONTRADO EN MEMORIA', 'error');
-    return;
-  }
-
-  // Verificar o crear dinámicamente el campo id hidden
-  let idInput = document.getElementById('editId') || document.getElementById('editProductId');
-  if (!idInput) {
-    idInput = document.createElement('input');
-    idInput.type = 'hidden';
-    idInput.id = 'editId';
-    const form = document.getElementById('editForm');
-    if (form) form.appendChild(idInput);
-  }
-
-  // Guardar el valor exacto del ID en el input
-  idInput.value = prod._id || prod.id;
-
-  if (document.getElementById('editNombre')) document.getElementById('editNombre').value = prod.nombre || '';
-  if (document.getElementById('editDescripcion')) document.getElementById('editDescripcion').value = prod.descripcion || '';
-  if (document.getElementById('editPrecio')) document.getElementById('editPrecio').value = (prod.precio !== undefined && prod.precio !== null) ? prod.precio : '';
-  if (document.getElementById('editCategoria')) document.getElementById('editCategoria').value = prod.categoria || 'LONA';
-
-  const fileInput = document.getElementById('editArchivo');
-  if (fileInput) fileInput.value = '';
-
-  const modal = document.getElementById('editModal');
-  if (modal) modal.style.display = 'flex';
-};
-
-function cerrarModal() {
-  const modal = document.getElementById('editModal');
-  if (modal) modal.style.display = 'none';
-}
-
-/**
- * Guarda los cambios al editar un producto
- */
-async function guardarEdicion(e) {
-  e.preventDefault();
-  playRetroSFX('click');
-  
-  const idInput = document.getElementById('editId') || document.getElementById('editProductId');
-  const id = idInput ? String(idInput.value).trim() : null;
-  const btnSave = document.getElementById('btnSaveEdit');
-
-  if (!id || id === 'undefined' || id === 'null') {
-    mostrarNotificacion('ERROR: ID DE PRODUCTO NO ENCONTRADO', 'error');
-    return;
-  }
-
-  if (btnSave) {
-    btnSave.disabled = true;
-    btnSave.innerText = 'SAVING...';
-  }
-
-  // Creación de FormData para la actualización
-  const formData = new FormData();
-  
-  const nombreEl = document.getElementById('editNombre');
-  const descEl = document.getElementById('editDescripcion');
-  const precioEl = document.getElementById('editPrecio');
-  const catEl = document.getElementById('editCategoria');
-  const fileInput = document.getElementById('editArchivo');
-
-  if (nombreEl) formData.append('nombre', nombreEl.value);
-  if (descEl) formData.append('descripcion', descEl.value);
-  if (precioEl) formData.append('precio', precioEl.value);
-  if (catEl) formData.append('categoria', catEl.value);
-
-  // Adjunta archivo solo si fue seleccionado
-  if (fileInput && fileInput.files && fileInput.files.length > 0) {
-    formData.append('archivo', fileInput.files[0]);
-  }
-
-  try {
-    const res = await fetch(`${API_URL}/${id}`, {
-      method: 'PUT',
-      body: formData
+    $('closeModalBtn').addEventListener('click', cerrarModal);
+    $('btnCancelEdit').addEventListener('click', cerrarModal);
+    modal.addEventListener('click', function (e) { if (e.target === modal) cerrarModal(); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') cerrarModal();
     });
 
-    const data = await res.json().catch(() => ({}));
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const id = String($('editId').value || '').trim();
+      if (!id || id === 'undefined' || id === 'null') {
+        notificar('No se encontró el ID de la publicación.', 'error');
+        return;
+      }
 
-    if (res.ok) {
-      playRetroSFX('save');
-      mostrarNotificacion('RECORD UPDATED', 'exito');
-      cerrarModal();
-      cargarPublicaciones();
-    } else {
-      mostrarNotificacion('ERROR: ' + (data.error || data.mensaje || `HTTP ${res.status}`), 'error');
-    }
-  } catch (error) {
-    console.error('Error en guardarEdicion:', error);
-    mostrarNotificacion('SERVER CONNECTION ERROR', 'error');
-  } finally {
-    if (btnSave) {
-      btnSave.disabled = false;
-      btnSave.innerText = 'GUARDAR CAMBIOS';
-    }
-  }
-}
+      const btn = $('btnSaveEdit');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner" aria-hidden="true"></span> Guardando…';
+      }
 
-/**
- * Eliminar publicación
- */
-window.eliminarProducto = async function(id) {
-  playRetroSFX('click');
-  if (!confirm('¿CONFIRMAR ELIMINACIÓN DE REGISTRO?')) return;
+      const datos = new FormData();
+      datos.append('nombre', $('editNombre').value);
+      datos.append('descripcion', $('editDescripcion').value);
+      datos.append('precio', $('editPrecio').value);
+      datos.append('categoria', $('editCategoria').value);
+      const archivo = $('editArchivo');
+      if (archivo.files && archivo.files[0]) datos.append('archivo', archivo.files[0]);
 
-  try {
-    const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      playRetroSFX('delete');
-      mostrarNotificacion('ITEM DELETED', 'exito');
-      cargarPublicaciones();
-    } else {
-      mostrarNotificacion('ERROR AT DELETE ATTEMPT', 'error');
-    }
-  } catch (error) {
-    mostrarNotificacion('SERVER CONNECTION ERROR', 'error');
-  }
-};
+      try {
+        const res = await fetch(API_URL + '/' + encodeURIComponent(id), {
+          method: 'PUT',
+          headers: authHeaders(),
+          body: datos
+        });
+        const data = await leerRespuesta(res);
 
-function escapeHTML(str) {
-  return str ? String(str).replace(/[&<>"']/g, match => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-  }[match])) : '';
-}
-
-/**
- * Notificaciones estilo HUD / Terminal Arcade
- */
-function mostrarNotificacion(mensaje, tipo = 'exito') {
-  let toast = document.getElementById('toast-notification');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'toast-notification';
-    document.body.appendChild(toast);
+        if (res.ok) {
+          Sonido.play('save');
+          notificar('Cambios guardados.');
+          cerrarModal();
+          cargar();
+        } else {
+          Sonido.play('error');
+          notificar('No se pudo guardar: ' + (data.error || data.mensaje || 'error ' + res.status), 'error');
+        }
+      } catch (error) {
+        console.error('Error al editar:', error);
+        Sonido.play('error');
+        notificar('Sin conexión con el servidor. Intenta de nuevo en un momento.', 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = 'Guardar cambios';
+        }
+      }
+    });
   }
 
-  const isExito = tipo === 'exito';
-  const borderColor = isExito ? '#00ff66' : '#ff0055';
-  const textColor = isExito ? '#00ff66' : '#ff0055';
-  
-  toast.style.cssText = `
-    position: fixed; bottom: 25px; right: 25px;
-    background: #090a14; color: ${textColor};
-    border: 3px solid ${borderColor};
-    box-shadow: 5px 5px 0px ${borderColor};
-    padding: 1rem 1.4rem;
-    font-family: monospace;
-    font-size: 0.75rem;
-    line-height: 1.4;
-    z-index: 2000; transition: all 0.2s ease;
-    opacity: 0; transform: scale(0.8);
-  `;
+  /* ==========================================================================
+     10. ELIMINAR
+     ========================================================================== */
 
-  toast.innerText = `[SYS_LOG]: ${mensaje}`;
+  async function eliminar(id, boton) {
+    const p = estado.productos.find(function (x) { return idDe(x) === String(id); });
+    const nombre = p && p.nombre ? '"' + p.nombre + '"' : 'esta publicación';
+    if (!window.confirm('¿Eliminar ' + nombre + '?\n\nDesaparecerá del sitio y no se puede deshacer.')) return;
 
-  requestAnimationFrame(() => {
-    toast.style.opacity = '1';
-    toast.style.transform = 'scale(1)';
-  });
+    if (boton) {
+      boton.disabled = true;
+      boton.textContent = 'Eliminando…';
+    }
 
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transform = 'scale(0.8)';
-  }, 3500);
-}
+    try {
+      const res = await fetch(API_URL + '/' + encodeURIComponent(id), {
+        method: 'DELETE',
+        headers: authHeaders()
+      });
+
+      if (res.ok) {
+        Sonido.play('delete');
+        notificar('Publicación eliminada.');
+        estado.productos = estado.productos.filter(function (x) { return idDe(x) !== String(id); });
+        actualizarConteos();
+        render();
+      } else {
+        const data = await leerRespuesta(res);
+        Sonido.play('error');
+        notificar('No se pudo eliminar: ' + (data.error || data.mensaje || 'error ' + res.status), 'error');
+        if (boton) { boton.disabled = false; boton.textContent = 'Eliminar'; }
+      }
+    } catch (error) {
+      Sonido.play('error');
+      notificar('Sin conexión con el servidor. Intenta de nuevo en un momento.', 'error');
+      if (boton) { boton.disabled = false; boton.textContent = 'Eliminar'; }
+    }
+  }
+
+  /* ==========================================================================
+     11. CERRAR SESIÓN Y ARRANQUE
+     ========================================================================== */
+
+  function initSesion() {
+    const btn = $('logoutBtn');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      try {
+        localStorage.removeItem('adminAutenticado');
+        localStorage.removeItem('adminToken');
+      } catch (e) {}
+      window.location.replace('login.html');
+    });
+  }
+
+  function iniciar() {
+    initTema();
+    initSesion();
+    initTabla();
+    initFiltros();
+    initContadores();
+    initCrear();
+    initEditar();
+    cargar();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', iniciar);
+  } else {
+    iniciar();
+  }
+})();
