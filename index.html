@@ -81,7 +81,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="index.css?v=1.4">
+  <link rel="stylesheet" href="index.css?v=1.5">
 </head>
 <body>
 
@@ -292,22 +292,9 @@
         try { localStorage.setItem('theme', nuevo); } catch (e) {}
         setIcon();
       });
-
-      // Accesibilidad del menú móvil: avisa si está abierto o cerrado
-      const menuBtn = document.getElementById('mobileMenuBtn');
-      menuBtn?.addEventListener('click', () => {
-        const abierto = menuBtn.getAttribute('aria-expanded') === 'true';
-        menuBtn.setAttribute('aria-expanded', String(!abierto));
-        menuBtn.setAttribute('aria-label', abierto ? 'Abrir menú' : 'Cerrar menú');
-      });
-
-      // Cerrar la imagen ampliada con la tecla Esc
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') document.getElementById('modalClose')?.click();
-      });
     });
   </script>
 
-  <script src="index.js" defer></script>
+  <script src="index.js?v=1.5" defer></script>
 </body>
 </html>
