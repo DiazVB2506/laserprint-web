@@ -4,9 +4,9 @@
  * Panel de administración: subir, editar y eliminar publicaciones.
  * ==============================================================================
  *
- * ⚠️ IMPORTANTE: la revisión de sesión de este archivo NO protege nada.
- * La protección real se agrega en el servidor (laserprint-backend).
- * Cuando esté lista, solo hay que completar la función authHeaders().
+ * Seguridad: el servidor exige un "pase" firmado para crear, editar o borrar.
+ * Este archivo solo lo guarda y lo envía; si el servidor lo rechaza
+ * (expiró o es falso), se regresa al login.
  */
 (function () {
   'use strict';
@@ -15,12 +15,28 @@
      0. CONFIGURACIÓN
      ========================================================================== */
 
-  try {
-    if (localStorage.getItem('adminAutenticado') !== 'true' && !localStorage.getItem('adminToken')) {
-      window.location.replace('login.html');
-      return;
-    }
-  } catch (e) {}
+  const CLAVE_SESION = 'lpAdminSesion';
+
+  function leerSesion() {
+    try {
+      const s = JSON.parse(localStorage.getItem(CLAVE_SESION) || 'null');
+      return s && s.token && s.expira > Date.now() ? s : null;
+    } catch (e) { return null; }
+  }
+
+  function salir(expirada) {
+    try {
+      localStorage.removeItem(CLAVE_SESION);
+      localStorage.removeItem('adminAutenticado');
+      localStorage.removeItem('adminToken');
+    } catch (e) {}
+    window.location.replace('login.html' + (expirada ? '?expirada=1' : ''));
+  }
+
+  if (!leerSesion()) {
+    salir(false);
+    return;
+  }
 
   const API_ORIGEN = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
     ? 'http://localhost:5000'
@@ -94,19 +110,49 @@
     return String(p._id || p.id || '');
   }
 
-  /**
-   * Encabezados de seguridad para el servidor.
-   * Hoy va vacío porque el servidor todavía no pide nada.
-   * Cuando el servidor tenga login, aquí se manda el pase (token).
-   */
+  /** Encabezado con el pase que entregó el servidor al iniciar sesión */
   function authHeaders() {
-    return {};
+    const s = leerSesion();
+    if (!s) { salir(true); return {}; }
+    return { Authorization: 'Bearer ' + s.token };
+  }
+
+  /**
+   * fetch que agrega el pase y, si el servidor responde 401
+   * (sesión expirada o falsa), manda de regreso al login.
+   */
+  async function fetchAdmin(url, opciones) {
+    opciones = opciones || {};
+    opciones.headers = Object.assign({}, opciones.headers || {}, authHeaders());
+    const res = await fetch(url, opciones);
+    if (res.status === 401) {
+      salir(true);
+      throw new Error('Sesión expirada');
+    }
+    return res;
   }
 
   /** Lee la respuesta del servidor aunque no sea JSON */
   async function leerRespuesta(res) {
     try { return await res.json(); } catch (e) { return {}; }
   }
+
+  /** Revisa con el servidor que el pase siga siendo válido */
+  async function verificarSesion() {
+    try {
+      await fetchAdmin(API_ORIGEN + '/api/auth/verificar');
+    } catch (e) {
+      // Sin conexión no cerramos sesión: el servidor puede estar despertando
+    }
+  }
+
+  // Cierra la sesión sola cuando expira, aunque la pestaña siga abierta
+  (function programarExpiracion() {
+    const s = leerSesion();
+    if (!s) return;
+    const faltan = s.expira - Date.now();
+    if (faltan < 2147483647) setTimeout(function () { salir(true); }, Math.max(0, faltan));
+  })();
 
   /* ==========================================================================
      2. SONIDOS (un solo reproductor; antes se creaba uno por clic
@@ -241,7 +287,7 @@
     }, 5000);
 
     try {
-      const res = await fetch(API_URL + '?limit=500', { headers: authHeaders() });
+      const res = await fetch(API_URL + '?limit=500');
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       estado.productos = Array.isArray(data) ? data : (data.productos || []);
@@ -559,9 +605,8 @@
       }
 
       try {
-        const res = await fetch(API_URL, {
+        const res = await fetchAdmin(API_URL, {
           method: 'POST',
-          headers: authHeaders(),
           body: new FormData(form)
         });
         const data = await leerRespuesta(res);
@@ -670,9 +715,8 @@
       if (archivo.files && archivo.files[0]) datos.append('archivo', archivo.files[0]);
 
       try {
-        const res = await fetch(API_URL + '/' + encodeURIComponent(id), {
+        const res = await fetchAdmin(API_URL + '/' + encodeURIComponent(id), {
           method: 'PUT',
-          headers: authHeaders(),
           body: datos
         });
         const data = await leerRespuesta(res);
@@ -714,9 +758,8 @@
     }
 
     try {
-      const res = await fetch(API_URL + '/' + encodeURIComponent(id), {
-        method: 'DELETE',
-        headers: authHeaders()
+      const res = await fetchAdmin(API_URL + '/' + encodeURIComponent(id), {
+        method: 'DELETE'
       });
 
       if (res.ok) {
@@ -745,13 +788,7 @@
   function initSesion() {
     const btn = $('logoutBtn');
     if (!btn) return;
-    btn.addEventListener('click', function () {
-      try {
-        localStorage.removeItem('adminAutenticado');
-        localStorage.removeItem('adminToken');
-      } catch (e) {}
-      window.location.replace('login.html');
-    });
+    btn.addEventListener('click', function () { salir(false); });
   }
 
   function iniciar() {
@@ -762,6 +799,7 @@
     initContadores();
     initCrear();
     initEditar();
+    verificarSesion();
     cargar();
   }
 
