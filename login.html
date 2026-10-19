@@ -1,105 +1,114 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-MX">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LaserPrint - Iniciar Sesión</title>
+  <title>Panel de Acceso | Diseño Laser Print</title>
 
-  <!-- FAVICON PARA PESTAÑA DEL NAVEGADOR -->
-  <link rel="icon" type="image/png" href="uploads/fotos/LOGOTIPO.png">
+  <!-- Que Google NO muestre esta página en los resultados de búsqueda -->
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="same-origin">
 
-  <!-- FUENTES RETRO ARCADE -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-
-  <!-- HOJA DE ESTILOS -->
-  <link rel="stylesheet" href="login.css?v=2.0">
-
-  <!-- SCRIPT ANTI-PARPADEO DE TEMA (Ejecución inmediata) -->
+  <!-- Aplica el tema ANTES de pintar la página (evita el parpadeo).
+       Usa la misma preferencia que el inicio, así el tema se conserva al cambiar de página. -->
   <script>
-    (function() {
-      const savedTheme = localStorage.getItem('theme') || 'dark';
-      if (savedTheme === 'light') {
-        document.documentElement.classList.add('light-theme');
-      } else {
-        document.documentElement.classList.add('dark-theme');
-      }
+    (function () {
+      var t = 'dark';
+      try { t = localStorage.getItem('theme') || 'dark'; } catch (e) {}
+      var root = document.documentElement;
+      root.classList.add(t === 'light' ? 'light-theme' : 'dark-theme');
+      root.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
     })();
   </script>
+
+  <link rel="icon" type="image/png" href="uploads/fotos/LOGOTIPO.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,700;1,6..96,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="login.css?v=2.2">
 </head>
 <body>
 
-  <!-- BOTÓN TOGGLE MODO CLARO / OSCURO -->
-  <button type="button" class="theme-toggle-btn" id="themeToggle" title="Cambiar tema">
-    <span>☯</span> Modo
+  <button type="button" class="theme-toggle-btn" id="themeToggle" aria-label="Cambiar entre tema claro y oscuro">
+    <span aria-hidden="true">☯</span> Modo
   </button>
 
-  <!-- Luces neón de fondo -->
-  <div class="bg-glow ambient-cyan"></div>
-  <div class="bg-glow ambient-magenta"></div>
+  <div class="bg-glow ambient-cyan" aria-hidden="true"></div>
+  <div class="bg-glow ambient-magenta" aria-hidden="true"></div>
 
-  <!-- Contenedor principal -->
   <main class="login-split-container">
 
-    <!-- COLUMNA IZQUIERDA: LOGO Y MARCA -->
-    <section class="brand-side">
-      <a href="index.html" class="logo-hero-link">
-        <img 
-          src="uploads/fotos/LOGOTIPO.png" 
-          alt="Diseño Laser Print Logo" 
+    <!-- Columna izquierda: marca -->
+    <section class="brand-side" aria-label="Diseño Laser Print">
+      <a href="index.html" class="logo-hero-link" aria-label="Ir al inicio de Diseño Laser Print">
+        <img
+          src="uploads/fotos/LOGOTIPO.png"
+          alt="Diseño Laser Print"
           class="hero-logo-img"
-          onerror="this.onerror=null; this.src='https://raw.githubusercontent.com/diazvb2506/laserprint-web/main/uploads/fotos/LOGOTIPO.png';"
+          decoding="async"
+          onerror="this.onerror=null; this.src='https://placehold.co/260x100/111111/00f0ff?text=LASERPRINT';"
         >
       </a>
       <h1 class="brand-title-outside">LASERPRINT</h1>
       <p class="brand-quote-outside">"Transformando ideas en impresiones de alta precisión."</p>
     </section>
 
-    <!-- COLUMNA DERECHA: PANEL DE ACCESO -->
+    <!-- Columna derecha: acceso -->
     <section class="form-side">
       <div class="card">
         <div class="card2">
-          <form class="form" id="loginForm" autocomplete="off">
+          <form class="form" id="loginForm" aria-labelledby="heading">
 
             <h2 id="heading">Panel de Acceso</h2>
 
-            <!-- Mensajes de alerta -->
-            <div id="alertMessage" class="alert-message" style="display: none;"></div>
+            <!-- Mensajes de error / éxito: los lectores de pantalla los anuncian solos -->
+            <div id="alertMessage" class="alert-message" role="alert" aria-live="assertive" style="display: none;"></div>
 
-            <!-- Campo Usuario -->
             <div class="field">
-              <svg class="input-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <svg class="input-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true">
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
               </svg>
-              <input 
-                type="text" 
-                id="usuario" 
+              <input
+                type="text"
+                id="usuario"
                 name="usuario"
-                class="input-field" 
-                placeholder="Usuario" 
-                required 
+                class="input-field"
+                placeholder="Usuario"
+                aria-label="Usuario"
+                required
                 autocomplete="username"
+                autocapitalize="none"
+                autocorrect="off"
+                spellcheck="false"
+                maxlength="60"
               >
             </div>
 
-            <!-- Campo Contraseña -->
             <div class="field">
-              <svg class="input-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <svg class="input-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true">
                 <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
               </svg>
-              <input 
-                type="password" 
-                id="password" 
+              <input
+                type="password"
+                id="password"
                 name="password"
-                class="input-field" 
-                placeholder="Contraseña" 
+                class="input-field"
+                placeholder="Contraseña"
+                aria-label="Contraseña"
                 required
                 autocomplete="current-password"
+                maxlength="128"
               >
+              <button type="button" class="toggle-pass" id="togglePass" aria-label="Mostrar contraseña" aria-pressed="false" aria-controls="password">
+                <svg class="icon-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="icon-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.9 17.9A10.4 10.4 0 0 1 12 19c-6.4 0-10-7-10-7a18.5 18.5 0 0 1 5.1-5.9M9.9 5.2A9.6 9.6 0 0 1 12 5c6.4 0 10 7 10 7a18.6 18.6 0 0 1-2.2 3.2M14.1 14.1a3 3 0 1 1-4.2-4.2"/><path d="M2 2l20 20"/></svg>
+              </button>
             </div>
 
-            <!-- Botón Entrar -->
+            <p class="caps-warning" id="capsWarning" role="status" hidden>⇪ Bloq Mayús está activado</p>
+
             <div class="btn">
               <button type="submit" class="button1" id="btnLogin">Entrar</button>
             </div>
@@ -113,7 +122,71 @@
 
   </main>
 
-  <!-- Script cargado al final con parámetro anti-caché para forzar actualización -->
-  <script src="login.js?v=2.0"></script>
+  <!-- Extras del formulario: ver contraseña, aviso de Bloq Mayús, sacudida en error
+       y sincronización del tema. Independiente de login.js. -->
+  <script>
+    (function () {
+      var root = document.documentElement;
+      var pass = document.getElementById('password');
+      var ojo = document.getElementById('togglePass');
+      var caps = document.getElementById('capsWarning');
+      var form = document.getElementById('loginForm');
+      var alerta = document.getElementById('alertMessage');
+      var card = document.querySelector('.card');
+
+      // 1. Mostrar / ocultar contraseña
+      function setVisible(ver) {
+        pass.type = ver ? 'text' : 'password';
+        ojo.classList.toggle('is-visible', ver);
+        ojo.setAttribute('aria-pressed', String(ver));
+        ojo.setAttribute('aria-label', ver ? 'Ocultar contraseña' : 'Mostrar contraseña');
+      }
+      if (pass && ojo) {
+        ojo.addEventListener('click', function () {
+          setVisible(pass.type === 'password');
+          pass.focus();
+        });
+        // Al enviar se vuelve a ocultar, para que no quede visible en pantalla
+        if (form) form.addEventListener('submit', function () { setVisible(false); }, true);
+      }
+
+      // 2. Aviso de Bloq Mayús
+      if (pass && caps) {
+        ['keydown', 'keyup'].forEach(function (ev) {
+          pass.addEventListener(ev, function (e) {
+            if (e.getModifierState) caps.hidden = !e.getModifierState('CapsLock');
+          });
+        });
+        pass.addEventListener('blur', function () { caps.hidden = true; });
+      }
+
+      // 3. La tarjeta se sacude cuando aparece un mensaje de error
+      if (alerta && card && 'MutationObserver' in window) {
+        new MutationObserver(function () {
+          var texto = alerta.textContent.trim();
+          var visible = alerta.style.display !== 'none' && texto;
+          var esExito = /bienvenid|correct|exito|éxito|concedido|redirig/i.test(texto) ||
+                        /success|exito/.test(alerta.className);
+          if (visible && !esExito) {
+            card.classList.remove('shake');
+            void card.offsetWidth;            // reinicia la animación
+            card.classList.add('shake');
+          }
+        }).observe(alerta, { attributes: true, childList: true, characterData: true, subtree: true });
+      }
+
+      // 4. Si login.js cambia el tema con clases (light-theme / dark-theme),
+      //    copiamos el valor a data-theme, que es lo que usa login.css
+      if ('MutationObserver' in window) {
+        new MutationObserver(function () {
+          var t = root.classList.contains('light-theme') ? 'light'
+                : root.classList.contains('dark-theme') ? 'dark' : null;
+          if (t && root.getAttribute('data-theme') !== t) root.setAttribute('data-theme', t);
+        }).observe(root, { attributes: true, attributeFilter: ['class'] });
+      }
+    })();
+  </script>
+
+  <script src="login.js?v=3.0" defer></script>
 </body>
 </html>
