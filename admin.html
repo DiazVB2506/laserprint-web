@@ -20,14 +20,13 @@
     })();
   </script>
 
-  <!-- Redirección rápida si no hay sesión. OJO: esto NO es seguridad,
-       la protección real tiene que estar en el servidor. -->
+  <!-- Si no hay sesión, al login antes de mostrar nada.
+       (La protección real está en el servidor: sin pase válido no acepta cambios.) -->
   <script>
     try {
-      if (localStorage.getItem('adminAutenticado') !== 'true' && !localStorage.getItem('adminToken')) {
-        window.location.replace('login.html');
-      }
-    } catch (e) {}
+      var s = JSON.parse(localStorage.getItem('lpAdminSesion') || 'null');
+      if (!s || !s.token || s.expira <= Date.now()) window.location.replace('login.html');
+    } catch (e) { window.location.replace('login.html'); }
   </script>
 
   <link rel="icon" type="image/png" href="uploads/fotos/LOGOTIPO.png">
@@ -36,7 +35,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="admin.css?v=4.0">
+  <link rel="stylesheet" href="admin.css?v=4.1">
 </head>
 <body>
 
@@ -237,6 +236,6 @@
   <!-- Notificaciones -->
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
-  <script src="admin.js?v=4.0" defer></script>
+  <script src="admin.js?v=4.1" defer></script>
 </body>
 </html>
