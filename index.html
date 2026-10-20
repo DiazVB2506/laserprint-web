@@ -109,6 +109,7 @@
         <li><a href="coroplast.html" class="nav-btn">COROPLAST</a></li>
         <li><a href="cortelaser.html" class="nav-btn">CORTE LÁSER</a></li>
         <li><a href="vinil.html" class="nav-btn">VINIL</a></li>
+        <li><a href="categoria.html" class="nav-btn">CATÁLOGO</a></li>
         <li><a href="login.html" class="nav-btn btn-admin" rel="nofollow">Iniciar Sesión Admin</a></li>
         <li>
           <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Cambiar tema claro u oscuro">🌙</button>
@@ -250,7 +251,7 @@
     <!-- ===== Pruébalo con tu nombre ===== -->
     <section class="inicio-bloque" id="pruebalo" aria-labelledby="pruebaloTitulo">
       <h2 class="section-title" id="pruebaloTitulo">Pruébalo con tu nombre</h2>
-      <p class="seccion-sub">Escribe tu nombre, tu negocio o una frase y mira cómo se vería. Es solo una idea: el diseño final lo hacemos contigo.</p>
+      <p class="seccion-sub">Sube tu diseño o escribe tu nombre y mira cómo se vería en cada producto. Descárgalo para compartirlo. Es solo una idea: el diseño final lo hacemos contigo.</p>
 
       <div class="estudio revelar">
         <div class="estudio-vista">
@@ -265,8 +266,29 @@
         </div>
 
         <div class="estudio-controles">
+          <div class="est-lados" id="estLados" role="group" aria-label="Lado de la playera" hidden>
+            <span>Editando:</span>
+            <button type="button" data-lado="frente" aria-pressed="true">👕 Frente</button>
+            <button type="button" data-lado="espalda" aria-pressed="false">🔄 Espalda</button>
+          </div>
+
+          <span class="est-etq">Tu diseño <span class="est-opc">(opcional)</span></span>
+          <label class="est-subir">
+            <input type="file" id="estArchivo" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml">
+            <span class="est-subir-mini" id="estSubirMini" aria-hidden="true">🖼️</span>
+            <span class="est-subir-txt"><strong id="estSubirTexto">Subir mi diseño</strong><small>PNG, JPG o SVG · no se sube a ningún lado</small></span>
+          </label>
+          <div class="est-diseno-extras" id="estDisenoExtras" hidden>
+            <label class="est-tamano">
+              <span>Tamaño</span>
+              <input type="range" id="estTamano" min="40" max="100" value="100" aria-label="Tamaño del diseño">
+            </label>
+            <button type="button" class="est-quitar" id="estQuitar">Quitar</button>
+          </div>
+
           <label class="est-etq" for="pruebaTexto">Tu texto</label>
           <input type="text" id="pruebaTexto" class="est-input" maxlength="28" value="Tu Negocio" autocomplete="off">
+          <p class="est-ayuda">Con tu diseño, el texto va abajo. Bórralo si solo quieres tu diseño.</p>
 
           <span class="est-etq">Letra</span>
           <div class="est-letras" id="estLetras" role="group" aria-label="Tipo de letra">
@@ -285,7 +307,8 @@
 
           <div class="est-acciones">
             <a class="hero-cta" id="estWhatsapp" href="#" target="_blank" rel="noopener noreferrer">💬 Lo quiero así</a>
-            <a class="hero-sec" id="estVer" href="dtf.html">Ver más</a>
+            <button type="button" class="hero-sec" id="estDescargar">⬇️ Descargar imagen</button>
+            <a class="est-ver" id="estVer" href="dtf.html">Ver más</a>
           </div>
         </div>
       </div>
