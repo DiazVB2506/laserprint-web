@@ -724,9 +724,22 @@ main {
   font-size: 1.25rem;
 }
 
+.tarifa-icono::before {
+  content: "";
+  width: 24px;
+  height: 16px;
+  border-radius: 3px;
+  border: 2px solid var(--tinta);
+  background: var(--tinta-suave);
+}
+
+.tarifa-icono.medio::before {
+  height: 8px;
+}
+
 .tarifa strong {
   font-family: var(--font-heading);
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: 600;
 }
 
@@ -872,32 +885,6 @@ main {
   text-transform: none;
   letter-spacing: 0;
   font-weight: 400;
-}
-
-.modos {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  padding: 4px;
-  border-radius: 14px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-}
-
-.modos button {
-  min-height: 46px;
-  border: none;
-  border-radius: 10px;
-  background: transparent;
-  color: var(--text-secondary);
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition-smooth);
-}
-
-.modos button[aria-pressed="true"] {
-  background: var(--bg-card);
-  color: var(--text-primary);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
 }
 
 .opciones {
@@ -1123,10 +1110,6 @@ main {
   display: none !important;
 }
 
-.plan:not([data-modo="stickers"]) .solo-stickers {
-  display: none;
-}
-
 /* Vista */
 .plan-vista {
   display: flex;
@@ -1194,6 +1177,13 @@ main {
   stroke: var(--tinta);
   stroke-width: 0.25;
   stroke-dasharray: 0.8 0.6;
+}
+
+.rollo .corte-medio {
+  stroke: var(--text-primary);
+  stroke-width: 0.6;
+  stroke-dasharray: 3 2;
+  opacity: 0.7;
 }
 
 .rollo .cota {
@@ -1325,96 +1315,7 @@ main {
 }
 
 /* ==========================================================================
-   10. BRILLANTE VS MATE
-   ========================================================================== */
-.acabados {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.acabado {
-  overflow: hidden;
-  border-radius: 20px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-card);
-}
-
-.muestra-acabado {
-  --x: 30%;
-  --y: 30%;
-  position: relative;
-  display: grid;
-  place-items: center;
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 75% 25%, #FFD166 0 16%, transparent 16.5%),
-    radial-gradient(circle at 20% 85%, #06D6A0 0 22%, transparent 22.5%),
-    linear-gradient(135deg, #FF5F6D, #C026D3 55%, #3B82F6);
-  outline: none;
-}
-
-.muestra-texto {
-  position: relative;
-  z-index: 1;
-  font-family: var(--font-heading);
-  font-size: clamp(2rem, 5vw, 3.4rem);
-  font-style: italic;
-  color: #FFFFFF;
-}
-
-.muestra-acabado::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-}
-
-/* Brillante: reflejo que sigue al dedo/mouse + barrido */
-.brillante .muestra-acabado::after {
-  background:
-    radial-gradient(circle at var(--x) var(--y), rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.15) 18%, transparent 40%),
-    linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.45) 45%, transparent 55%);
-  background-size: 100% 100%, 250% 100%;
-  background-position: 0 0, 120% 0;
-  animation: barrido 4.5s ease-in-out infinite;
-}
-
-@keyframes barrido {
-  0%, 55% { background-position: 0 0, 120% 0; }
-  100% { background-position: 0 0, -40% 0; }
-}
-
-/* Mate: sin reflejo, un poco de textura */
-.mate .muestra-acabado {
-  filter: saturate(0.85) brightness(0.97);
-}
-
-.mate .muestra-acabado::after {
-  background:
-    radial-gradient(circle at var(--x) var(--y), rgba(255, 255, 255, 0.12), transparent 45%),
-    repeating-radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 3px);
-}
-
-.acabado-info {
-  padding: 18px 20px 22px;
-}
-
-.acabado-info h3 {
-  font-size: 1.1rem;
-  font-weight: 700;
-}
-
-.acabado-info p {
-  margin-top: 6px;
-  font-size: 0.92rem;
-  color: var(--text-secondary);
-}
-
-/* ==========================================================================
-   11. CÓMO APLICARLO
+   10. CÓMO APLICARLO
    ========================================================================== */
 .pasos {
   list-style: none;
@@ -1474,28 +1375,8 @@ main {
   color: var(--text-secondary);
 }
 
-.otros {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  margin-top: 18px;
-  padding: 16px 20px;
-  border-radius: 16px;
-  border: 1.5px dashed var(--border-focus);
-}
-
-.otros p {
-  color: var(--text-secondary);
-}
-
-.otros strong {
-  color: var(--text-primary);
-}
-
 /* ==========================================================================
-   12. PLANILLA DE TRABAJOS (stickers sobre el papel)
+   11. PLANILLA DE TRABAJOS (stickers sobre el papel)
    ========================================================================== */
 .planilla-resumen {
   margin-top: 10px;
@@ -1710,7 +1591,7 @@ main {
 }
 
 /* ==========================================================================
-   13. RESPONSIVE
+   12. RESPONSIVE
    ========================================================================== */
 @media (max-width: 1280px) {
   .mobile-menu-btn { display: flex; }
@@ -1817,8 +1698,6 @@ main {
     margin-top: 72px;
     padding: 0 14px;
   }
-
-  .acabados { grid-template-columns: 1fr; }
 
   .pasos { grid-template-columns: 1fr; }
   .pasos li::after { display: none; }
