@@ -4,8 +4,8 @@
  * Archivo independiente de la página de Vinil.
  *
  *  1. Tema, menú y detalles
- *  2. Sticker de la portada y muestras de acabado
- *  3. Planificador: stickers en el rollo (por metro) y vinil impreso (por m²)
+ *  2. Sticker de la portada
+ *  3. Planificador: cuántos stickers caben en medio metro / un metro
  *  4. Planilla de trabajos (panel) + visor
  * ==============================================================================
  */
@@ -21,18 +21,13 @@
     titulo: 'Vinil',
     whatsapp: '5215598788857',
 
-    // Stickers (se cobran por metro lineal del rollo)
+    // El vinil se vende en rollo de 1.5 m de ancho, por medio metro o por metro
     rolloAncho: 150,             // cm
-    precioMetro: 450,            // $ por metro lineal
-    minimoMetros: 0.5,
-    redondeoMetros: 0.1,         // el largo se redondea hacia arriba a cada 10 cm
+    pasoMetros: 0.5,             // medio metro
     separacion: 0.5,             // cm entre stickers (para el corte)
-    margen: 1,                   // cm de orilla del rollo
-
-    // Vinil impreso (se cobra por m²)
-    precioM2: 300,
-    minimoM2: 0.5
+    margen: 1                    // cm de orilla del rollo
   };
+
 
   const API_ORIGEN = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
     ? 'http://localhost:5000'
@@ -42,7 +37,6 @@
   const SVG_NS = 'http://www.w3.org/2000/svg';
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const formatoMXN = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
   const formatoNum = new Intl.NumberFormat('es-MX', { maximumFractionDigits: 2 });
   const $ = function (id) { return document.getElementById(id); };
 
@@ -106,9 +100,8 @@
     const year = $('year');
     if (year) year.textContent = new Date().getFullYear();
     const links = {
-      '.wa-general': 'Hola Laser Print, quiero cotizar vinil / stickers',
-      '.wa-otros': 'Hola Laser Print, ¿manejan vinil de corte, esmerilado o microperforado? Quiero cotizar',
-      '.wa-diseno': 'Hola Laser Print, necesito que me hagan el diseño para mis stickers / vinil. ¿Cuánto cuesta?'
+      '.wa-general': 'Hola Laser Print, quiero cotizar stickers / vinil',
+      '.wa-diseno': 'Hola Laser Print, necesito que me hagan el diseño para mis stickers. ¿Cuánto cuesta?'
     };
     Object.keys(links).forEach(function (sel) {
       document.querySelectorAll(sel).forEach(function (a) { a.href = linkWhatsApp(links[sel]); });
@@ -116,7 +109,7 @@
   }
 
   /* ==========================================================================
-     2. STICKER DE LA PORTADA Y ACABADOS
+     2. STICKER DE LA PORTADA
      ========================================================================== */
 
   function initPortada() {
@@ -133,50 +126,29 @@
     escena.addEventListener('click', function () { pegatina.classList.toggle('despegando'); });
   }
 
-  function initAcabados() {
-    document.querySelectorAll('.muestra-acabado').forEach(function (m) {
-      function mover(e) {
-        const r = m.getBoundingClientRect();
-        m.style.setProperty('--x', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
-        m.style.setProperty('--y', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
-      }
-      m.addEventListener('pointermove', mover);
-      m.addEventListener('pointerdown', mover);
-    });
-  }
-
   /* ==========================================================================
-     3. PLANIFICADOR
+     3. PLANIFICADOR: ¿cuántos stickers caben y cuánto vinil necesito?
+     El vinil se vende en rollo de 1.5 m de ancho, por medio metro o por metro.
      ========================================================================== */
 
   const Plan = (function () {
-    const plan = document.querySelector('.plan');
     const form = $('planForm');
     const svg = $('rolloSvg');
     const resultado = $('resultado');
     const aviso = $('planAviso');
     const tip = $('planTip');
     const boton = $('planWhatsapp');
-    let modo = 'stickers';
     let imagenUrl = null;
 
     const RAPIDAS = {
       circulo: [[3], [4], [5], [7], [10]],
       cuadrado: [[3], [5], [7], [10]],
-      rectangulo: [[5, 3], [8, 5], [10, 7], [15, 10]],
-      impreso: [[50, 50], [100, 50], [100, 100], [150, 100]]
+      rectangulo: [[5, 3], [8, 5], [10, 7], [15, 10]]
     };
-
-    const NOMBRE_FORMA = { circulo: 'Círculo', cuadrado: 'Cuadrado', rectangulo: 'Rectángulo' };
 
     function forma() {
       const el = form.querySelector('input[name="forma"]:checked');
       return el ? el.value : 'circulo';
-    }
-
-    function acabado() {
-      const el = form.querySelector('input[name="acabado"]:checked');
-      return el ? el.value : 'Brillante';
     }
 
     function numero(id) {
@@ -186,32 +158,29 @@
 
     function cm(n) { return formatoNum.format(Math.round(n * 10) / 10); }
 
-    function unaMedida() {
-      return modo === 'stickers' && forma() !== 'rectangulo';
+    function unaMedida() { return forma() !== 'rectangulo'; }
+
+    /** 0.5 → "Medio metro", 1 → "1 metro", 1.5 → "1.5 metros" */
+    function textoMetros(m) {
+      if (m === 0.5) return 'Medio metro';
+      if (m === 1) return '1 metro';
+      return formatoNum.format(m) + ' metros';
     }
 
     /* ---------- etiquetas, medidas rápidas y campos ---------- */
 
     function pintarCampos() {
-      plan.dataset.modo = modo;
-      document.querySelectorAll('.modos button').forEach(function (b) {
-        b.setAttribute('aria-pressed', String(b.dataset.modo === modo));
-      });
-
       const una = unaMedida();
       document.querySelector('.plan-fila').classList.toggle('una', una);
       $('campoAlto').hidden = una;
       $('pPor').hidden = una;
-      $('etqMedida').textContent = modo === 'impreso' ? 'Medida de cada pieza'
-        : forma() === 'circulo' ? 'Diámetro de cada sticker'
+      $('etqMedida').textContent = forma() === 'circulo' ? 'Diámetro de cada sticker'
         : forma() === 'cuadrado' ? 'Lado de cada sticker' : 'Medida de cada sticker';
-      $('etqCantidad').textContent = modo === 'impreso' ? '¿Cuántas piezas?' : '¿Cuántos stickers?';
       $('pAncho').setAttribute('aria-label', una ? (forma() === 'circulo' ? 'Diámetro en centímetros' : 'Lado en centímetros') : 'Ancho en centímetros');
 
-      const lista = RAPIDAS[modo === 'impreso' ? 'impreso' : forma()];
       const caja = $('rapidas');
       caja.innerHTML = '';
-      lista.forEach(function (m) {
+      RAPIDAS[forma()].forEach(function (m) {
         const b = crear('button', '', m.length === 1 ? (forma() === 'circulo' ? 'Ø ' : '') + m[0] + ' cm' : m[0] + ' × ' + m[1] + ' cm');
         b.type = 'button';
         b.dataset.a = m[0];
@@ -229,9 +198,9 @@
       });
     }
 
-    /* ---------- cálculos ---------- */
+    /* ---------- cálculo ---------- */
 
-    function calcularStickers(w, h, cantidad) {
+    function calcular(w, h, cantidad) {
       const g = CONFIG.separacion;
       const util = CONFIG.rolloAncho - CONFIG.margen * 2;
 
@@ -250,39 +219,15 @@
       }
       if (!mejor) return null;
 
-      const paso = CONFIG.redondeoMetros;
-      let metros = Math.ceil((mejor.largo / 100) / paso - 1e-9) * paso;
-      metros = Math.max(CONFIG.minimoMetros, +metros.toFixed(2));
-      const filasQueCaben = Math.floor((metros * 100 - CONFIG.margen * 2 + g) / (mejor.alto + g));
-
-      mejor.metros = metros;
+      // Se vende por medio metro: se redondea hacia arriba a cada 50 cm
+      const paso = CONFIG.pasoMetros;
+      mejor.metros = Math.max(paso, Math.ceil((mejor.largo / 100) / paso - 1e-9) * paso);
+      const filasQueCaben = Math.floor((mejor.metros * 100 - CONFIG.margen * 2 + g) / (mejor.alto + g));
       mejor.capacidad = filasQueCaben * mejor.columnas;
-      mejor.precio = metros * CONFIG.precioMetro;
-      mejor.porPieza = mejor.precio / cantidad;
-      mejor.esMinimo = metros === CONFIG.minimoMetros && mejor.largo / 100 < CONFIG.minimoMetros;
       return mejor;
     }
 
-    function calcularImpreso(w, h, piezas) {
-      const area = w * h / 10000;
-      const total = area * piezas;
-      const cobrado = Math.max(CONFIG.minimoM2, total);
-      return {
-        area: area,
-        total: total,
-        cobrado: cobrado,
-        precio: cobrado * CONFIG.precioM2,
-        esMinimo: total < CONFIG.minimoM2
-      };
-    }
-
     /* ---------- dibujo ---------- */
-
-    function definirImagen(defs, idClip, circulo) {
-      const clip = svgEl('clipPath', { id: idClip, clipPathUnits: 'objectBoundingBox' }, defs);
-      if (circulo) svgEl('circle', { cx: 0.5, cy: 0.5, r: 0.5 }, clip);
-      else svgEl('rect', { width: 1, height: 1, rx: 0.08, ry: 0.08 }, clip);
-    }
 
     function dibujarRollo(r, cantidad) {
       svg.innerHTML = '';
@@ -290,10 +235,9 @@
       const LARGO_MAX = 300;                       // cm que se dibujan como máximo
       const largoHoja = r.metros * 100;
       const L = Math.min(largoHoja, LARGO_MAX);
-      // Lo más largo siempre va acostado: si el pedazo mide menos que el ancho del rollo,
-      // el ancho del rollo va a lo largo de la pantalla.
+      // Lo más largo siempre va acostado
       const acostado = L >= A;
-      const W = acostado ? L : A;                  // medidas del dibujo
+      const W = acostado ? L : A;
       const H = acostado ? A : L;
       const t = Math.max(4, Math.min(W, H) * 0.06, W * 0.03);
       svg.setAttribute('viewBox', [-t * 2.2, -t * 0.6, W + t * 2.6, H + t * 3].map(function (n) { return +n.toFixed(2); }).join(' '));
@@ -305,9 +249,20 @@
 
       const defs = svgEl('defs', {}, svg);
       const circulo = forma() === 'circulo';
-      if (imagenUrl) definirImagen(defs, 'clipStk', circulo);
+      if (imagenUrl) {
+        const clip = svgEl('clipPath', { id: 'clipStk', clipPathUnits: 'objectBoundingBox' }, defs);
+        if (circulo) svgEl('circle', { cx: 0.5, cy: 0.5, r: 0.5 }, clip);
+        else svgEl('rect', { width: 1, height: 1, rx: 0.08, ry: 0.08 }, clip);
+      }
 
       svgEl('rect', { class: 'vinil-hoja', x: 0, y: 0, width: W, height: H, rx: 1.5 }, svg);
+
+      // Líneas de cada medio metro (se agregan encima de los stickers, más abajo)
+      const lineas = svgEl('g', {});
+      for (let v = 50; v < L - 0.01; v += 50) {
+        const a = pos(0, v, A, 0);
+        svgEl('line', { class: 'corte-medio', x1: a.x, y1: a.y, x2: a.x + (acostado ? 0 : A), y2: a.y + (acostado ? A : 0) }, lineas);
+      }
 
       const g = CONFIG.separacion;
       const m = CONFIG.margen;
@@ -338,7 +293,9 @@
         if (lleno) reales++;
       }
 
-      // Cotas: izquierda = alto del dibujo, abajo = ancho del dibujo
+      svg.appendChild(lineas);
+
+      // Cotas
       const textoAncho = '1.5 m';
       const textoLargo = (largoHoja > LARGO_MAX ? 'primeros 3 m de ' : '') + formatoNum.format(r.metros) + ' m';
       const cx = -t * 1.1;
@@ -354,45 +311,7 @@
       const faltan = cantidad - reales;
       mas.hidden = faltan <= 0;
       if (faltan > 0) mas.textContent = '+' + faltan.toLocaleString('es-MX') + ' más';
-      $('rolloEtq').textContent = 'ROLLO · 1.5 m DE ANCHO';
-      svg.setAttribute('aria-label', 'Acomodo: ' + r.columnas + ' stickers por fila, ' + r.filas + ' filas, ' + formatoNum.format(r.metros) + ' metros de rollo');
-    }
-
-    function dibujarPieza(w, h, piezas) {
-      svg.innerHTML = '';
-      const S = Math.max(w, h, 100) * 1.12;
-      const t = S * 0.04;
-      svg.setAttribute('viewBox', [-t * 2.2, -t * 0.6, S + t * 2.6, S + t * 3].map(function (n) { return +n.toFixed(2); }).join(' '));
-
-      // Cuadrícula: cuadros de 10 cm (o de 50 cm si es muy grande)
-      const paso = S > 400 ? 50 : 10;
-      let d = '';
-      for (let v = 0; v <= S + 0.01; v += paso) d += 'M' + v + ' 0V' + S + 'M0 ' + v + 'H' + S;
-      svgEl('path', { class: 'reticula', d: d, 'stroke-width': S / 600 }, svg);
-
-      const x = (S - w) / 2;
-      const y = (S - h) / 2;
-      if (imagenUrl) {
-        svgEl('image', { href: imagenUrl, x: x, y: y, width: w, height: h, preserveAspectRatio: 'xMidYMid slice' }, svg);
-        svgEl('rect', { x: x, y: y, width: w, height: h, fill: 'none', class: 'pieza', style: 'fill:none', 'stroke-width': S / 300 }, svg);
-      } else {
-        svgEl('rect', { class: 'pieza', x: x, y: y, width: w, height: h, rx: Math.min(w, h) * 0.02, 'stroke-width': S / 300 }, svg);
-      }
-
-      const cxp = x - t * 0.9;
-      svgEl('path', { class: 'cota', d: 'M' + cxp + ' ' + y + 'V' + (y + h), 'stroke-width': S / 500 }, svg);
-      const tv = svgEl('text', { class: 'cota-txt', x: cxp - t * 0.35, y: y + h / 2, 'font-size': t, 'text-anchor': 'middle', transform: 'rotate(-90 ' + (cxp - t * 0.35) + ' ' + (y + h / 2) + ')' }, svg);
-      tv.textContent = cm(h) + ' cm';
-      const cyp = y + h + t * 0.9;
-      svgEl('path', { class: 'cota', d: 'M' + x + ' ' + cyp + 'H' + (x + w), 'stroke-width': S / 500 }, svg);
-      const th = svgEl('text', { class: 'cota-txt', x: x + w / 2, y: cyp + t * 1.25, 'font-size': t, 'text-anchor': 'middle' }, svg);
-      th.textContent = cm(w) + ' cm';
-
-      const mas = $('rolloMas');
-      mas.hidden = piezas < 2;
-      mas.textContent = '× ' + piezas.toLocaleString('es-MX') + ' piezas';
-      $('rolloEtq').textContent = 'A ESCALA · CUADROS DE ' + paso + ' cm';
-      svg.setAttribute('aria-label', 'Pieza de ' + cm(w) + ' por ' + cm(h) + ' centímetros');
+      svg.setAttribute('aria-label', 'Acomodo: ' + r.columnas + ' stickers por fila, ' + r.filas + ' filas, ' + textoMetros(r.metros) + ' de vinil');
     }
 
     /* ---------- resultado ---------- */
@@ -431,98 +350,53 @@
       const h = unaMedida() ? w : numero('pAlto');
       const cantidad = Math.max(1, Math.round(numero('pCantidad') || 1));
       mostrarTip('');
+      mostrarAviso('');
 
-      if (!w || !h) {
+      const vacio = function (t) {
         svg.innerHTML = '';
         $('rolloMas').hidden = true;
-        ficha([['Precio estimado', '—', 'grande']]);
-        mostrarAviso('Escribe la medida en centímetros para calcular.');
-        boton.href = linkWhatsApp('Hola Laser Print, quiero cotizar ' + (modo === 'impreso' ? 'vinil impreso' : 'stickers'));
+        ficha([['Necesitas', '—', 'grande']]);
+        mostrarAviso(t);
+        boton.href = linkWhatsApp('Hola Laser Print, quiero cotizar stickers en vinil');
+      };
+
+      if (!w || !h) { vacio('Escribe la medida en centímetros para calcular.'); return; }
+
+      const r = calcular(w, h, cantidad);
+      if (!r) {
+        vacio('Ese sticker es más ancho que el rollo (1.5 m). Escríbenos y vemos cómo hacerlo.');
+        boton.href = linkWhatsApp('Hola Laser Print, quiero una pieza de vinil de ' + cm(w) + ' × ' + cm(h) + ' cm. ¿Cómo se puede hacer?');
         return;
       }
 
-      if (modo === 'stickers') {
-        const r = calcularStickers(w, h, cantidad);
-        if (!r) {
-          svg.innerHTML = '';
-          $('rolloMas').hidden = true;
-          ficha([['Precio estimado', '—', 'grande']]);
-          mostrarAviso('Ese sticker es más ancho que el rollo (1.5 m). Para piezas grandes usa vinil impreso por m².');
-          mostrarTip('¿Lo calculamos como vinil impreso?', 'Calcular por m²', function () { cambiarModo('impreso', true); });
-          boton.href = linkWhatsApp('Hola Laser Print, quiero cotizar un vinil de ' + cm(w) + ' × ' + cm(h) + ' cm');
-          return;
-        }
-        mostrarAviso(r.esMinimo ? 'Tu pedido usa menos de medio metro: se cobra el mínimo de 0.5 m.' : '');
-        dibujarRollo(r, cantidad);
-        ficha([
-          ['Precio estimado', formatoMXN.format(r.precio), 'grande'],
-          ['Caben por fila', r.columnas + (r.girado ? ' (girados)' : '')],
-          ['Filas', String(r.filas)],
-          ['Rollo', formatoNum.format(r.metros) + ' m lineal'],
-          ['Cada sticker', formatoMXN.format(r.porPieza)]
-        ]);
+      dibujarRollo(r, cantidad);
+      ficha([
+        ['Necesitas', textoMetros(r.metros), 'grande'],
+        ['Caben por fila', r.columnas + (r.girado ? ' (girados)' : '')],
+        ['Filas', String(r.filas)],
+        ['Medida del vinil', '150 × ' + formatoNum.format(r.metros * 100) + ' cm'],
+        ['Caben en total', r.capacidad.toLocaleString('es-MX')]
+      ]);
 
-        const extra = r.capacidad - cantidad;
-        if (extra > 0) {
-          const nuevo = formatoMXN.format(r.precio / r.capacidad);
-          mostrarTip('En los mismos ' + formatoNum.format(r.metros) + ' m caben ' + r.capacidad.toLocaleString('es-MX') +
-            '. Pidiendo ' + extra.toLocaleString('es-MX') + ' más, cada uno te sale en ' + nuevo + '.',
-            'Pedir ' + r.capacidad.toLocaleString('es-MX'),
-            function () { $('pCantidad').value = r.capacidad; actualizar(); });
-        }
-
-        const nombre = forma() === 'circulo' ? 'Círculo de ' + cm(w) + ' cm' : forma() === 'cuadrado' ? 'Cuadrado de ' + cm(w) + ' cm' : 'Rectángulo de ' + cm(w) + ' × ' + cm(h) + ' cm';
-        boton.href = linkWhatsApp([
-          'Hola Laser Print 👋, quiero stickers:',
-          '• Forma: ' + nombre,
-          '• Cantidad: ' + cantidad.toLocaleString('es-MX'),
-          '• Acabado: ' + acabado(),
-          '• Estimado en su página: ' + formatoNum.format(r.metros) + ' m lineal = ' + formatoMXN.format(r.precio),
-          '',
-          'Les mando mi diseño en este chat.'
-        ].join('\n'));
-      } else {
-        const r = calcularImpreso(w, h, cantidad);
-        const avisos = [];
-        if (r.esMinimo) avisos.push('Menos de medio m²: se cobra el mínimo de 0.5 m².');
-        if (Math.min(w, h) > CONFIG.rolloAncho) avisos.push('Mide más de 1.5 m por ambos lados: confírmanos por WhatsApp cómo se arma.');
-        mostrarAviso(avisos.join(' '));
-        dibujarPieza(w, h, cantidad);
-        ficha([
-          ['Precio estimado', formatoMXN.format(r.precio), 'grande'],
-          ['Área por pieza', formatoNum.format(r.area) + ' m²'],
-          ['Área total', formatoNum.format(r.total) + ' m²'],
-          ['Se cobra', formatoNum.format(r.cobrado) + ' m²'],
-          ['Precio por m²', formatoMXN.format(CONFIG.precioM2)]
-        ]);
-        boton.href = linkWhatsApp([
-          'Hola Laser Print 👋, quiero vinil impreso:',
-          '• Medida: ' + cm(w) + ' × ' + cm(h) + ' cm',
-          '• Piezas: ' + cantidad.toLocaleString('es-MX'),
-          '• Acabado: ' + acabado(),
-          '• Estimado en su página: ' + formatoNum.format(r.cobrado) + ' m² = ' + formatoMXN.format(r.precio),
-          '',
-          'Les mando mi diseño en este chat.'
-        ].join('\n'));
+      const extra = r.capacidad - cantidad;
+      if (extra > 0) {
+        mostrarTip('En ' + textoMetros(r.metros).toLowerCase() + ' te caben ' + r.capacidad.toLocaleString('es-MX') +
+          ' stickers de ese tamaño: sobra lugar para ' + extra.toLocaleString('es-MX') + ' más.',
+          'Llenar con ' + r.capacidad.toLocaleString('es-MX'),
+          function () { $('pCantidad').value = r.capacidad; actualizar(); });
       }
-    }
 
-    function cambiarModo(nuevo, conservar) {
-      if (nuevo === modo) return;
-      modo = nuevo;
-      if (conservar) {
-        $('pCantidad').value = 1;
-      } else if (modo === 'impreso') {
-        $('pAncho').value = 100;
-        $('pAlto').value = 50;
-        $('pCantidad').value = 1;
-      } else {
-        $('pAncho').value = 5;
-        $('pAlto').value = forma() === 'rectangulo' ? 3 : 5;
-        $('pCantidad').value = 100;
-      }
-      pintarCampos();
-      actualizar();
+      const nombre = forma() === 'circulo' ? 'Círculo de ' + cm(w) + ' cm'
+        : forma() === 'cuadrado' ? 'Cuadrado de ' + cm(w) + ' cm'
+        : 'Rectángulo de ' + cm(w) + ' × ' + cm(h) + ' cm';
+      boton.href = linkWhatsApp([
+        'Hola Laser Print 👋, quiero stickers en vinil:',
+        '• Forma: ' + nombre,
+        '• Cantidad: ' + cantidad.toLocaleString('es-MX'),
+        '• Según su página: ' + textoMetros(r.metros).toLowerCase() + ' de vinil (150 × ' + formatoNum.format(r.metros * 100) + ' cm)',
+        '',
+        '¿Cuánto sale? Les mando mi diseño en este chat.'
+      ].join('\n'));
     }
 
     function initDiseno() {
@@ -547,15 +421,17 @@
       });
     }
 
-    function init() {
-      if (!plan || !form) return;
+    // Botones − / +: pasos cómodos según la cantidad
+    function pasoCantidad(dir) {
+      const actual = Math.max(1, Math.round(numero('pCantidad') || 1));
+      const paso = actual >= 500 ? 100 : actual >= 100 ? 50 : actual >= 20 ? 10 : 1;
+      let nuevo = dir > 0 ? Math.floor(actual / paso) * paso + paso : Math.ceil(actual / paso) * paso - paso;
+      $('pCantidad').value = Math.max(1, nuevo);
+      actualizar();
+    }
 
-      document.querySelectorAll('.modos button').forEach(function (b) {
-        b.addEventListener('click', function () { cambiarModo(b.dataset.modo); });
-      });
-      document.querySelectorAll('.tarifa[data-ir]').forEach(function (a) {
-        a.addEventListener('click', function () { cambiarModo(a.dataset.ir); });
-      });
+    function init() {
+      if (!form) return;
 
       $('rapidas').addEventListener('click', function (e) {
         const b = e.target.closest('button');
@@ -578,25 +454,12 @@
           }
           pintarCampos();
           actualizar();
-        } else if (e.target.name === 'acabado') {
-          actualizar();
         }
       });
       form.addEventListener('submit', function (e) { e.preventDefault(); });
 
       initDiseno();
       pintarCampos();
-      actualizar();
-    }
-
-    // Botones − / +: pasos cómodos según la cantidad
-    function pasoCantidad(dir) {
-      const actual = Math.max(1, Math.round(numero('pCantidad') || 1));
-      let paso = 1;
-      if (modo === 'stickers') paso = actual >= 500 ? 100 : actual >= 100 ? 50 : actual >= 20 ? 10 : 1;
-      let nuevo = dir > 0 ? Math.floor(actual / paso) * paso + paso : Math.ceil(actual / paso) * paso - paso;
-      nuevo = Math.max(1, nuevo);
-      $('pCantidad').value = nuevo;
       actualizar();
     }
 
@@ -633,11 +496,6 @@
     if (/video/.test(t) || /\.(mp4|webm|mov)(\?|$)/.test(u)) return 'video';
     if (/pdf/.test(t) || /\.pdf(\?|$)/.test(u)) return 'pdf';
     return 'imagen';
-  }
-
-  function precioTexto(precio) {
-    if (precio === null || precio === undefined || precio === '' || isNaN(Number(precio))) return '';
-    return formatoMXN.format(Number(precio));
   }
 
   /* --- PDF (la librería solo se descarga si hay catálogos) --- */
@@ -786,7 +644,7 @@
       return {
         nombre: p.nombre || 'Trabajo de vinil',
         descripcion: p.descripcion || '',
-        precio: precioTexto(p.precio),
+        precio: '',                      // en esta página no se muestran precios
         tipo: tipoDe(p),
         url: urlArchivo(p.archivoUrl)
       };
@@ -972,7 +830,6 @@
     initMenu();
     initDetalles();
     initPortada();
-    initAcabados();
     Plan.init();
     initVisor();
     cargar();
