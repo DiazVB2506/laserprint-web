@@ -1,14 +1,15 @@
 /**
  * ==============================================================================
- * DISEÑO LASER PRINT — coroplast.js (v1.1)
- * Archivo independiente de la página de Coroplast.
+ * DISEÑO LASER PRINT — categoria.js (v1.0)
+ * Catálogo general: todos los trabajos del panel, con filtros.
+ *
+ *  Se puede abrir ya filtrado:   categoria.html?cat=LONA
+ *  (también acepta "DTF TEXTIL / UV", "SUBLIMACIÓN", "CORTE LASER", etc.)
  *
  *  1. Tema, menú y detalles
- *  2. Letrero de la portada (se inclina en 3D con el mouse)
- *  3. Anatomía (las capas se separan al verla)
- *  4. Pestañas de tipos de letrero
- *  5. Armador de pedido → WhatsApp
- *  6. Pared de letreros (trabajos del panel) + visor
+ *  2. Carga de trabajos (con caché y aviso de servidor dormido)
+ *  3. Filtros: categoría, tipo y búsqueda (se guardan en la URL)
+ *  4. Tarjetas + visor
  * ==============================================================================
  */
 (function () {
@@ -19,27 +20,53 @@
      ========================================================================== */
 
   const CONFIG = {
-    categoria: 'COROPLAST',      // exactamente como en el panel
-    titulo: 'Coroplast',
     whatsapp: '5215598788857',
-    hojaAncho: 240,              // cm
-    hojaAlto: 118,               // cm
-    precioHoja: null             // $ por hoja. Ponlo (ej. 450) y la página mostrará el precio estimado
+    porPagina: 24                 // tarjetas que se muestran antes de "Ver más"
   };
+
+  // Categorías del sitio: nombre, página propia y color de su puntito
+  const CATEGORIAS = [
+    { clave: 'DTFTEXTIL/UV', nombre: 'DTF Textil / UV', pagina: 'dtf.html', color: '#0EA5E9' },
+    { clave: 'SUBLIMACION',  nombre: 'Sublimación',     pagina: 'sublimacion.html', color: '#A855F7' },
+    { clave: 'LONA',         nombre: 'Lona',            pagina: 'lona.html', color: '#F59E0B' },
+    { clave: 'COROPLAST',    nombre: 'Coroplast',       pagina: 'coroplast.html', color: '#10B981' },
+    { clave: 'CORTELASER',   nombre: 'Corte Láser',     pagina: 'cortelaser.html', color: '#EF4444' },
+    { clave: 'VINIL',        nombre: 'Vinil',           pagina: 'vinil.html', color: '#EC4899' }
+  ];
 
   const API_ORIGEN = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
     ? 'http://localhost:5000'
     : 'https://laserprint-api.onrender.com';
 
-  const CLAVE_CACHE = 'lp_seccion_' + CONFIG.categoria;
+  const CLAVE_CACHE = 'lp_catalogo_todo';
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const conMouse = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   const formatoMXN = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
   const $ = function (id) { return document.getElementById(id); };
 
   function linkWhatsApp(texto) {
     return 'https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(texto);
+  }
+
+  function crear(tag, clase, texto) {
+    const el = document.createElement(tag);
+    if (clase) el.className = clase;
+    if (texto !== undefined) el.textContent = texto;
+    return el;
+  }
+
+  /** Mayúsculas, sin acentos ni espacios: "Corte Láser" → "CORTELASER" */
+  function claveCategoria(c) {
+    return String(c || '').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '');
+  }
+
+  /** Para buscar: minúsculas y sin acentos */
+  function normal(t) {
+    return String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+
+  function infoCategoria(clave) {
+    return CATEGORIAS.find(function (c) { return c.clave === clave; }) || null;
   }
 
   /* ==========================================================================
@@ -84,348 +111,13 @@
     const year = $('year');
     if (year) year.textContent = new Date().getFullYear();
     document.querySelectorAll('.wa-general').forEach(function (a) {
-      a.href = linkWhatsApp('Hola Laser Print, quiero cotizar letreros de coroplast');
-    });
-    document.querySelectorAll('.wa-volumen').forEach(function (a) {
-      a.href = linkWhatsApp('Hola Laser Print, necesito muchos letreros de coroplast. ¿Me pueden hacer una cotización por volumen?');
+      a.href = linkWhatsApp('Hola Laser Print, vi su catálogo y quiero cotizar un trabajo');
     });
   }
 
   /* ==========================================================================
-     2. LETRERO DE LA PORTADA (inclinación 3D)
+     2. DATOS
      ========================================================================== */
-
-  function initLetrero() {
-    const letrero = $('letrero');
-    const escenario = letrero && letrero.parentElement;
-    if (!letrero || reduceMotion || !conMouse) return;
-
-    let pendiente = null;
-    escenario.addEventListener('pointermove', function (e) {
-      const r = escenario.getBoundingClientRect();
-      const x = (e.clientX - r.left) / r.width - 0.5;    // -0.5 … 0.5
-      const y = (e.clientY - r.top) / r.height - 0.5;
-      if (pendiente) cancelAnimationFrame(pendiente);
-      pendiente = requestAnimationFrame(function () {
-        letrero.style.setProperty('--ry', (x * 28).toFixed(1) + 'deg');
-        letrero.style.setProperty('--rx', (-y * 16).toFixed(1) + 'deg');
-        letrero.style.setProperty('--brillo', (50 + x * 60).toFixed(0) + '%');
-      });
-    });
-    escenario.addEventListener('pointerleave', function () {
-      letrero.style.setProperty('--ry', '-14deg');
-      letrero.style.setProperty('--rx', '0deg');
-      letrero.style.setProperty('--brillo', '70%');
-    });
-  }
-
-  /* ==========================================================================
-     3. ANATOMÍA: las capas se separan al aparecer en pantalla
-     ========================================================================== */
-
-  function initAnatomia() {
-    const a = $('anatomia');
-    if (!a) return;
-    if (!('IntersectionObserver' in window) || reduceMotion) {
-      a.classList.add('abierta');
-      return;
-    }
-    new IntersectionObserver(function (ents, obs) {
-      if (ents[0].isIntersecting) {
-        setTimeout(function () { a.classList.add('abierta'); }, 250);
-        obs.disconnect();
-      }
-    }, { threshold: 0.45 }).observe(a);
-  }
-
-  /* ==========================================================================
-     4. PESTAÑAS DE TIPOS
-     ========================================================================== */
-
-  function initTipos() {
-    const tabs = Array.from(document.querySelectorAll('.tipo-tab'));
-    if (!tabs.length) return;
-
-    function activar(tab, enfocar) {
-      tabs.forEach(function (t) {
-        const sel = t === tab;
-        t.setAttribute('aria-selected', String(sel));
-        t.tabIndex = sel ? 0 : -1;
-        $(t.getAttribute('aria-controls')).hidden = !sel;
-      });
-      if (enfocar) tab.focus();
-    }
-
-    tabs.forEach(function (t, i) {
-      t.addEventListener('click', function () { activar(t, false); });
-      t.addEventListener('keydown', function (e) {
-        let n = null;
-        if (e.key === 'ArrowRight') n = tabs[(i + 1) % tabs.length];
-        if (e.key === 'ArrowLeft') n = tabs[(i - 1 + tabs.length) % tabs.length];
-        if (e.key === 'Home') n = tabs[0];
-        if (e.key === 'End') n = tabs[tabs.length - 1];
-        if (n) { e.preventDefault(); activar(n, true); }
-      });
-    });
-
-    // "Usar en mi pedido" y medidas del panel → armador
-    document.querySelectorAll('.tipo-panel').forEach(function (panel) {
-      const tipo = panel.dataset.tipo;
-      panel.addEventListener('click', function (e) {
-        const medida = e.target.closest('[data-medida]');
-        const usar = e.target.closest('[data-usar-tipo]');
-        if (!medida && !usar) return;
-        Armador.poner({ tipo: tipo, medida: medida ? medida.dataset.medida : null });
-        $('armador').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
-      });
-    });
-  }
-
-  /* ==========================================================================
-     5. ARMADOR DE PEDIDO
-     ========================================================================== */
-
-  /**
-   * Acomodo de piezas en la hoja: prueba el letrero derecho y girado,
-   * y se queda con la forma en que caben más.
-   */
-  function acomodar(ancho, alto) {
-    const W = CONFIG.hojaAncho;
-    const H = CONFIG.hojaAlto;
-    const eps = 1e-6;
-    const opciones = [
-      { w: ancho, h: alto, girado: false },
-      { w: alto, h: ancho, girado: true }
-    ].map(function (o) {
-      o.cols = Math.floor(W / o.w + eps);
-      o.filas = Math.floor(H / o.h + eps);
-      o.total = o.cols * o.filas;
-      return o;
-    });
-    opciones.sort(function (a, b) { return b.total - a.total || (a.girado ? 1 : -1); });
-    return opciones[0];
-  }
-
-  /** Si sobra material, la medida más grande que da el mismo número de piezas */
-  function medidaSugerida(a) {
-    if (!a.total) return null;
-    const w = Math.floor(CONFIG.hojaAncho / a.cols * 2) / 2;   // redondeo a medio cm
-    const h = Math.floor(CONFIG.hojaAlto / a.filas * 2) / 2;
-    const crece = (w * h) / (a.w * a.h);
-    if (crece < 1.08) return null;                             // casi no hay desperdicio
-    return a.girado ? { ancho: h, alto: w } : { ancho: w, alto: h };
-  }
-
-  function cm(n) {
-    return (Math.round(n * 10) / 10).toLocaleString('es-MX');
-  }
-
-  const Armador = {
-    init: function () {
-      const form = $('armadorForm');
-      if (!form) return;
-      const self = this;
-      form.addEventListener('input', function () { self.actualizar(); });
-      // 'change' solo para selector, casillas y opciones: en los campos de texto ya se
-      // calculó con 'input', y recalcular al salir del campo borraría el botón de sugerencia
-      // justo cuando el cliente lo va a tocar.
-      form.addEventListener('change', function (e) {
-        if (e.target.matches('select, input[type="radio"], input[type="checkbox"]')) self.actualizar();
-      });
-      form.addEventListener('submit', function (e) { e.preventDefault(); });
-
-      $('armMedidas').addEventListener('click', function (e) {
-        const c = e.target.closest('[data-medida]');
-        if (c) self.poner({ medida: c.dataset.medida });
-      });
-
-      // Botón "usar esta medida" de la sugerencia
-      $('tipHoja').addEventListener('click', function (e) {
-        const b = e.target.closest('[data-medida]');
-        if (b) self.poner({ medida: b.dataset.medida });
-      });
-
-      // La estaca solo tiene sentido para letreros con estaca: se marca sola al cambiar el tipo
-      $('armTipo').addEventListener('change', function () {
-        $('armEstaca').checked = $('armTipo').value === 'Letrero con estaca';
-        self.actualizar();
-      });
-
-      this.actualizar();
-    },
-
-    poner: function (o) {
-      if (o.tipo) {
-        $('armTipo').value = o.tipo;
-        $('armEstaca').checked = o.tipo === 'Letrero con estaca';
-      }
-      if (o.medida) {
-        const p = o.medida.split('x');
-        $('armAncho').value = p[0];
-        $('armAlto').value = p[1];
-      }
-      this.actualizar();
-    },
-
-    num: function (id) {
-      const v = parseFloat(String($(id).value).replace(',', '.'));
-      return isFinite(v) && v > 0 ? v : 0;
-    },
-
-    dibujarHoja: function (a, piezasUltimaHoja) {
-      const svg = $('hojaSvg');
-      Array.from(svg.childNodes).forEach(function (n) { if (n.nodeName !== 'title') n.remove(); });
-      const NS = 'http://www.w3.org/2000/svg';
-      const el = function (tag, attrs) {
-        const n = document.createElementNS(NS, tag);
-        Object.keys(attrs).forEach(function (k) { n.setAttribute(k, attrs[k]); });
-        svg.appendChild(n);
-        return n;
-      };
-
-      // Hoja con canales
-      el('rect', { class: 'h-hoja', x: 0, y: 0, width: CONFIG.hojaAncho, height: CONFIG.hojaAlto, rx: 1.5 });
-      if (!a || !a.total) return;
-
-      // Piezas (las que se usan en una hoja llena; las sobrantes en gris)
-      let n = 0;
-      for (let f = 0; f < a.filas; f++) {
-        for (let c = 0; c < a.cols; c++) {
-          const usada = n < piezasUltimaHoja;
-          el('rect', {
-            class: usada ? 'h-pieza' : 'h-pieza libre',
-            x: c * a.w + 0.6, y: f * a.h + 0.6,
-            width: Math.max(0.5, a.w - 1.2), height: Math.max(0.5, a.h - 1.2), rx: 1
-          });
-          n++;
-        }
-      }
-
-      // Desperdicio (derecha y abajo)
-      const usadoW = a.cols * a.w;
-      const usadoH = a.filas * a.h;
-      if (CONFIG.hojaAncho - usadoW > 0.5) el('rect', { class: 'h-sobra', x: usadoW, y: 0, width: CONFIG.hojaAncho - usadoW, height: CONFIG.hojaAlto });
-      if (CONFIG.hojaAlto - usadoH > 0.5) el('rect', { class: 'h-sobra', x: 0, y: usadoH, width: usadoW, height: CONFIG.hojaAlto - usadoH });
-
-      // Medida dentro de la primera pieza si cabe el texto
-      if (a.w >= 26 && a.h >= 12) {
-        const t = el('text', { class: 'h-texto', x: a.w / 2, y: a.h / 2 + 2.5, 'text-anchor': 'middle' });
-        t.textContent = cm(a.w) + '×' + cm(a.h);
-      }
-    },
-
-    actualizar: function () {
-      const tipo = $('armTipo').value;
-      const ancho = this.num('armAncho');
-      const alto = this.num('armAlto');
-      const cantidad = Math.max(1, Math.round(this.num('armCantidad')) || 1);
-      const caras = (document.querySelector('input[name="caras"]:checked') || {}).value === '2' ? 2 : 1;
-      const estaca = $('armEstaca').checked;
-      const notas = $('armNotas').value.trim();
-
-      document.querySelectorAll('#armMedidas .chip').forEach(function (c) {
-        const p = c.dataset.medida.split('x').map(Number);
-        c.classList.toggle('activo', p[0] === ancho && p[1] === alto);
-      });
-
-      const tip = $('tipHoja');
-      tip.hidden = true;
-      tip.textContent = '';
-
-      let a = null;
-      let hojas = 0;
-      let uso = 0;
-      let medidaTxt = 'Por definir';
-      let resumenCalculo = '';
-
-      if (ancho && alto) {
-        medidaTxt = cm(ancho) + ' × ' + cm(alto) + ' cm';
-        a = acomodar(ancho, alto);
-
-        if (a.total > 0) {
-          hojas = Math.ceil(cantidad / a.total);
-          uso = Math.round(a.total * a.w * a.h / (CONFIG.hojaAncho * CONFIG.hojaAlto) * 100);
-          const ultima = cantidad - (hojas - 1) * a.total;   // piezas en la última hoja
-          this.dibujarHoja(a, hojas === 1 ? ultima : a.total);
-
-          $('tkPorHoja').textContent = a.total;
-          $('tkHojas').textContent = hojas;
-          $('hojaPorHoja').textContent = a.total + (a.total === 1 ? ' pieza' : ' piezas') + (a.girado ? ' (girados)' : '');
-          $('tkUso').textContent = uso + '% de la hoja';
-
-          const sobrantes = hojas * a.total - cantidad;
-          const partes = [];
-          if (sobrantes > 0) {
-            partes.push('Con ' + hojas + (hojas === 1 ? ' hoja' : ' hojas') + ' te alcanza para ' + (hojas * a.total) + ' letreros: te sobran ' + sobrantes + '.');
-          }
-          const sug = medidaSugerida(a);
-          if (sug) {
-            partes.push('Sobra material: con la misma hoja puedes hacerlos de ' + cm(sug.ancho) + ' × ' + cm(sug.alto) + ' cm.');
-          }
-          if (partes.length) {
-            tip.hidden = false;
-            tip.appendChild(document.createTextNode('💡 ' + partes.join(' ') + ' '));
-            if (sug) {
-              const b = document.createElement('button');
-              b.type = 'button';
-              b.dataset.medida = sug.ancho + 'x' + sug.alto;
-              b.textContent = 'Usar ' + cm(sug.ancho) + ' × ' + cm(sug.alto);
-              tip.appendChild(b);
-            }
-          }
-          resumenCalculo = a.total + ' por hoja → ' + hojas + (hojas === 1 ? ' hoja' : ' hojas');
-        } else {
-          // Más grande que la hoja
-          this.dibujarHoja(null, 0);
-          $('tkPorHoja').textContent = '—';
-          $('tkHojas').textContent = '—';
-          $('hojaPorHoja').textContent = 'No cabe en una hoja';
-          $('tkUso').textContent = '—';
-          tip.hidden = false;
-          tip.textContent = '📐 Esa medida es más grande que una hoja (240 × 118 cm). Se puede armar uniendo varias hojas: escríbenos y te decimos cómo.';
-          resumenCalculo = 'más grande que una hoja';
-        }
-      } else {
-        this.dibujarHoja(null, 0);
-        $('tkPorHoja').textContent = '—';
-        $('tkHojas').textContent = '—';
-        $('hojaPorHoja').textContent = '';
-        $('tkUso').textContent = '—';
-      }
-
-      $('tkTipo').textContent = tipo;
-      $('tkMedida').textContent = medidaTxt;
-      $('tkCantidad').textContent = cantidad + (cantidad === 1 ? ' letrero' : ' letreros');
-      $('tkCaras').textContent = caras === 2 ? 'Por los 2 lados' : 'De 1 lado';
-      $('tkExtras').textContent = estaca ? 'Con estaca' : 'Sin extras';
-
-      // Precio (solo si configuraste el precio por hoja)
-      const filaPrecio = $('tkPrecioFila');
-      const hayPrecio = typeof CONFIG.precioHoja === 'number' && CONFIG.precioHoja > 0 && hojas > 0;
-      filaPrecio.hidden = !hayPrecio;
-      if (hayPrecio) $('tkPrecio').textContent = formatoMXN.format(hojas * CONFIG.precioHoja);
-
-      const lineas = [
-        'Hola Laser Print, quiero cotizar letreros de coroplast:',
-        '• Tipo: ' + tipo,
-        '• Medida: ' + medidaTxt,
-        '• Cantidad: ' + cantidad + ' letreros' + (resumenCalculo ? ' (' + resumenCalculo + ')' : ''),
-        '• Impresión: ' + (caras === 2 ? 'por los 2 lados' : 'de 1 lado'),
-        '• ' + (estaca ? 'Con estaca' : 'Sin estaca')
-      ];
-      if (hayPrecio) lineas.push('• Precio estimado: ' + formatoMXN.format(hojas * CONFIG.precioHoja));
-      if (notas) lineas.push('• Notas: ' + notas);
-      $('armWhatsapp').href = linkWhatsApp(lineas.join('\n'));
-    }
-  };
-
-  /* ==========================================================================
-     6. PARED DE LETREROS + VISOR
-     ========================================================================== */
-
-  function claveCategoria(c) {
-    return String(c || '').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '');
-  }
 
   function urlArchivo(ruta) {
     if (!ruta) return '';
@@ -456,6 +148,172 @@
     return formatoMXN.format(Number(precio));
   }
 
+  /** Deja solo lo que la página necesita (también es lo que se guarda en caché) */
+  function limpiar(p) {
+    return {
+      _id: p._id || p.id,
+      nombre: p.nombre,
+      descripcion: p.descripcion,
+      precio: p.precio,
+      categoria: p.categoria,
+      tipoArchivo: p.tipoArchivo,
+      archivoUrl: p.archivoUrl,
+      updatedAt: p.updatedAt,
+      createdAt: p.createdAt
+    };
+  }
+
+  function preparar(lista) {
+    return lista.map(function (p) {
+      const clave = claveCategoria(p.categoria);
+      const cat = infoCategoria(clave);
+      return {
+        nombre: p.nombre || 'Trabajo',
+        descripcion: p.descripcion || '',
+        precio: clave === 'VINIL' ? '' : precioTexto(p.precio),   // vinil va sin precio
+        tipo: tipoDe(p),
+        url: urlArchivo(p.archivoUrl),
+        clave: clave,
+        categoria: cat ? cat.nombre : (p.categoria || 'Otros'),
+        color: cat ? cat.color : '#94A3B8',
+        busqueda: normal([p.nombre, p.descripcion, cat ? cat.nombre : p.categoria].join(' '))
+      };
+    }).filter(function (t) { return t.url; });
+  }
+
+  /* ==========================================================================
+     3. FILTROS
+     ========================================================================== */
+
+  let todos = [];          // todos los trabajos
+  let visibles = [];       // los que pasan el filtro
+  let mostrados = 0;       // cuántas tarjetas están en pantalla
+  let firmaActual = null;
+
+  const estado = { cat: 'TODAS', tipo: 'todos', q: '' };
+
+  function leerUrl() {
+    const qs = new URLSearchParams(location.search);
+    const cat = claveCategoria(qs.get('cat') || '');
+    estado.cat = infoCategoria(cat) ? cat : 'TODAS';
+    const tipo = qs.get('tipo');
+    estado.tipo = ['imagen', 'video', 'pdf'].indexOf(tipo) >= 0 ? tipo : 'todos';
+    estado.q = (qs.get('q') || '').slice(0, 80);
+    $('buscar').value = estado.q;
+  }
+
+  function guardarUrl() {
+    const qs = new URLSearchParams();
+    if (estado.cat !== 'TODAS') qs.set('cat', infoCategoria(estado.cat).nombre.toUpperCase());
+    if (estado.tipo !== 'todos') qs.set('tipo', estado.tipo);
+    if (estado.q) qs.set('q', estado.q);
+    const nueva = location.pathname + (qs.toString() ? '?' + qs.toString() : '');
+    try { history.replaceState(null, '', nueva); } catch (e) {}
+  }
+
+  function pintarChips() {
+    const caja = $('chips');
+    caja.innerHTML = '';
+    const cuenta = {};
+    todos.forEach(function (t) { cuenta[t.clave] = (cuenta[t.clave] || 0) + 1; });
+
+    function chip(clave, nombre, color, n) {
+      const b = crear('button', 'chip');
+      b.type = 'button';
+      b.dataset.cat = clave;
+      b.setAttribute('aria-pressed', String(estado.cat === clave));
+      if (color) {
+        b.style.setProperty('--color-cat', color);
+        b.appendChild(crear('span', 'punto'));
+      }
+      b.appendChild(document.createTextNode(nombre));
+      if (n !== null) b.appendChild(crear('span', 'cuenta', String(n)));
+      caja.appendChild(b);
+    }
+
+    const cargado = todos.length > 0 || firmaActual !== null;
+    chip('TODAS', 'Todas', null, cargado ? todos.length : null);
+    CATEGORIAS.forEach(function (c) { chip(c.clave, c.nombre, c.color, cargado ? (cuenta[c.clave] || 0) : null); });
+
+    const activo = caja.querySelector('[aria-pressed="true"]');
+    if (activo && activo.scrollIntoView && caja.scrollWidth > caja.clientWidth) {
+      caja.scrollLeft = activo.offsetLeft - caja.offsetLeft - 12;
+    }
+  }
+
+  function pintarEncabezado() {
+    const cat = infoCategoria(estado.cat);
+    const titulo = $('catTitulo');
+    titulo.innerHTML = '';
+    if (cat) {
+      titulo.appendChild(document.createTextNode('Trabajos de '));
+      titulo.appendChild(crear('span', 'text-gradient', cat.nombre));
+      $('catLead').textContent = 'Lo más reciente que hemos hecho en ' + cat.nombre.toLowerCase() + '. Toca uno para verlo en grande y pedir uno igual.';
+      document.title = cat.nombre + ' · Catálogo | Diseño Laser Print';
+    } else {
+      titulo.appendChild(document.createTextNode('Nuestro '));
+      titulo.appendChild(crear('span', 'text-gradient', 'catálogo'));
+      $('catLead').textContent = 'Trabajos recientes de todas nuestras áreas. Filtra por lo que buscas y pídenos uno igual por WhatsApp.';
+      document.title = 'Catálogo de trabajos | Diseño Laser Print';
+    }
+    const ir = $('irSeccion');
+    ir.hidden = !cat;
+    if (cat) {
+      ir.href = cat.pagina;
+      ir.textContent = 'Ver la página de ' + cat.nombre + ' →';
+    }
+    document.querySelectorAll('#tipos button').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.dataset.tipo === estado.tipo));
+    });
+  }
+
+  function filtrar() {
+    const palabras = normal(estado.q).split(/\s+/).filter(Boolean);
+    visibles = todos.filter(function (t) {
+      if (estado.cat !== 'TODAS' && t.clave !== estado.cat) return false;
+      if (estado.tipo !== 'todos' && t.tipo !== estado.tipo) return false;
+      return palabras.every(function (p) { return t.busqueda.indexOf(p) >= 0; });
+    });
+  }
+
+  function aplicar() {
+    filtrar();
+    pintarChips();
+    pintarEncabezado();
+    guardarUrl();
+    pintarResultados();
+  }
+
+  function initFiltros() {
+    $('chips').addEventListener('click', function (e) {
+      const b = e.target.closest('.chip');
+      if (!b) return;
+      estado.cat = b.dataset.cat;
+      aplicar();
+    });
+    $('tipos').addEventListener('click', function (e) {
+      const b = e.target.closest('button[data-tipo]');
+      if (!b) return;
+      estado.tipo = b.dataset.tipo;
+      aplicar();
+    });
+    let espera = null;
+    $('buscar').addEventListener('input', function () {
+      clearTimeout(espera);
+      espera = setTimeout(function () {
+        estado.q = $('buscar').value.trim().slice(0, 80);
+        aplicar();
+      }, 180);
+    });
+    $('verMas').addEventListener('click', function () { agregarTarjetas(); });
+  }
+
+  /* ==========================================================================
+     4. TARJETAS + VISOR
+     ========================================================================== */
+
+  const catalogo = $('catalogo');
+
   /* --- PDF (la librería solo se descarga si hay catálogos) --- */
   let promesaPdf = null;
   function cargarPdfJs() {
@@ -467,7 +325,7 @@
           window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
           ok(window.pdfjsLib);
         };
-        s.onerror = falla;
+        s.onerror = function (e) { promesaPdf = null; falla(e); };
         document.head.appendChild(s);
       });
     }
@@ -490,13 +348,6 @@
     } catch (e) { /* se queda el ícono 📄 */ }
   }
 
-  const pared = $('pared');
-  let trabajos = [];
-  let firmaActual = null;
-
-  // Inclinación "a mano" de cada letrero: siempre la misma para el mismo lugar
-  const GIROS = [-2.2, 1.4, -0.8, 2.4, -1.6, 0.9, 2, -2.6, 1.1, -1.2];
-
   const obsVideos = ('IntersectionObserver' in window) ? new IntersectionObserver(function (ents) {
     ents.forEach(function (en) {
       if (en.isIntersecting && !reduceMotion) en.target.play().catch(function () {});
@@ -508,78 +359,49 @@
     ents.forEach(function (en) {
       if (!en.isIntersecting) return;
       obs.unobserve(en.target);
-      portadaPdf(en.target.dataset.url, en.target, 300);
+      portadaPdf(en.target.dataset.url, en.target, 320);
     });
   }, { rootMargin: '300px' }) : null;
 
-  function resumen(t) {
-    const r = $('paredResumen');
-    if (r) r.textContent = t;
+  /** Escribe el texto marcando lo que coincide con la búsqueda (sin innerHTML) */
+  function textoConMarca(el, texto) {
+    const palabras = normal(estado.q).split(/\s+/).filter(Boolean);
+    if (!palabras.length) { el.textContent = texto; return; }
+    const base = normal(texto);
+    const marcas = [];
+    palabras.forEach(function (p) {
+      let i = base.indexOf(p);
+      while (i >= 0) { marcas.push([i, i + p.length]); i = base.indexOf(p, i + p.length); }
+    });
+    if (!marcas.length) { el.textContent = texto; return; }
+    marcas.sort(function (a, b) { return a[0] - b[0]; });
+    let pos = 0;
+    marcas.forEach(function (m) {
+      if (m[0] < pos) return;
+      el.appendChild(document.createTextNode(texto.slice(pos, m[0])));
+      el.appendChild(crear('mark', '', texto.slice(m[0], m[1])));
+      pos = m[1];
+    });
+    el.appendChild(document.createTextNode(texto.slice(pos)));
   }
 
-  function esqueleto() {
-    pared.setAttribute('aria-busy', 'true');
-    pared.innerHTML = '';
-    for (let i = 0; i < 6; i++) {
-      const d = document.createElement('div');
-      d.className = 'colgado esqueleto';
-      d.style.setProperty('--rot', GIROS[i] + 'deg');
-      d.style.setProperty('--i', i);
-      d.setAttribute('aria-hidden', 'true');
-      pared.appendChild(d);
-    }
-  }
-
-  function mensaje(icono, titulo, texto, boton) {
-    pared.setAttribute('aria-busy', 'false');
-    pared.innerHTML = '';
-    const caja = document.createElement('div');
-    caja.className = 'pared-mensaje';
-    const i = document.createElement('span');
-    i.className = 'icono';
-    i.textContent = icono;
-    const t = document.createElement('strong');
-    t.textContent = titulo;
-    const p = document.createElement('p');
-    p.textContent = texto;
-    caja.append(i, t, p);
-    if (boton) {
-      const b = boton.href ? document.createElement('a') : document.createElement('button');
-      b.textContent = boton.texto;
-      if (boton.href) { b.href = boton.href; b.target = '_blank'; b.rel = 'noopener noreferrer'; b.className = 'btn-cta'; }
-      else { b.type = 'button'; b.addEventListener('click', boton.accion); }
-      caja.appendChild(b);
-    }
-    pared.appendChild(caja);
-  }
-
-  function crearColgado(t, i) {
-    const el = document.createElement('article');
-    el.className = 'colgado';
-    el.dataset.indice = i;
+  function crearTarjeta(t, i, n) {
+    const el = crear('article', 'ficha');
+    el.dataset.pos = i;
     el.tabIndex = 0;
     el.setAttribute('role', 'button');
     el.setAttribute('aria-label', 'Ver ' + t.nombre);
-    el.style.setProperty('--rot', GIROS[i % GIROS.length] + 'deg');
-    el.style.setProperty('--i', Math.min(i, 12));
+    el.style.setProperty('--i', n % CONFIG.porPagina);
+    el.style.setProperty('--color-cat', t.color);
 
-    const media = document.createElement('div');
-    media.className = 'colgado-media';
-
+    const media = crear('div', 'ficha-media');
     if (t.tipo === 'imagen') {
-      const img = document.createElement('img');
+      const img = crear('img');
       img.alt = t.nombre;
       img.decoding = 'async';
-      if (i > 5) img.loading = 'lazy';
-      img.addEventListener('load', function () { img.classList.add('cargada'); });
-      img.addEventListener('error', function () {
-        img.remove();
-        const h = document.createElement('div');
-        h.className = 'hoja';
-        h.textContent = '🖼️';
-        media.appendChild(h);
-      }, { once: true });
-      img.src = cld(t.url, 700);
+      if (n > 7) img.loading = 'lazy';
+      img.addEventListener('error', function () { img.replaceWith(crear('div', 'hoja', '🖼️')); }, { once: true });
+      img.src = cld(t.url, 600);
       media.appendChild(img);
     } else if (t.tipo === 'video') {
       const v = document.createElement('video');
@@ -594,102 +416,111 @@
       v.addEventListener('playing', function () { el.classList.add('reproduciendo'); });
       v.addEventListener('pause', function () { el.classList.remove('reproduciendo'); });
       media.appendChild(v);
-      media.insertAdjacentHTML('beforeend', '<span class="colgado-play" aria-hidden="true">▶</span>');
+      media.appendChild(crear('span', 'ficha-play', '▶'));
       if (obsVideos) obsVideos.observe(v);
     } else {
-      const h = document.createElement('div');
-      h.className = 'hoja';
+      const h = crear('div', 'hoja', '📄');
       h.dataset.url = t.url;
-      h.textContent = '📄';
       media.appendChild(h);
-      if (obsPdf) obsPdf.observe(h); else portadaPdf(t.url, h, 300);
+      if (obsPdf) obsPdf.observe(h); else portadaPdf(t.url, h, 320);
     }
 
-    if (i === 0 && trabajos.length > 1) media.insertAdjacentHTML('beforeend', '<span class="colgado-etq nuevo">Lo más nuevo</span>');
-    else if (t.tipo === 'video') media.insertAdjacentHTML('beforeend', '<span class="colgado-etq">Video</span>');
-    else if (t.tipo === 'pdf') media.insertAdjacentHTML('beforeend', '<span class="colgado-etq">Catálogo PDF</span>');
-
+    if (estado.cat === 'TODAS') media.appendChild(crear('span', 'ficha-cat', t.categoria));
+    if (t.tipo !== 'imagen') media.appendChild(crear('span', 'ficha-tipo', t.tipo === 'video' ? 'Video' : 'PDF'));
     el.appendChild(media);
 
-    const info = document.createElement('div');
-    info.className = 'colgado-info';
-    const h3 = document.createElement('h3');
-    h3.textContent = t.nombre;
+    const info = crear('div', 'ficha-info');
+    const h3 = crear('h3');
+    textoConMarca(h3, t.nombre);
     info.appendChild(h3);
-    if (t.precio) {
-      const pr = document.createElement('span');
-      pr.className = 'colgado-precio';
-      pr.textContent = t.precio;
-      info.appendChild(pr);
+    if (t.descripcion) {
+      const p = crear('p');
+      textoConMarca(p, t.descripcion);
+      info.appendChild(p);
     }
+    if (t.precio) info.appendChild(crear('span', 'ficha-precio', t.precio));
     el.appendChild(info);
     return el;
   }
 
-  /** El trabajo más nuevo con foto se imprime en el letrero de la portada */
-  function llenarLetrero() {
-    const placa = $('letreroPlaca');
-    if (!placa) return;
-    const idx = trabajos.findIndex(function (t) { return t.tipo === 'imagen'; });
-    if (idx < 0) return;
-    const t = trabajos[idx];
-
-    const zona = placa.querySelector('.letrero-impresion');
-    let img = zona.querySelector('img');
-    if (!img) {
-      img = document.createElement('img');
-      img.decoding = 'async';
-      img.addEventListener('load', function () { placa.classList.add('con-foto'); });
-      zona.prepend(img);
-    }
-    img.alt = t.nombre;
-    img.src = cld(t.url, 1000);
-
-    const pie = $('letreroPie');
-    pie.textContent = 'Trabajo reciente: ';
-    const b = document.createElement('strong');
-    b.textContent = t.nombre;
-    pie.appendChild(b);
-
-    placa.dataset.indice = idx;
-    placa.tabIndex = 0;
-    placa.setAttribute('role', 'button');
-    placa.setAttribute('aria-label', 'Ver ' + t.nombre);
+  function agregarTarjetas() {
+    const hasta = Math.min(visibles.length, mostrados + CONFIG.porPagina);
+    const frag = document.createDocumentFragment();
+    for (let i = mostrados; i < hasta; i++) frag.appendChild(crearTarjeta(visibles[i], i, i - mostrados));
+    catalogo.appendChild(frag);
+    mostrados = hasta;
+    const resto = visibles.length - mostrados;
+    $('verMas').hidden = resto <= 0;
+    if (resto > 0) $('verMas').textContent = 'Ver más trabajos (' + resto + ')';
   }
 
-  function render(productos) {
-    trabajos = productos.map(function (p) {
-      return {
-        nombre: p.nombre || 'Letrero de coroplast',
-        descripcion: p.descripcion || '',
-        precio: precioTexto(p.precio),
-        tipo: tipoDe(p),
-        url: urlArchivo(p.archivoUrl)
-      };
-    }).filter(function (t) { return t.url; });
+  function resumen(t) {
+    $('catResumen').textContent = t;
+  }
 
-    llenarLetrero();
+  function mensaje(icono, titulo, texto, boton) {
+    catalogo.setAttribute('aria-busy', 'false');
+    catalogo.innerHTML = '';
+    $('verMas').hidden = true;
+    const caja = crear('div', 'cat-mensaje');
+    caja.appendChild(crear('span', 'icono', icono));
+    caja.appendChild(crear('strong', '', titulo));
+    caja.appendChild(crear('p', '', texto));
+    if (boton) {
+      const b = boton.href ? crear('a', 'btn-cta', boton.texto) : crear('button', '', boton.texto);
+      if (boton.href) { b.href = boton.href; b.target = '_blank'; b.rel = 'noopener noreferrer'; }
+      else { b.type = 'button'; b.addEventListener('click', boton.accion); }
+      caja.appendChild(b);
+    }
+    catalogo.appendChild(caja);
+  }
 
-    if (!trabajos.length) {
-      resumen('Pronto subiremos fotos de nuestros letreros.');
-      mensaje('🪧', 'Aún no hay letreros publicados',
-        'Mientras tanto, escríbenos y te mandamos fotos de trabajos anteriores.',
-        { texto: 'Pedir fotos por WhatsApp', href: linkWhatsApp('Hola Laser Print, ¿me pueden mandar fotos de letreros de coroplast que hayan hecho?') });
+  function pintarResultados() {
+    catalogo.querySelectorAll('video').forEach(function (v) { v.pause(); if (obsVideos) obsVideos.unobserve(v); });
+    catalogo.innerHTML = '';
+    catalogo.setAttribute('aria-busy', 'false');
+    mostrados = 0;
+
+    if (!todos.length) {
+      resumen('Pronto subiremos nuestros trabajos.');
+      mensaje('🖨️', 'Aún no hay trabajos publicados', 'Escríbenos y te mandamos fotos de lo que hemos hecho.',
+        { texto: 'Pedir fotos por WhatsApp', href: linkWhatsApp('Hola Laser Print, ¿me pueden mandar fotos de sus trabajos?') });
       return;
     }
 
-    pared.setAttribute('aria-busy', 'false');
-    pared.innerHTML = '';
-    const frag = document.createDocumentFragment();
-    trabajos.forEach(function (t, i) { frag.appendChild(crearColgado(t, i)); });
-    pared.appendChild(frag);
+    if (!visibles.length) {
+      const cat = infoCategoria(estado.cat);
+      resumen('0 trabajos');
+      mensaje('🔍', 'No encontramos trabajos con esos filtros',
+        estado.q ? 'Prueba con otra palabra o quita algún filtro.' : (cat ? 'Aún no hay publicaciones de ' + cat.nombre.toLowerCase() + ' con ese tipo de archivo.' : 'Prueba quitando algún filtro.'),
+        { texto: 'Quitar filtros', accion: function () { estado.cat = 'TODAS'; estado.tipo = 'todos'; estado.q = ''; $('buscar').value = ''; aplicar(); } });
+      return;
+    }
 
-    const n = trabajos.length;
-    resumen(n + (n === 1 ? ' letrero' : ' letreros') + ' colgados · toca uno para verlo');
+    const n = visibles.length;
+    resumen(n + (n === 1 ? ' trabajo' : ' trabajos') + (estado.q ? ' para “' + estado.q + '”' : '') + ' · toca uno para verlo en grande');
+    agregarTarjetas();
+  }
+
+  function esqueleto() {
+    catalogo.setAttribute('aria-busy', 'true');
+    catalogo.innerHTML = '';
+    for (let i = 0; i < 8; i++) {
+      const d = crear('div', 'ficha esqueleto');
+      d.setAttribute('aria-hidden', 'true');
+      catalogo.appendChild(d);
+    }
   }
 
   function firma(lista) {
     return lista.map(function (p) { return (p._id || p.id) + ':' + (p.updatedAt || '') + ':' + p.archivoUrl; }).join('|');
+  }
+
+  function ordenar(lista) {
+    // Lo más nuevo primero (si el servidor manda fechas)
+    return lista.slice().sort(function (a, b) {
+      return String(b.createdAt || b.updatedAt || '').localeCompare(String(a.createdAt || a.updatedAt || ''));
+    });
   }
 
   async function cargar() {
@@ -697,9 +528,12 @@
     try { guardados = JSON.parse(localStorage.getItem(CLAVE_CACHE) || 'null'); } catch (e) {}
     if (Array.isArray(guardados) && guardados.length) {
       firmaActual = firma(guardados);
-      render(guardados);
+      todos = preparar(guardados);
+      aplicar();
     } else {
       guardados = null;
+      pintarChips();
+      pintarEncabezado();
       esqueleto();
     }
 
@@ -714,18 +548,15 @@
       clearTimeout(limite);
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
-      const todos = Array.isArray(data) ? data : (data.productos || []);
-      const clave = claveCategoria(CONFIG.categoria);
-      const deEsta = todos
-        .filter(function (p) { return p && p.activo !== false && claveCategoria(p.categoria) === clave; })
-        .map(function (p) {
-          return { _id: p._id || p.id, nombre: p.nombre, descripcion: p.descripcion, precio: p.precio, tipoArchivo: p.tipoArchivo, archivoUrl: p.archivoUrl, updatedAt: p.updatedAt };
-        });
+      const lista = ordenar((Array.isArray(data) ? data : (data.productos || []))
+        .filter(function (p) { return p && p.activo !== false; })
+        .map(limpiar));
 
-      try { localStorage.setItem(CLAVE_CACHE, JSON.stringify(deEsta)); } catch (e) {}
-      if (firma(deEsta) !== firmaActual) {
-        firmaActual = firma(deEsta);
-        render(deEsta);
+      try { localStorage.setItem(CLAVE_CACHE, JSON.stringify(lista)); } catch (e) {}
+      if (firma(lista) !== firmaActual) {
+        firmaActual = firma(lista);
+        todos = preparar(lista);
+        aplicar();
       }
     } catch (e) {
       if (!guardados) {
@@ -738,15 +569,15 @@
     }
   }
 
-  /* --- Visor --- */
+  /* --- Visor (recorre solo los trabajos filtrados) --- */
   const visor = $('visor');
   let posVisor = 0;
   let focoPrevio = null;
 
   function mostrar(pos) {
-    const total = trabajos.length;
+    const total = visibles.length;
     posVisor = (pos + total) % total;
-    const t = trabajos[posVisor];
+    const t = visibles[posVisor];
     const media = $('visorMedia');
     media.querySelectorAll('video').forEach(function (v) { v.pause(); });
     media.innerHTML = '';
@@ -773,24 +604,24 @@
       portadaPdf(t.url, h, 700);
     }
 
-    $('visorContador').textContent = total > 1 ? (posVisor + 1) + ' / ' + total : CONFIG.titulo;
+    $('visorContador').textContent = (total > 1 ? (posVisor + 1) + ' / ' + total + ' · ' : '') + t.categoria;
     $('visorTitulo').textContent = t.nombre;
     $('visorPrecio').textContent = t.precio;
     $('visorDesc').textContent = t.descripcion;
-    $('visorWhatsapp').href = linkWhatsApp('Hola Laser Print, vi en su página el letrero "' + t.nombre + '" y quiero uno así. ¿Me pueden cotizar?');
+    $('visorWhatsapp').href = linkWhatsApp('Hola Laser Print, vi en su catálogo el trabajo "' + t.nombre + '" (' + t.categoria + ') y quiero uno así. ¿Me pueden cotizar?');
     $('visorAbrir').hidden = t.tipo !== 'pdf';
     if (t.tipo === 'pdf') $('visorAbrir').href = t.url;
     $('visorPrev').hidden = total < 2;
     $('visorNext').hidden = total < 2;
   }
 
-  function abrir(indice) {
-    if (!trabajos[indice]) return;
+  function abrir(pos) {
+    if (!visibles[pos]) return;
     focoPrevio = document.activeElement;
     visor.hidden = false;
     document.body.style.overflow = 'hidden';
-    pared.querySelectorAll('video').forEach(function (v) { v.pause(); });
-    mostrar(indice);
+    catalogo.querySelectorAll('video').forEach(function (v) { v.pause(); });
+    mostrar(pos);
     $('visorCerrar').focus();
   }
 
@@ -806,17 +637,15 @@
 
   function initVisor() {
     const abrirDesde = function (e) {
-      const el = e.target.closest('[data-indice]');
-      if (el) abrir(Number(el.dataset.indice));
+      const el = e.target.closest('.ficha[data-pos]');
+      if (el) abrir(Number(el.dataset.pos));
     };
-    [pared, $('letreroPlaca')].forEach(function (zona) {
-      zona.addEventListener('click', abrirDesde);
-      zona.addEventListener('keydown', function (e) {
-        if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('[data-indice]')) {
-          e.preventDefault();
-          abrirDesde(e);
-        }
-      });
+    catalogo.addEventListener('click', abrirDesde);
+    catalogo.addEventListener('keydown', function (e) {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.ficha[data-pos]')) {
+        e.preventDefault();
+        abrirDesde(e);
+      }
     });
 
     $('visorCerrar').addEventListener('click', cerrar);
@@ -828,8 +657,8 @@
     document.addEventListener('keydown', function (e) {
       if (visor.hidden) return;
       if (e.key === 'Escape') cerrar();
-      else if (e.key === 'ArrowRight' && trabajos.length > 1) mostrar(posVisor + 1);
-      else if (e.key === 'ArrowLeft' && trabajos.length > 1) mostrar(posVisor - 1);
+      else if (e.key === 'ArrowRight' && visibles.length > 1) mostrar(posVisor + 1);
+      else if (e.key === 'ArrowLeft' && visibles.length > 1) mostrar(posVisor - 1);
     });
 
     let x0 = 0;
@@ -839,22 +668,20 @@
     media.addEventListener('touchend', function (e) {
       const dx = e.changedTouches[0].clientX - x0;
       const dy = e.changedTouches[0].clientY - y0;
-      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) && trabajos.length > 1) mostrar(posVisor + (dx < 0 ? 1 : -1));
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) && visibles.length > 1) mostrar(posVisor + (dx < 0 ? 1 : -1));
     }, { passive: true });
   }
 
   /* ==========================================================================
-     7. ARRANQUE
+     5. ARRANQUE
      ========================================================================== */
 
   function iniciar() {
     initTema();
     initMenu();
     initDetalles();
-    initLetrero();
-    initAnatomia();
-    initTipos();
-    Armador.init();
+    leerUrl();
+    initFiltros();
     initVisor();
     cargar();
   }
