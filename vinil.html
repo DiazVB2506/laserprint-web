@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vinil impreso y stickers en Atizapán | Diseño Laser Print</title>
+  <title>Vinil y stickers en Atizapán | Diseño Laser Print</title>
 
   <script>
     (function () {
@@ -15,7 +15,7 @@
     })();
   </script>
 
-  <meta name="description" content="Stickers a $450 el metro lineal (rollo de 1.5 m) y vinil impreso a $300 el m² en Cd. López Mateos, Atizapán. Calcula cuántos stickers te caben y pide por WhatsApp.">
+  <meta name="description" content="Stickers y vinil en Cd. López Mateos, Atizapán. Rollo de 1.5 m de ancho, por medio metro o por metro. Calcula cuántos stickers te caben y pide por WhatsApp.">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#0a0a12">
   <link rel="canonical" href="https://diazvb2506.github.io/laserprint-web/vinil.html">
@@ -23,8 +23,8 @@
   <meta property="og:type" content="website">
   <meta property="og:locale" content="es_MX">
   <meta property="og:site_name" content="Diseño Laser Print">
-  <meta property="og:title" content="Vinil impreso y stickers | Diseño Laser Print">
-  <meta property="og:description" content="Calcula cuántos stickers te caben en el rollo y cuánto sale cada uno.">
+  <meta property="og:title" content="Vinil y stickers | Diseño Laser Print">
+  <meta property="og:description" content="Calcula cuántos stickers te caben en medio metro o en un metro de vinil.">
   <meta property="og:url" content="https://diazvb2506.github.io/laserprint-web/vinil.html">
   <meta property="og:image" content="https://diazvb2506.github.io/laserprint-web/uploads/fotos/LOGOTIPO.png">
 
@@ -80,25 +80,25 @@
           <span aria-current="page">Vinil</span>
         </nav>
 
-        <p class="kicker">Vinil impreso · Stickers</p>
+        <p class="kicker">Vinil · Stickers</p>
         <h1>Pégalo <span class="despega">donde quieras</span></h1>
-        <p class="lead">Stickers para tu marca, etiquetas para tus productos y vinil impreso para vitrinas, paredes, autos y más. Brillante o mate, impreso a todo color.</p>
+        <p class="lead">Stickers para tu marca, etiquetas para tus productos y vinil para vitrinas, paredes y más. Se vende en rollo de 1.5 m de ancho, por medio metro o por metro.</p>
 
         <div class="tarifas">
-          <a class="tarifa" href="#planificador" data-ir="stickers">
-            <span class="tarifa-icono" aria-hidden="true">🏷️</span>
-            <span><strong>$450</strong> metro lineal</span>
-            <small>Stickers · rollo de 1.5 m de ancho</small>
+          <a class="tarifa" href="#planificador">
+            <span class="tarifa-icono medio" aria-hidden="true"></span>
+            <span><strong>Medio metro</strong></span>
+            <small>150 × 50 cm</small>
           </a>
-          <a class="tarifa" href="#planificador" data-ir="impreso">
-            <span class="tarifa-icono" aria-hidden="true">🖼️</span>
-            <span><strong>$300</strong> por m²</span>
-            <small>Vinil impreso · mínimo ½ m²</small>
+          <a class="tarifa" href="#planificador">
+            <span class="tarifa-icono" aria-hidden="true"></span>
+            <span><strong>1 metro</strong></span>
+            <small>150 × 100 cm</small>
           </a>
         </div>
 
         <div class="hero-acciones">
-          <a class="btn-cta" href="#planificador">Calcular mi pedido ↓</a>
+          <a class="btn-cta" href="#planificador">¿Cuántos me caben? ↓</a>
           <a class="btn-sec wa-general" href="https://wa.me/5215598788857" target="_blank" rel="noopener noreferrer">Cotizar por WhatsApp</a>
         </div>
       </div>
@@ -134,17 +134,12 @@
       <div class="bloque-header">
         <p class="kicker">Calcula tu pedido</p>
         <h2 id="tituloPlan" class="titulo-seccion">Acomoda tus stickers en el rollo</h2>
-        <p class="sub-seccion">Pon la medida y la cantidad: te mostramos cuántos caben, cuántos metros se usan y cuánto sale cada uno. Si subes tu diseño, lo verás en el acomodo.</p>
+        <p class="sub-seccion">Pon la medida y cuántos quieres: te mostramos cómo se acomodan y si te alcanza con medio metro o con un metro. Si subes tu diseño, lo verás en el acomodo.</p>
       </div>
 
       <div class="plan">
         <form class="plan-campos" id="planForm" novalidate>
-          <div class="modos" role="group" aria-label="Tipo de vinil">
-            <button type="button" data-modo="stickers" aria-pressed="true">🏷️ Stickers</button>
-            <button type="button" data-modo="impreso" aria-pressed="false">🖼️ Vinil impreso</button>
-          </div>
-
-          <fieldset class="solo-stickers">
+          <fieldset>
             <legend>Forma</legend>
             <div class="opciones">
               <label class="opcion"><input type="radio" name="forma" value="circulo" checked><span><i class="f-circulo" aria-hidden="true"></i>Círculo</span></label>
@@ -164,21 +159,13 @@
           </div>
 
           <div>
-            <label class="plan-etq" for="pCantidad" id="etqCantidad">¿Cuántos?</label>
+            <label class="plan-etq" for="pCantidad" id="etqCantidad">¿Cuántos stickers?</label>
             <div class="cantidad">
               <button type="button" class="menos" aria-label="Menos">−</button>
               <label class="campo"><input type="number" id="pCantidad" inputmode="numeric" min="1" step="1" value="100"><span class="unidad" id="unidadCantidad">pzs</span></label>
               <button type="button" class="mas" aria-label="Más">+</button>
             </div>
           </div>
-
-          <fieldset>
-            <legend>Acabado</legend>
-            <div class="opciones">
-              <label class="opcion"><input type="radio" name="acabado" value="Brillante" checked><span>✨ Brillante</span></label>
-              <label class="opcion"><input type="radio" name="acabado" value="Mate"><span>Mate</span></label>
-            </div>
-          </fieldset>
 
           <div>
             <span class="plan-etq">Tu diseño <span class="opcional">(opcional, no se sube a ningún lado)</span></span>
@@ -202,40 +189,10 @@
           <p class="plan-tip" id="planTip" hidden></p>
 
           <div class="plan-acciones">
-            <a class="btn-cta" id="planWhatsapp" href="#" target="_blank" rel="noopener noreferrer">Pedir por WhatsApp</a>
+            <a class="btn-cta" id="planWhatsapp" href="#" target="_blank" rel="noopener noreferrer">Cotizar por WhatsApp</a>
           </div>
-          <p class="plan-letra">Precio estimado, sin diseño (el diseño tiene costo extra). Entrega en 2 a 3 días hábiles. Te confirmamos el total por WhatsApp.</p>
+          <p class="plan-letra">El acomodo es aproximado; te lo confirmamos por WhatsApp. El diseño tiene costo extra. Entrega en 2 a 3 días hábiles.</p>
         </div>
-      </div>
-    </section>
-
-    <!-- ===== Brillante vs mate ===== -->
-    <section class="bloque" aria-labelledby="tituloAcabados">
-      <div class="bloque-header">
-        <p class="kicker">Acabados</p>
-        <h2 id="tituloAcabados" class="titulo-seccion">¿Brillante o mate?</h2>
-        <p class="sub-seccion">Pasa el dedo o el mouse sobre cada uno para ver cómo le pega la luz.</p>
-      </div>
-
-      <div class="acabados">
-        <article class="acabado brillante">
-          <div class="muestra-acabado" tabindex="0" aria-label="Muestra de vinil brillante">
-            <span class="muestra-texto">Brillante</span>
-          </div>
-          <div class="acabado-info">
-            <h3>✨ Brillante</h3>
-            <p>Colores más vivos y con reflejo. Llama la atención en stickers, etiquetas de producto y promociones.</p>
-          </div>
-        </article>
-        <article class="acabado mate">
-          <div class="muestra-acabado" tabindex="0" aria-label="Muestra de vinil mate">
-            <span class="muestra-texto">Mate</span>
-          </div>
-          <div class="acabado-info">
-            <h3>Mate</h3>
-            <p>Sin reflejos: se lee bien aunque le dé la luz de frente. Se ve elegante en etiquetas, menús y vitrinas.</p>
-          </div>
-        </article>
       </div>
     </section>
 
@@ -268,11 +225,6 @@
           <p>Pícala con un alfiler y aplánala con el dedo.</p>
         </li>
       </ol>
-
-      <div class="otros">
-        <p><strong>¿Buscas otro tipo de vinil?</strong> Vinil de corte, esmerilado o microperforado: pregúntanos.</p>
-        <a class="btn-sec wa-otros" href="https://wa.me/5215598788857" target="_blank" rel="noopener noreferrer">Preguntar</a>
-      </div>
     </section>
 
     <!-- ===== Planilla de trabajos ===== -->
