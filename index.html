@@ -79,9 +79,9 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="index.css?v=1.5">
+  <link rel="stylesheet" href="index.css?v=1.6">
 </head>
 <body>
 
@@ -118,12 +118,43 @@
   </header>
 
   <main>
+    <!-- ===== Portada ===== -->
     <section class="hero-section">
+      <div class="hero-flotantes" id="heroFlotantes" aria-hidden="true">
+        <span class="flota f1">👕</span>
+        <span class="flota f2">🏷️</span>
+        <span class="flota f3">✂️</span>
+        <span class="flota f4">🖼️</span>
+        <span class="flota f5">🎨</span>
+        <span class="flota f6">🪧</span>
+      </div>
+
       <div class="hero-content">
-        <h1 class="hero-title">Bienvenidos a <span class="text-gradient">Diseño Laser Print</span></h1>
-        <p class="hero-subtitle">Imprenta digital, corte de alta precisión y soluciones visuales de otro nivel.</p>
+        <p class="estado-tienda" id="estadoTienda" hidden>
+          <span class="estado-punto" aria-hidden="true"></span>
+          <span id="estadoTexto"></span>
+        </p>
+
+        <h1 class="hero-title">
+          Imprimimos tu
+          <span class="rotador" id="rotador" aria-live="polite"><span class="text-gradient">idea</span></span>
+        </h1>
+        <p class="hero-subtitle">DTF, sublimación, lona, coroplast, vinil y corte láser en Cd. López Mateos, Atizapán. Tú pones la idea, nosotros la hacemos realidad.</p>
+
+        <div class="inicio-acciones">
+          <a class="hero-cta" href="https://wa.me/5215598788857?text=Hola%20Laser%20Print%2C%20quiero%20cotizar%20un%20trabajo" target="_blank" rel="noopener noreferrer">💬 Cotizar por WhatsApp</a>
+          <a class="hero-sec" href="#pruebalo">✨ Pruébalo con tu nombre</a>
+        </div>
       </div>
     </section>
+
+    <!-- ===== Cinta de servicios ===== -->
+    <div class="cinta" aria-hidden="true">
+      <div class="cinta-pista">
+        <span>DTF Textil</span><i>✦</i><span>DTF UV</span><i>✦</i><span>Sublimación</span><i>✦</i><span>Lona</span><i>✦</i><span>Coroplast</span><i>✦</i><span>Corte láser CO2</span><i>✦</i><span>Vinil</span><i>✦</i><span>Volantes</span><i>✦</i><span>Tarjetas</span><i>✦</i><span>Letreros LED</span><i>✦</i>
+        <span>DTF Textil</span><i>✦</i><span>DTF UV</span><i>✦</i><span>Sublimación</span><i>✦</i><span>Lona</span><i>✦</i><span>Coroplast</span><i>✦</i><span>Corte láser CO2</span><i>✦</i><span>Vinil</span><i>✦</i><span>Volantes</span><i>✦</i><span>Tarjetas</span><i>✦</i><span>Letreros LED</span><i>✦</i>
+      </div>
+    </div>
 
     <section class="video-section" aria-label="Video de presentación">
       <div class="video-container glass-card" id="videoWrapper">
@@ -134,6 +165,133 @@
       </div>
     </section>
 
+    <!-- ===== Servicios ===== -->
+    <section class="inicio-bloque" id="servicios" aria-labelledby="serviciosTitulo">
+      <h2 class="section-title" id="serviciosTitulo">¿Qué hacemos?</h2>
+      <p class="seccion-sub">Toca un servicio para ver trabajos, medidas y cotizar.</p>
+
+      <div class="servicios">
+        <a class="servicio revelar" href="dtf.html" style="--c1:#0EA5E9;--c2:#6366F1">
+          <span class="servicio-arte" aria-hidden="true">👕</span>
+          <h3>DTF Textil / UV</h3>
+          <p>Tu diseño a todo color en playeras, sudaderas y gorras. Y DTF UV para objetos.</p>
+          <span class="servicio-ir">Ver más →</span>
+        </a>
+        <a class="servicio revelar" href="sublimacion.html" style="--c1:#A855F7;--c2:#EC4899">
+          <span class="servicio-arte" aria-hidden="true">🎨</span>
+          <h3>Sublimación</h3>
+          <p>Colores que se funden con la tela. Ideal para telas claras de poliéster.</p>
+          <span class="servicio-ir">Ver más →</span>
+        </a>
+        <a class="servicio revelar" href="lona.html" style="--c1:#F59E0B;--c2:#EF4444">
+          <span class="servicio-arte" aria-hidden="true">🖼️</span>
+          <h3>Lona</h3>
+          <p>Anuncios, fachadas y fondos para eventos, listos para colgar.</p>
+          <span class="servicio-ir">Ver más →</span>
+        </a>
+        <a class="servicio revelar" href="coroplast.html" style="--c1:#10B981;--c2:#0EA5E9">
+          <span class="servicio-arte" aria-hidden="true">🪧</span>
+          <h3>Coroplast</h3>
+          <p>Letreros ligeros y resistentes: se vende, se renta, avisos y señalética.</p>
+          <span class="servicio-ir">Ver más →</span>
+        </a>
+        <a class="servicio revelar" href="cortelaser.html" style="--c1:#EF4444;--c2:#F97316">
+          <span class="servicio-arte" aria-hidden="true">✂️</span>
+          <h3>Corte láser CO2</h3>
+          <p>Corte y grabado en MDF, acrílico, cascarón y cartón. Grabado en aluminio.</p>
+          <span class="servicio-ir">Ver más →</span>
+        </a>
+        <a class="servicio revelar" href="vinil.html" style="--c1:#EC4899;--c2:#F43F5E">
+          <span class="servicio-arte" aria-hidden="true">🏷️</span>
+          <h3>Vinil</h3>
+          <p>Stickers y etiquetas. Por medio metro o por metro, en rollo de 1.5 m.</p>
+          <span class="servicio-ir">Ver más →</span>
+        </a>
+        <a class="servicio revelar wa-servicio" data-msg="Hola Laser Print, quiero cotizar volantes / tarjetas de presentación / notas de remisión" href="https://wa.me/5215598788857" target="_blank" rel="noopener noreferrer" style="--c1:#64748B;--c2:#0F4C81">
+          <span class="servicio-arte" aria-hidden="true">📄</span>
+          <h3>Imprenta</h3>
+          <p>Volantes, tarjetas de presentación y notas de remisión para tu negocio.</p>
+          <span class="servicio-ir">Cotizar →</span>
+        </a>
+        <a class="servicio revelar wa-servicio" data-msg="Hola Laser Print, quiero cotizar un letrero LED" href="https://wa.me/5215598788857" target="_blank" rel="noopener noreferrer" style="--c1:#FACC15;--c2:#A855F7">
+          <span class="servicio-arte" aria-hidden="true">💡</span>
+          <h3>Letreros LED</h3>
+          <p>Letreros personalizados en MDF con lona, MDF o acrílico.</p>
+          <span class="servicio-ir">Cotizar →</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ===== ¿Qué necesitas? ===== -->
+    <section class="inicio-bloque" id="necesitas" aria-labelledby="necesitasTitulo">
+      <div class="necesitas revelar">
+        <div class="necesitas-pregunta">
+          <p class="mini-etq">¿No sabes cuál elegir?</p>
+          <h2 id="necesitasTitulo">Dime qué quieres hacer…</h2>
+          <div class="opciones-grandes" id="opcionesNecesitas" role="group" aria-label="Opciones">
+            <button type="button" data-n="ropa"><span>👕</span>Ropa con mi diseño</button>
+            <button type="button" data-n="anuncio"><span>📣</span>Un anuncio grande</button>
+            <button type="button" data-n="letrero"><span>🏠</span>Letrero de “se vende”</button>
+            <button type="button" data-n="stickers"><span>🏷️</span>Stickers o etiquetas</button>
+            <button type="button" data-n="madera"><span>🪵</span>Algo en madera o acrílico</button>
+            <button type="button" data-n="papel"><span>📄</span>Volantes o tarjetas</button>
+          </div>
+        </div>
+
+        <div class="necesitas-respuesta" id="respuestaNecesitas" aria-live="polite">
+          <div class="resp-vacia">
+            <span class="resp-flecha" aria-hidden="true">👈</span>
+            <p>Elige una opción y te digo cuál es el ideal.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Pruébalo con tu nombre ===== -->
+    <section class="inicio-bloque" id="pruebalo" aria-labelledby="pruebaloTitulo">
+      <h2 class="section-title" id="pruebaloTitulo">Pruébalo con tu nombre</h2>
+      <p class="seccion-sub">Escribe tu nombre, tu negocio o una frase y mira cómo se vería. Es solo una idea: el diseño final lo hacemos contigo.</p>
+
+      <div class="estudio revelar">
+        <div class="estudio-vista">
+          <div class="productos" id="productos" role="tablist" aria-label="Producto">
+            <button type="button" role="tab" data-p="playera" aria-selected="true">👕 Playera</button>
+            <button type="button" role="tab" data-p="lona" aria-selected="false">🖼️ Lona</button>
+            <button type="button" role="tab" data-p="letrero" aria-selected="false">🪧 Letrero</button>
+            <button type="button" role="tab" data-p="sticker" aria-selected="false">🏷️ Sticker</button>
+            <button type="button" role="tab" data-p="llavero" aria-selected="false">🔑 Llavero</button>
+          </div>
+          <div class="maqueta" id="maqueta" role="img" aria-label="Vista previa"></div>
+        </div>
+
+        <div class="estudio-controles">
+          <label class="est-etq" for="pruebaTexto">Tu texto</label>
+          <input type="text" id="pruebaTexto" class="est-input" maxlength="28" value="Tu Negocio" autocomplete="off">
+
+          <span class="est-etq">Letra</span>
+          <div class="est-letras" id="estLetras" role="group" aria-label="Tipo de letra">
+            <button type="button" data-f="clasica" aria-pressed="true" style="font-family:var(--font-heading);font-style:italic">Clásica</button>
+            <button type="button" data-f="moderna" aria-pressed="false" style="font-weight:800">Moderna</button>
+            <button type="button" data-f="bloque" aria-pressed="false" style="font-family:Impact,'Arial Black',sans-serif;letter-spacing:.04em">BLOQUE</button>
+          </div>
+
+          <span class="est-etq">Color del texto</span>
+          <div class="muestras" id="colorTexto" role="group" aria-label="Color del texto"></div>
+
+          <span class="est-etq" id="etqFondo">Color de fondo</span>
+          <div class="muestras" id="colorFondo" role="group" aria-label="Color de fondo"></div>
+
+          <p class="est-nota" id="estNota"></p>
+
+          <div class="est-acciones">
+            <a class="hero-cta" id="estWhatsapp" href="#" target="_blank" rel="noopener noreferrer">💬 Lo quiero así</a>
+            <a class="hero-sec" id="estVer" href="dtf.html">Ver más</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Trabajos destacados ===== -->
     <section class="carousel-section" aria-labelledby="trabajosTitulo">
       <h2 class="section-title" id="trabajosTitulo">Nuestros Trabajos Destacados</h2>
 
@@ -149,6 +307,34 @@
         <button class="carousel-btn next-btn" id="nextBtn" aria-label="Trabajo siguiente">❯</button>
       </div>
       <div class="carousel-dots" id="carouselDots"></div>
+      <p class="ver-catalogo"><a href="categoria.html">Ver todo el catálogo →</a></p>
+    </section>
+
+    <!-- ===== Así trabajamos ===== -->
+    <section class="inicio-bloque" aria-labelledby="pasosTitulo">
+      <h2 class="section-title" id="pasosTitulo">Así de fácil</h2>
+      <ol class="pasos-inicio">
+        <li class="revelar">
+          <span class="paso-icono" aria-hidden="true">💬</span>
+          <h3>Escríbenos</h3>
+          <p>Por WhatsApp o pregúntale a PIXEL, nuestro asistente.</p>
+        </li>
+        <li class="revelar">
+          <span class="paso-icono" aria-hidden="true">📁</span>
+          <h3>Mándanos tu diseño</h3>
+          <p>¿No tienes? Te lo hacemos (el diseño tiene costo extra).</p>
+        </li>
+        <li class="revelar">
+          <span class="paso-icono" aria-hidden="true">🖨️</span>
+          <h3>Lo producimos</h3>
+          <p>Normalmente en 2 a 3 días hábiles.</p>
+        </li>
+        <li class="revelar">
+          <span class="paso-icono" aria-hidden="true">🎉</span>
+          <h3>¡Listo!</h3>
+          <p>Te avisamos en cuanto tu pedido esté terminado.</p>
+        </li>
+      </ol>
     </section>
 
     <section class="location-section" aria-labelledby="ubicacionTitulo">
@@ -156,6 +342,10 @@
       <div class="location-card glass-card">
         <p class="location-address">📍 Calz. S. Mateo 27-A, San Juan Bosco 1, 52946 Cdad. López Mateos, Méx.</p>
         <p class="location-hours">🕘 <b>Lunes a viernes:</b> 9:00 a.m. – 6:00 p.m. &nbsp;·&nbsp; <b>Sábados:</b> 9:00 a.m. – 2:00 p.m.</p>
+        <p class="estado-tienda en-mapa" id="estadoTienda2" hidden>
+          <span class="estado-punto" aria-hidden="true"></span>
+          <span id="estadoTexto2"></span>
+        </p>
 
         <div class="map-container">
           <iframe
@@ -169,6 +359,8 @@
             referrerpolicy="no-referrer-when-downgrade">
           </iframe>
         </div>
+
+        <a class="como-llegar" href="https://www.google.com/maps/dir/?api=1&destination=Calz.+San+Mateo+27-A,+San+Juan+Bosco+1,+52946+Ciudad+L%C3%B3pez+Mateos,+M%C3%A9x." target="_blank" rel="noopener noreferrer">🧭 Cómo llegar</a>
 
         <div class="streetview-note">
           ⚠️ <b>Nota importante:</b> La fachada en Google Maps / Street View aún no se encuentra actualizada. Si giras la vista de la calle, la fachada aparecerá registrada anteriormente como local de hules.
@@ -295,6 +487,6 @@
     });
   </script>
 
-  <script src="index.js?v=1.5" defer></script>
+  <script src="index.js?v=1.6" defer></script>
 </body>
 </html>
