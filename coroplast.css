@@ -1,5 +1,5 @@
 /* ==========================================================================
-   DISEÑO LASER PRINT — coroplast.css (v1.0)
+   DISEÑO LASER PRINT — coroplast.css (v1.1)
    Archivo independiente: no necesita index.css ni ningún otro.
    Mismo sistema visual del sitio (Inter + Playfair, azul editorial,
    tema claro / oscuro con data-theme).
@@ -1382,53 +1382,6 @@ main {
   border-left: 1px dashed var(--border-focus);
 }
 
-.mini-wrap {
-  display: grid;
-  place-items: center;
-  height: 190px;
-  border-radius: 14px;
-  background:
-    linear-gradient(var(--border-color) 1px, transparent 1px) 0 0 / 18px 18px,
-    linear-gradient(90deg, var(--border-color) 1px, transparent 1px) 0 0 / 18px 18px,
-    var(--bg-card);
-}
-
-.mini-letrero {
-  position: relative;
-  width: 150px;
-  height: 112px;
-  border-radius: 3px;
-  background: linear-gradient(120deg, #0F4C81, #2C7BB6 50%, #C026D3);
-  box-shadow: 0 10px 20px var(--sombra-letrero);
-  transition: width 0.4s var(--ease-out), height 0.4s var(--ease-out);
-}
-
-.mini-letrero::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 5px;
-  background: repeating-linear-gradient(90deg, var(--coro-canal-osc) 0 2px, var(--coro-canal) 2px 6px);
-  border-radius: 3px 3px 0 0;
-}
-
-.mini-letrero .mini-estaca {
-  position: absolute;
-  left: 30%;
-  right: 30%;
-  top: 100%;
-  height: 34px;
-  border-left: 3px solid var(--estaca);
-  border-right: 3px solid var(--estaca);
-  display: none;
-}
-
-.mini-letrero.con-estaca .mini-estaca {
-  display: block;
-}
-
 .ticket {
   list-style: none;
   display: flex;
@@ -1467,6 +1420,169 @@ main {
   font-size: 0.8rem;
   color: var(--text-muted);
   text-align: center;
+}
+
+/* --- Hoja de 240 × 118 dibujada con el acomodo --- */
+.hoja-vista {
+  margin: 0;
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+}
+
+.hoja-vista svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.hoja-vista .h-hoja {
+  fill: var(--coro-canal);
+  stroke: var(--coro-borde);
+  stroke-width: 0.6;
+}
+
+.hoja-vista .h-pieza {
+  fill: var(--accent-color);
+  fill-opacity: 0.85;
+  stroke: var(--bg-card);
+  stroke-width: 0.4;
+  transition: all 0.35s var(--ease-out);
+}
+
+.hoja-vista .h-pieza.libre {
+  fill: var(--coro-cara);
+  fill-opacity: 1;
+  stroke: var(--coro-borde);
+  stroke-dasharray: 2 1.5;
+}
+
+.hoja-vista .h-sobra {
+  fill: rgba(239, 68, 68, 0.14);
+  stroke: rgba(239, 68, 68, 0.45);
+  stroke-width: 0.5;
+  stroke-dasharray: 2 1.5;
+}
+
+.hoja-vista .h-texto {
+  fill: var(--on-accent);
+  font-family: var(--font-body);
+  font-size: 7px;
+  font-weight: 700;
+}
+
+.hoja-vista figcaption {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.hoja-vista figcaption span:last-child {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.calc-grande {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.calc-grande div {
+  display: flex;
+  flex-direction: column;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--accent-color);
+  color: var(--on-accent);
+}
+
+.calc-grande div + div {
+  background: var(--text-primary);
+  color: var(--bg-body);
+}
+
+.calc-grande span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.calc-grande strong {
+  font-family: var(--font-heading);
+  font-size: 2.4rem;
+  font-weight: 600;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+
+.tip-hoja {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.tip-hoja[hidden] {
+  display: none;
+}
+
+.tip-hoja button {
+  margin-top: 8px;
+  display: inline-flex;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--text-primary);
+  color: var(--bg-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ticket li[hidden] {
+  display: none;
+}
+
+/* Dato de la hoja en la portada */
+.hoja-dato {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 560px;
+  margin-top: 22px;
+  padding: 14px 18px;
+  border-left: 3px solid var(--accent-color);
+  border-radius: 0 12px 12px 0;
+  background: var(--accent-soft);
+}
+
+.hoja-dato strong {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.hoja-dato span {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+}
+
+/* Cuántos salen por hoja dentro de los botones de medida */
+.chip small {
+  margin-left: 6px;
+  font-size: 0.72rem;
+  opacity: 0.7;
 }
 
 /* ==========================================================================
