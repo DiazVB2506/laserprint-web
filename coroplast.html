@@ -1,116 +1,392 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-MX">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LaserPrint Arcade - COROPLAST</title>
+  <title>Letreros de coroplast en Atizapán | Diseño Laser Print</title>
 
-  <!-- FAVICON -->
-  <link rel="icon" type="image/png" href="uploads/fotos/LOGOTIPO.png">
-
-  <!-- FUENTES RETRO & TECH -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-
-  <!-- PDF.JS LIBRARY -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>
-    if (typeof pdfjsLib !== 'undefined') {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    }
+    (function () {
+      try {
+        var t = localStorage.getItem('theme');
+        if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
   </script>
 
-  <!-- ESTILOS ARCADE -->
-  <link rel="stylesheet" href="coroplast.css">
+  <meta name="description" content="Letreros de coroplast impresos en Cd. López Mateos, Atizapán: letreros con estaca, señalética, avisos de obra, inmobiliarias y exhibidores. Ligeros y resistentes al agua. Arma tu pedido y cotiza por WhatsApp.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0a0a12">
+  <link rel="canonical" href="https://diazvb2506.github.io/laserprint-web/coroplast.html">
+
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_MX">
+  <meta property="og:site_name" content="Diseño Laser Print">
+  <meta property="og:title" content="Letreros de coroplast | Diseño Laser Print">
+  <meta property="og:description" content="Ligeros, resistentes al agua y listos para clavar. Arma tu pedido en un minuto.">
+  <meta property="og:url" content="https://diazvb2506.github.io/laserprint-web/coroplast.html">
+  <meta property="og:image" content="https://diazvb2506.github.io/laserprint-web/uploads/fotos/LOGOTIPO.png">
+
+  <link rel="icon" type="image/png" href="uploads/fotos/LOGOTIPO.png">
+  <link rel="apple-touch-icon" href="uploads/fotos/LOGOTIPO.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://res.cloudinary.com">
+  <link rel="preconnect" href="https://laserprint-api.onrender.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="coroplast.css?v=1.0">
 </head>
-<body data-categoria="COROPLAST">
+<body>
 
-  <!-- ENCABEZADO HUD / ARCADE -->
-  <header class="retro-header">
-    <div class="header-logo-container">
-      <a href="index.html">
-        <img src="uploads/fotos/LOGOTIPO.png" alt="LaserPrint Logo" class="logo-img" id="mainLogo">
+  <div class="bg-glow ambient-cyan" aria-hidden="true"></div>
+  <div class="bg-glow ambient-magenta" aria-hidden="true"></div>
+
+  <!-- ===== Encabezado ===== -->
+  <header class="glass-header">
+    <nav class="nav-container" aria-label="Menú principal">
+      <a href="index.html" class="logo" aria-label="Diseño Laser Print, ir al inicio">
+        <img src="uploads/fotos/LOGOTIPO.png" alt="Diseño Laser Print" class="logo-img"
+             onerror="this.onerror=null; this.src='https://placehold.co/260x100/111111/00f0ff?text=DISE%C3%91O+LASERPRINT';">
       </a>
-    </div>
 
-    <!-- MENÚ MÓVIL TOGGLE -->
-    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir Menú">
-      <span></span><span></span><span></span>
-    </button>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú" aria-controls="navLinks" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
 
-    <nav id="navLinks">
-      <a href="index.html" class="nav-btn arcade-sound-hover">INICIO</a>
-      <a href="dtf.html" class="nav-btn arcade-sound-hover">DTF TEXTIL / UV</a>
-      <a href="sublimacion.html" class="nav-btn arcade-sound-hover">SUBLIMACIÓN</a>
-      <a href="lona.html" class="nav-btn arcade-sound-hover">LONA</a>
-      <a href="coroplast.html" class="nav-btn active arcade-sound-hover">COROPLAST</a>
-      <a href="cortelaser.html" class="nav-btn arcade-sound-hover">CORTE LÁSER</a>
-      <a href="vinil.html" class="nav-btn arcade-sound-hover">VINIL</a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html" class="nav-btn">Inicio</a></li>
+        <li><a href="dtf.html" class="nav-btn">DTF TEXTIL / UV</a></li>
+        <li><a href="sublimacion.html" class="nav-btn">SUBLIMACIÓN</a></li>
+        <li><a href="lona.html" class="nav-btn">LONA</a></li>
+        <li><a href="coroplast.html" class="nav-btn active" aria-current="page">COROPLAST</a></li>
+        <li><a href="cortelaser.html" class="nav-btn">CORTE LÁSER</a></li>
+        <li><a href="vinil.html" class="nav-btn">VINIL</a></li>
+        <li><a href="login.html" class="nav-btn btn-admin" rel="nofollow">Iniciar Sesión Admin</a></li>
+        <li><button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Cambiar tema claro u oscuro">🌙</button></li>
+      </ul>
     </nav>
   </header>
 
-  <main class="main-container">
-    <!-- TÍTULO NEÓN ARCADE -->
-    <section class="hero-section">
-      <h1 class="pixel-title">SELECT CATEGORY: COROPLAST IMPRESO Y SUAJADO</h1>
-      <p class="pixel-subtitle">STAGE 04 - SEÑALÉTICA, EXHIBIDORES Y CORRUGADO PLÁSTICO</p>
+  <main>
+    <!-- ===== Portada: texto + letrero en estaca ===== -->
+    <section class="coro-hero">
+      <div>
+        <nav class="migas" aria-label="Ruta">
+          <a href="index.html">Inicio</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">Coroplast</span>
+        </nav>
+
+        <p class="kicker">Letreros · Señalética · Exhibidores</p>
+        <h1>Letreros que <span class="text-gradient">aguantan</span> sol y lluvia</h1>
+        <p class="lead">El coroplast es un plástico ligero y rígido: perfecto para letreros de jardín, inmobiliarias, campañas, avisos de obra y señalética. Lo clavas, lo cuelgas o lo atornillas, y dura.</p>
+
+        <ul class="virtudes" aria-label="Ventajas del coroplast">
+          <li><span aria-hidden="true">💧</span> No le afecta el agua</li>
+          <li><span aria-hidden="true">🪶</span> Muy ligero</li>
+          <li><span aria-hidden="true">🧱</span> Rígido, no se dobla</li>
+          <li><span aria-hidden="true">♻️</span> Se puede reutilizar</li>
+        </ul>
+
+        <div class="hero-acciones">
+          <a class="btn-cta" href="#armador">Armar mi pedido ↓</a>
+          <a class="btn-sec wa-general" href="https://wa.me/5215598788857" target="_blank" rel="noopener noreferrer">Cotizar por WhatsApp</a>
+        </div>
+      </div>
+
+      <div class="escenario">
+        <!-- El trabajo de coroplast más nuevo que subas desde el panel aparece aquí -->
+        <figure class="letrero" id="letrero">
+          <div class="letrero-placa" id="letreroPlaca">
+            <div class="letrero-impresion">
+              <div class="letrero-demo" aria-hidden="true">
+                <span class="grande">SE VENDE</span>
+                <span class="chico">CASA · 3 RECÁMARAS</span>
+                <span class="tel">55 0000 0000</span>
+              </div>
+            </div>
+            <span class="letrero-brillo" aria-hidden="true"></span>
+          </div>
+          <div class="estaca" aria-hidden="true"><span></span><span></span></div>
+        </figure>
+        <p class="escenario-pie" id="letreroPie">Así se ve un letrero de coroplast con estaca.</p>
+      </div>
     </section>
 
-    <!-- PESTAÑAS DE NAVEGACIÓN DIRECTA -->
-    <div class="tabs-container">
-      <button class="tab-btn active arcade-sound-btn" data-tab="imagenes">
-        <span class="tab-icon">🖼️</span> GALERÍA
-      </button>
-      <button class="tab-btn arcade-sound-btn" data-tab="videos">
-        <span class="tab-icon">🎬</span> DEMOS VIDEO
-      </button>
-      <button class="tab-btn arcade-sound-btn" data-tab="pdfs">
-        <span class="tab-icon">📄</span> CATÁLOGOS PDF
-      </button>
-    </div>
+    <!-- ===== Anatomía ===== -->
+    <section class="bloque" aria-labelledby="tituloAnatomia">
+      <div class="anatomia" id="anatomia">
+        <div class="capas" aria-hidden="true">
+          <div class="capas-giro">
+            <div class="capa reverso"></div>
+            <div class="capa alma"></div>
+            <div class="capa frente"></div>
+          </div>
+          <span class="marca-capa m1">1</span>
+          <span class="marca-capa m2">2</span>
+          <span class="marca-capa m3">3</span>
+        </div>
 
-    <!-- SECCIÓN IMÁGENES -->
-    <section id="sec-imagenes" class="media-section">
-      <h2 class="section-title"><span>🖼️</span> MUESTRAS DE TRABAJO (GALERÍA)</h2>
-      <div id="gridImagenes" class="pixel-grid"></div>
+        <div>
+          <p class="kicker">Por dentro</p>
+          <h2 id="tituloAnatomia" class="titulo-seccion">¿Por qué el coroplast dura tanto?</h2>
+          <ol class="partes" style="margin-top:24px">
+            <li>
+              <span class="num" aria-hidden="true">1</span>
+              <div>
+                <h3>Cara impresa</h3>
+                <p>Tu diseño a todo color sobre una superficie lisa de plástico. Se puede imprimir de uno o de los dos lados.</p>
+              </div>
+            </li>
+            <li>
+              <span class="num" aria-hidden="true">2</span>
+              <div>
+                <h3>Canales huecos</h3>
+                <p>Por dentro es como un cartón corrugado, pero de plástico: por eso es tan ligero y a la vez rígido. Por esos canales entra la estaca.</p>
+              </div>
+            </li>
+            <li>
+              <span class="num" aria-hidden="true">3</span>
+              <div>
+                <h3>Plástico de los dos lados</h3>
+                <p>A diferencia del cartón, no se humedece ni se deshace con la lluvia.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
     </section>
 
-    <!-- SECCIÓN VIDEOS -->
-    <section id="sec-videos" class="media-section" style="display: none;">
-      <h2 class="section-title"><span>🎬</span> PROCESOS DE IMPRESIÓN Y CORTE (VIDEOS)</h2>
-      <div id="gridVideos" class="pixel-grid"></div>
+    <!-- ===== Tipos de letrero ===== -->
+    <section class="bloque" aria-labelledby="tituloTipos">
+      <div class="bloque-header">
+        <p class="kicker">Tipos</p>
+        <h2 id="tituloTipos" class="titulo-seccion">¿Qué letrero necesitas?</h2>
+        <p class="sub-seccion">Elige uno para ver sus usos y medidas comunes. Con un toque lo pasas al armador de pedido.</p>
+      </div>
+
+      <div class="tipos-tabs" role="tablist" aria-label="Tipos de letrero">
+        <button type="button" class="tipo-tab" role="tab" id="tab-estaca" aria-controls="panel-estaca" aria-selected="true">🪧 Con estaca</button>
+        <button type="button" class="tipo-tab" role="tab" id="tab-senal" aria-controls="panel-senal" aria-selected="false" tabindex="-1">🚻 Señalética</button>
+        <button type="button" class="tipo-tab" role="tab" id="tab-fachada" aria-controls="panel-fachada" aria-selected="false" tabindex="-1">🏗️ Fachada y obra</button>
+        <button type="button" class="tipo-tab" role="tab" id="tab-exhibidor" aria-controls="panel-exhibidor" aria-selected="false" tabindex="-1">🛍️ Exhibidor</button>
+      </div>
+
+      <div class="tipo-panel" role="tabpanel" id="panel-estaca" aria-labelledby="tab-estaca" data-tipo="Letrero con estaca">
+        <div>
+          <h3>Letrero con estaca</h3>
+          <p>Se clava en el pasto o la tierra en segundos. El clásico de inmobiliarias, campañas, graduaciones y negocios que quieren llamar la atención en la calle.</p>
+          <p class="tipo-etq">Ideal para</p>
+          <ul class="chips"><li>Se vende / Se renta</li><li>Campañas</li><li>Graduaciones</li><li>Fraccionamientos</li></ul>
+          <p class="tipo-etq">Medidas comunes</p>
+          <div class="chips">
+            <button type="button" class="chip" data-medida="45x30">45 × 30 cm</button>
+            <button type="button" class="chip" data-medida="60x45">60 × 45 cm</button>
+            <button type="button" class="chip" data-medida="90x60">90 × 60 cm</button>
+          </div>
+        </div>
+        <div class="tipo-dibujo" aria-hidden="true">🪧
+          <div class="usar"><button type="button" class="btn-sec" data-usar-tipo>Usar en mi pedido</button></div>
+        </div>
+      </div>
+
+      <div class="tipo-panel" role="tabpanel" id="panel-senal" aria-labelledby="tab-senal" data-tipo="Señalética" hidden>
+        <div>
+          <h3>Señalética</h3>
+          <p>Letreros para pared o puerta: se pegan con cinta doble cara o se atornillan. Claros, ligeros y fáciles de cambiar.</p>
+          <p class="tipo-etq">Ideal para</p>
+          <ul class="chips"><li>Baños</li><li>Salida / Ruta de evacuación</li><li>No estacionarse</li><li>Horarios</li><li>Oficinas</li></ul>
+          <p class="tipo-etq">Medidas comunes</p>
+          <div class="chips">
+            <button type="button" class="chip" data-medida="20x30">20 × 30 cm</button>
+            <button type="button" class="chip" data-medida="30x40">30 × 40 cm</button>
+            <button type="button" class="chip" data-medida="40x60">40 × 60 cm</button>
+          </div>
+        </div>
+        <div class="tipo-dibujo" aria-hidden="true">🚻
+          <div class="usar"><button type="button" class="btn-sec" data-usar-tipo>Usar en mi pedido</button></div>
+        </div>
+      </div>
+
+      <div class="tipo-panel" role="tabpanel" id="panel-fachada" aria-labelledby="tab-fachada" data-tipo="Letrero de fachada u obra" hidden>
+        <div>
+          <h3>Fachada y obra</h3>
+          <p>Letreros grandes para atornillar o amarrar a rejas, bardas o mallas. Aguantan meses a la intemperie.</p>
+          <p class="tipo-etq">Ideal para</p>
+          <ul class="chips"><li>Avisos de obra</li><li>Licencias y permisos</li><li>Nombre del negocio</li><li>Estacionamientos</li></ul>
+          <p class="tipo-etq">Medidas comunes</p>
+          <div class="chips">
+            <button type="button" class="chip" data-medida="90x60">90 × 60 cm</button>
+            <button type="button" class="chip" data-medida="120x90">120 × 90 cm</button>
+            <button type="button" class="chip" data-medida="244x122">244 × 122 cm</button>
+          </div>
+        </div>
+        <div class="tipo-dibujo" aria-hidden="true">🏗️
+          <div class="usar"><button type="button" class="btn-sec" data-usar-tipo>Usar en mi pedido</button></div>
+        </div>
+      </div>
+
+      <div class="tipo-panel" role="tabpanel" id="panel-exhibidor" aria-labelledby="tab-exhibidor" data-tipo="Exhibidor" hidden>
+        <div>
+          <h3>Exhibidor</h3>
+          <p>Piezas para punto de venta: displays de mostrador, porta-precios o figuras con forma. Cuéntanos tu idea y la armamos contigo.</p>
+          <p class="tipo-etq">Ideal para</p>
+          <ul class="chips"><li>Mostradores</li><li>Promociones en tienda</li><li>Ferias y expos</li></ul>
+          <p class="tipo-etq">Medidas comunes</p>
+          <div class="chips">
+            <button type="button" class="chip" data-medida="30x45">30 × 45 cm</button>
+            <button type="button" class="chip" data-medida="60x90">60 × 90 cm</button>
+          </div>
+        </div>
+        <div class="tipo-dibujo" aria-hidden="true">🛍️
+          <div class="usar"><button type="button" class="btn-sec" data-usar-tipo>Usar en mi pedido</button></div>
+        </div>
+      </div>
     </section>
 
-    <!-- SECCIÓN PDFS -->
-    <section id="sec-pdfs" class="media-section" style="display: none;">
-      <h2 class="section-title"><span>📄</span> PLANTILLAS Y ESPECIFICACIONES (PDF)</h2>
-      <div id="gridPdfs" class="pixel-grid"></div>
+    <!-- ===== Armador de pedido ===== -->
+    <section class="bloque" id="armador" aria-labelledby="tituloArmador">
+      <div class="bloque-header">
+        <p class="kicker">Arma tu pedido</p>
+        <h2 id="tituloArmador" class="titulo-seccion">Tu pedido en un minuto</h2>
+        <p class="sub-seccion">Elige lo que necesitas y mándanoslo por WhatsApp. Te respondemos con el precio exacto.</p>
+      </div>
+
+      <form class="armador" id="armadorForm" novalidate>
+        <div class="arm-campos">
+          <div>
+            <label class="arm-etq" for="armTipo">Tipo de letrero</label>
+            <select class="arm-select" id="armTipo">
+              <option>Letrero con estaca</option>
+              <option>Señalética</option>
+              <option>Letrero de fachada u obra</option>
+              <option>Exhibidor</option>
+              <option>Otro / no estoy seguro</option>
+            </select>
+          </div>
+
+          <fieldset>
+            <legend>Medida</legend>
+            <div class="chips" id="armMedidas">
+              <button type="button" class="chip" data-medida="45x30">45 × 30</button>
+              <button type="button" class="chip" data-medida="60x45">60 × 45</button>
+              <button type="button" class="chip" data-medida="90x60">90 × 60</button>
+              <button type="button" class="chip" data-medida="120x90">120 × 90</button>
+            </div>
+            <div class="arm-medida">
+              <span class="campo"><input type="number" id="armAncho" inputmode="decimal" min="1" step="any" value="60" aria-label="Ancho en centímetros"><span class="unidad">cm</span></span>
+              <span class="por" aria-hidden="true">×</span>
+              <span class="campo"><input type="number" id="armAlto" inputmode="decimal" min="1" step="any" value="45" aria-label="Alto en centímetros"><span class="unidad">cm</span></span>
+            </div>
+          </fieldset>
+
+          <div class="arm-fila">
+            <fieldset>
+              <legend>Impresión</legend>
+              <div class="segmentado">
+                <label><input type="radio" name="caras" value="1" checked> 1 cara</label>
+                <label><input type="radio" name="caras" value="2"> 2 caras</label>
+              </div>
+            </fieldset>
+            <div>
+              <label class="arm-etq" for="armCantidad">Cantidad</label>
+              <span class="campo"><input type="number" id="armCantidad" inputmode="numeric" min="1" step="1" value="10"><span class="unidad">pzs</span></span>
+            </div>
+          </div>
+
+          <label class="arm-extra"><input type="checkbox" id="armEstaca" checked> Con estaca para clavar</label>
+
+          <div>
+            <label class="arm-etq" for="armNotas">¿Algo más? <span style="text-transform:none;letter-spacing:0;font-weight:400">(opcional)</span></label>
+            <textarea class="arm-notas" id="armNotas" maxlength="400" placeholder="Ej. Ya tengo el diseño · Lo necesito para el viernes · Con mi logo y teléfono"></textarea>
+          </div>
+        </div>
+
+        <aside class="arm-resumen" aria-live="polite">
+          <div class="mini-wrap" aria-hidden="true">
+            <div class="mini-letrero" id="miniLetrero"><span class="mini-estaca"></span></div>
+          </div>
+          <ul class="ticket">
+            <li><span>Tipo</span><strong id="tkTipo">—</strong></li>
+            <li><span>Medida</span><strong id="tkMedida">—</strong></li>
+            <li><span>Impresión</span><strong id="tkCaras">—</strong></li>
+            <li><span>Cantidad</span><strong id="tkCantidad">—</strong></li>
+            <li><span>Extras</span><strong id="tkExtras">—</strong></li>
+          </ul>
+          <a class="btn-cta" id="armWhatsapp" href="#" target="_blank" rel="noopener noreferrer">Enviar pedido por WhatsApp</a>
+          <p class="arm-letra">Te respondemos con el precio. El diseño tiene costo extra según la complejidad.</p>
+        </aside>
+      </form>
+    </section>
+
+    <!-- ===== Pared de letreros ===== -->
+    <section class="bloque" id="trabajos" aria-labelledby="tituloTrabajos">
+      <div class="pared-header">
+        <div>
+          <p class="kicker">Trabajos</p>
+          <h2 id="tituloTrabajos" class="titulo-seccion">Nuestra pared de letreros</h2>
+          <p class="pared-resumen" id="paredResumen" aria-live="polite">Cargando trabajos…</p>
+        </div>
+      </div>
+      <div class="pared" id="pared" aria-busy="true"></div>
+    </section>
+
+    <!-- ===== Llamado final ===== -->
+    <section class="cta-banda">
+      <div>
+        <h2>¿Campaña, fraccionamiento o franquicia?</h2>
+        <p>Para pedidos de muchas piezas te armamos una cotización especial.</p>
+      </div>
+      <a class="btn-cta wa-volumen" href="https://wa.me/5215598788857" target="_blank" rel="noopener noreferrer">Cotizar volumen</a>
     </section>
   </main>
 
-  <!-- VISOR MODAL RETRO -->
-  <div id="mediaModal" class="pixel-modal" style="display: none;">
-    <span class="close-modal arcade-sound-btn" id="closeModal">&times;</span>
-    <div class="modal-content-wrapper">
-      <div id="modalBody"></div>
-      <p id="captionModal" class="modal-caption"></p>
+  <!-- ===== Pie ===== -->
+  <footer class="glass-footer">
+    <div class="footer-content">
+      <div class="footer-social">
+        <a href="https://www.facebook.com/PON_AQUI_TU_LINK" target="_blank" rel="noopener noreferrer" aria-label="Facebook de Laser Print">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.5 1.6-1.5h1.7V4.4c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.4H7.7V14h2.7v8h3.1z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/laserprint678/" target="_blank" rel="noopener noreferrer" aria-label="Instagram de Laser Print">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="https://www.tiktok.com/@laserprint2026" target="_blank" rel="noopener noreferrer" aria-label="TikTok de Laser Print">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M16.6 3c.4 2.2 1.9 3.8 4 4v3.1c-1.5 0-2.9-.5-4-1.2V15a6 6 0 1 1-6-6c.3 0 .6 0 .9.1v3.2a2.9 2.9 0 1 0 2 2.7V3h3.1z"/></svg>
+        </a>
+      </div>
+      <div class="footer-contact">
+        <a href="tel:+525598788857">📞 +52 55 9878 8857</a>
+        <span class="footer-separator">|</span>
+        <a href="mailto:laserprint678@gmail.com">✉️ laserprint678@gmail.com</a>
+      </div>
+      <p class="footer-rights">© <span id="year">2026</span> Diseño Laser Print. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- ===== Visor ===== -->
+  <div class="visor" id="visor" role="dialog" aria-modal="true" aria-labelledby="visorTitulo" hidden>
+    <button type="button" class="visor-cerrar" id="visorCerrar" aria-label="Cerrar">✕</button>
+    <button type="button" class="visor-nav visor-prev" id="visorPrev" aria-label="Anterior">‹</button>
+    <button type="button" class="visor-nav visor-next" id="visorNext" aria-label="Siguiente">›</button>
+    <div class="visor-caja">
+      <div class="visor-media" id="visorMedia"></div>
+      <aside class="visor-info">
+        <p class="visor-contador" id="visorContador"></p>
+        <h2 id="visorTitulo"></h2>
+        <p class="visor-precio" id="visorPrecio"></p>
+        <p class="visor-desc" id="visorDesc"></p>
+        <div class="visor-acciones">
+          <a class="btn-cta" id="visorWhatsapp" target="_blank" rel="noopener noreferrer">Quiero uno así</a>
+          <a class="btn-sec" id="visorAbrir" target="_blank" rel="noopener noreferrer" hidden>Abrir PDF</a>
+        </div>
+      </aside>
     </div>
   </div>
 
-  <!-- CONTROL DE FALLBACK PARA LOGO -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const logo = document.getElementById('mainLogo');
-      if (logo) {
-        logo.addEventListener('error', () => {
-          logo.src = 'https://via.placeholder.com/150x50/000/00f0ff?text=LASERPRINT';
-        });
-      }
-    });
-  </script>
-
-  <!-- LÓGICA DE CONTROL -->
-  <script src="coroplast.js"></script>
+  <script src="coroplast.js?v=1.0" defer></script>
 </body>
 </html>
