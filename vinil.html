@@ -1,100 +1,344 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-MX">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LaserPrint Arcade - VINIL</title>
+  <title>Vinil impreso y stickers en Atizapán | Diseño Laser Print</title>
 
-  <!-- FAVICON PARA PESTAÑA DEL NAVEGADOR -->
-  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/diazvb2506/laserprint-web/main/uploads/fotos/LOGOTIPO.png">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('theme');
+        if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
 
-  <!-- FUENTES RETRO & TECH -->
+  <meta name="description" content="Stickers a $450 el metro lineal (rollo de 1.5 m) y vinil impreso a $300 el m² en Cd. López Mateos, Atizapán. Calcula cuántos stickers te caben y pide por WhatsApp.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0a0a12">
+  <link rel="canonical" href="https://diazvb2506.github.io/laserprint-web/vinil.html">
+
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_MX">
+  <meta property="og:site_name" content="Diseño Laser Print">
+  <meta property="og:title" content="Vinil impreso y stickers | Diseño Laser Print">
+  <meta property="og:description" content="Calcula cuántos stickers te caben en el rollo y cuánto sale cada uno.">
+  <meta property="og:url" content="https://diazvb2506.github.io/laserprint-web/vinil.html">
+  <meta property="og:image" content="https://diazvb2506.github.io/laserprint-web/uploads/fotos/LOGOTIPO.png">
+
+  <link rel="icon" type="image/png" href="uploads/fotos/LOGOTIPO.png">
+  <link rel="apple-touch-icon" href="uploads/fotos/LOGOTIPO.png">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://res.cloudinary.com">
+  <link rel="preconnect" href="https://laserprint-api.onrender.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
 
-  <!-- PDF.JS LIBRARY -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-  <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
-
-  <!-- ESTILOS ARCADE -->
-  <link rel="stylesheet" href="vinil.css">
+  <link rel="stylesheet" href="vinil.css?v=1.0">
 </head>
-<body data-categoria="VINIL">
+<body>
 
-  <!-- ENCABEZADO HUD / ARCADE -->
-  <header class="retro-header">
-    <div class="header-logo-container">
-      <a href="index.html">
-        <img src="https://raw.githubusercontent.com/diazvb2506/laserprint-web/main/uploads/fotos/LOGOTIPO.png" alt="LaserPrint Logo" class="logo-img">
+  <div class="bg-glow ambient-cyan" aria-hidden="true"></div>
+  <div class="bg-glow ambient-magenta" aria-hidden="true"></div>
+
+  <!-- ===== Encabezado ===== -->
+  <header class="glass-header">
+    <nav class="nav-container" aria-label="Menú principal">
+      <a href="index.html" class="logo" aria-label="Diseño Laser Print, ir al inicio">
+        <img src="uploads/fotos/LOGOTIPO.png" alt="Diseño Laser Print" class="logo-img"
+             onerror="this.onerror=null; this.src='https://placehold.co/260x100/111111/00f0ff?text=DISE%C3%91O+LASERPRINT';">
       </a>
-    </div>
 
-    <!-- MENÚ MÓVIL TOGGLE -->
-    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir Menú">
-      <span></span><span></span><span></span>
-    </button>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú" aria-controls="navLinks" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
 
-    <nav id="navLinks">
-      <a href="index.html" class="nav-btn arcade-sound-hover">INICIO</a>
-      <a href="dtf.html" class="nav-btn arcade-sound-hover">DTF TEXTIL / UV</a>
-      <a href="sublimacion.html" class="nav-btn arcade-sound-hover">SUBLIMACIÓN</a>
-      <a href="lona.html" class="nav-btn arcade-sound-hover">LONA</a>
-      <a href="coroplast.html" class="nav-btn arcade-sound-hover">COROPLAST</a>
-      <a href="cortelaser.html" class="nav-btn arcade-sound-hover">CORTE LÁSER</a>
-      <a href="vinil.html" class="nav-btn active arcade-sound-hover">VINIL</a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html" class="nav-btn">Inicio</a></li>
+        <li><a href="dtf.html" class="nav-btn">DTF TEXTIL / UV</a></li>
+        <li><a href="sublimacion.html" class="nav-btn">SUBLIMACIÓN</a></li>
+        <li><a href="lona.html" class="nav-btn">LONA</a></li>
+        <li><a href="coroplast.html" class="nav-btn">COROPLAST</a></li>
+        <li><a href="cortelaser.html" class="nav-btn">CORTE LÁSER</a></li>
+        <li><a href="vinil.html" class="nav-btn active" aria-current="page">VINIL</a></li>
+        <li><a href="login.html" class="nav-btn btn-admin" rel="nofollow">Iniciar Sesión Admin</a></li>
+        <li><button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Cambiar tema claro u oscuro">🌙</button></li>
+      </ul>
     </nav>
   </header>
 
-  <main class="main-container">
-    <!-- TÍTULO NEÓN ARCADE -->
-    <section class="hero-section">
-      <h1 class="pixel-title">SELECT CATEGORY: VINIL IMPRESO Y DE CORTE</h1>
-      <p class="pixel-subtitle">STAGE 06 - ROTULACIÓN, DECORATIVO, ESMERILADO Y MICROPERFORADO</p>
+  <main>
+    <!-- ===== Portada: texto + sticker que se despega ===== -->
+    <section class="vinil-hero">
+      <div>
+        <nav class="migas" aria-label="Ruta">
+          <a href="index.html">Inicio</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">Vinil</span>
+        </nav>
+
+        <p class="kicker">Vinil impreso · Stickers</p>
+        <h1>Pégalo <span class="despega">donde quieras</span></h1>
+        <p class="lead">Stickers para tu marca, etiquetas para tus productos y vinil impreso para vitrinas, paredes, autos y más. Brillante o mate, impreso a todo color.</p>
+
+        <div class="tarifas">
+          <a class="tarifa" href="#planificador" data-ir="stickers">
+            <span class="tarifa-icono" aria-hidden="true">🏷️</span>
+            <span><strong>$450</strong> metro lineal</span>
+            <small>Stickers · rollo de 1.5 m de ancho</small>
+          </a>
+          <a class="tarifa" href="#planificador" data-ir="impreso">
+            <span class="tarifa-icono" aria-hidden="true">🖼️</span>
+            <span><strong>$300</strong> por m²</span>
+            <small>Vinil impreso · mínimo ½ m²</small>
+          </a>
+        </div>
+
+        <div class="hero-acciones">
+          <a class="btn-cta" href="#planificador">Calcular mi pedido ↓</a>
+          <a class="btn-sec wa-general" href="https://wa.me/5215598788857" target="_blank" rel="noopener noreferrer">Cotizar por WhatsApp</a>
+        </div>
+      </div>
+
+      <div class="escena" aria-hidden="true">
+        <div class="pegatina chica uno"><span>★</span></div>
+        <div class="pegatina chica dos"><span>♥</span></div>
+        <div class="pegatina-grande">
+          <div class="pegatina principal">
+            <svg viewBox="0 0 300 300">
+              <defs>
+                <linearGradient id="gStk" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#FF5F6D"/>
+                  <stop offset=".5" stop-color="#C026D3"/>
+                  <stop offset="1" stop-color="#3B82F6"/>
+                </linearGradient>
+              </defs>
+              <rect width="300" height="300" fill="url(#gStk)"/>
+              <circle cx="235" cy="70" r="70" fill="#FFD166" opacity=".9"/>
+              <circle cx="60" cy="250" r="90" fill="#06D6A0" opacity=".55"/>
+              <text x="150" y="150" text-anchor="middle" font-family="Georgia, serif" font-size="46" font-weight="700" fill="#fff">Laser</text>
+              <text x="150" y="196" text-anchor="middle" font-family="Georgia, serif" font-size="46" font-style="italic" fill="#fff">Print</text>
+              <text x="150" y="236" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" letter-spacing="4" fill="#fff" opacity=".9">HECHO A TU MEDIDA</text>
+            </svg>
+          </div>
+          <div class="pestana"></div>
+        </div>
+      </div>
     </section>
 
-    <!-- PESTAÑAS DE NAVEGACIÓN DIRECTA -->
-    <div class="tabs-container">
-      <button class="tab-btn active arcade-sound-btn" data-tab="imagenes">
-        <span class="tab-icon">🖼️</span> GALERÍA
-      </button>
-      <button class="tab-btn arcade-sound-btn" data-tab="videos">
-        <span class="tab-icon">🎬</span> DEMOS VIDEO
-      </button>
-      <button class="tab-btn arcade-sound-btn" data-tab="pdfs">
-        <span class="tab-icon">📄</span> CATÁLOGOS PDF
-      </button>
-    </div>
+    <!-- ===== Planificador ===== -->
+    <section class="bloque" id="planificador" aria-labelledby="tituloPlan">
+      <div class="bloque-header">
+        <p class="kicker">Calcula tu pedido</p>
+        <h2 id="tituloPlan" class="titulo-seccion">Acomoda tus stickers en el rollo</h2>
+        <p class="sub-seccion">Pon la medida y la cantidad: te mostramos cuántos caben, cuántos metros se usan y cuánto sale cada uno. Si subes tu diseño, lo verás en el acomodo.</p>
+      </div>
 
-    <!-- SECCIÓN IMÁGENES -->
-    <section id="sec-imagenes" class="media-section">
-      <h2 class="section-title"><span>🖼️</span> MUESTRAS DE TRABAJO (GALERÍA)</h2>
-      <div id="gridImagenes" class="pixel-grid"></div>
+      <div class="plan">
+        <form class="plan-campos" id="planForm" novalidate>
+          <div class="modos" role="group" aria-label="Tipo de vinil">
+            <button type="button" data-modo="stickers" aria-pressed="true">🏷️ Stickers</button>
+            <button type="button" data-modo="impreso" aria-pressed="false">🖼️ Vinil impreso</button>
+          </div>
+
+          <fieldset class="solo-stickers">
+            <legend>Forma</legend>
+            <div class="opciones">
+              <label class="opcion"><input type="radio" name="forma" value="circulo" checked><span><i class="f-circulo" aria-hidden="true"></i>Círculo</span></label>
+              <label class="opcion"><input type="radio" name="forma" value="cuadrado"><span><i class="f-cuadrado" aria-hidden="true"></i>Cuadrado</span></label>
+              <label class="opcion"><input type="radio" name="forma" value="rectangulo"><span><i class="f-rect" aria-hidden="true"></i>Rectángulo</span></label>
+            </div>
+          </fieldset>
+
+          <div>
+            <span class="plan-etq" id="etqMedida">Medida de cada sticker</span>
+            <div class="plan-fila">
+              <label class="campo"><input type="number" id="pAncho" inputmode="decimal" min="0.5" step="any" value="5" aria-label="Ancho en centímetros"><span class="unidad">cm</span></label>
+              <span class="por" aria-hidden="true" id="pPor">×</span>
+              <label class="campo" id="campoAlto"><input type="number" id="pAlto" inputmode="decimal" min="0.5" step="any" value="5" aria-label="Alto en centímetros"><span class="unidad">cm</span></label>
+            </div>
+            <div class="rapidas" id="rapidas" aria-label="Medidas comunes"></div>
+          </div>
+
+          <div>
+            <label class="plan-etq" for="pCantidad" id="etqCantidad">¿Cuántos?</label>
+            <div class="cantidad">
+              <button type="button" class="menos" aria-label="Menos">−</button>
+              <label class="campo"><input type="number" id="pCantidad" inputmode="numeric" min="1" step="1" value="100"><span class="unidad" id="unidadCantidad">pzs</span></label>
+              <button type="button" class="mas" aria-label="Más">+</button>
+            </div>
+          </div>
+
+          <fieldset>
+            <legend>Acabado</legend>
+            <div class="opciones">
+              <label class="opcion"><input type="radio" name="acabado" value="Brillante" checked><span>✨ Brillante</span></label>
+              <label class="opcion"><input type="radio" name="acabado" value="Mate"><span>Mate</span></label>
+            </div>
+          </fieldset>
+
+          <div>
+            <span class="plan-etq">Tu diseño <span class="opcional">(opcional, no se sube a ningún lado)</span></span>
+            <label class="subir" id="subir">
+              <input type="file" id="pDiseno" accept="image/png,image/jpeg,image/webp,image/svg+xml">
+              <span class="subir-mini" id="subirMini" aria-hidden="true">🎨</span>
+              <span class="subir-texto"><strong id="subirNombre">Elegir imagen</strong><small>PNG, JPG o SVG para verlo en la vista previa</small></span>
+            </label>
+          </div>
+        </form>
+
+        <div class="plan-vista">
+          <div class="rollo" id="rollo">
+            <span class="rollo-etq" id="rolloEtq">ROLLO · 1.5 m DE ANCHO</span>
+            <svg id="rolloSvg" role="img" aria-label="Acomodo en el rollo"></svg>
+            <span class="rollo-mas" id="rolloMas" hidden></span>
+          </div>
+
+          <ul class="resultado" id="resultado" aria-live="polite"></ul>
+          <p class="plan-aviso" id="planAviso" role="status" hidden></p>
+          <p class="plan-tip" id="planTip" hidden></p>
+
+          <div class="plan-acciones">
+            <a class="btn-cta" id="planWhatsapp" href="#" target="_blank" rel="noopener noreferrer">Pedir por WhatsApp</a>
+          </div>
+          <p class="plan-letra">Precio estimado, sin diseño (el diseño tiene costo extra). Entrega en 2 a 3 días hábiles. Te confirmamos el total por WhatsApp.</p>
+        </div>
+      </div>
     </section>
 
-    <!-- SECCIÓN VIDEOS -->
-    <section id="sec-videos" class="media-section" style="display: none;">
-      <h2 class="section-title"><span>🎬</span> PROCESOS DE CORTE Y APLICACIÓN (VIDEOS)</h2>
-      <div id="gridVideos" class="pixel-grid"></div>
+    <!-- ===== Brillante vs mate ===== -->
+    <section class="bloque" aria-labelledby="tituloAcabados">
+      <div class="bloque-header">
+        <p class="kicker">Acabados</p>
+        <h2 id="tituloAcabados" class="titulo-seccion">¿Brillante o mate?</h2>
+        <p class="sub-seccion">Pasa el dedo o el mouse sobre cada uno para ver cómo le pega la luz.</p>
+      </div>
+
+      <div class="acabados">
+        <article class="acabado brillante">
+          <div class="muestra-acabado" tabindex="0" aria-label="Muestra de vinil brillante">
+            <span class="muestra-texto">Brillante</span>
+          </div>
+          <div class="acabado-info">
+            <h3>✨ Brillante</h3>
+            <p>Colores más vivos y con reflejo. Llama la atención en stickers, etiquetas de producto y promociones.</p>
+          </div>
+        </article>
+        <article class="acabado mate">
+          <div class="muestra-acabado" tabindex="0" aria-label="Muestra de vinil mate">
+            <span class="muestra-texto">Mate</span>
+          </div>
+          <div class="acabado-info">
+            <h3>Mate</h3>
+            <p>Sin reflejos: se lee bien aunque le dé la luz de frente. Se ve elegante en etiquetas, menús y vitrinas.</p>
+          </div>
+        </article>
+      </div>
     </section>
 
-    <!-- SECCIÓN PDFS -->
-    <section id="sec-pdfs" class="media-section" style="display: none;">
-      <h2 class="section-title"><span>📄</span> MUESTRARIOS DE COLOR Y ESPECIFICACIONES (PDF)</h2>
-      <div id="gridPdfs" class="pixel-grid"></div>
+    <!-- ===== Cómo aplicarlo ===== -->
+    <section class="bloque" aria-labelledby="tituloAplicar">
+      <div class="bloque-header">
+        <p class="kicker">Ya lo tienes</p>
+        <h2 id="tituloAplicar" class="titulo-seccion">Cómo pegarlo sin burbujas</h2>
+      </div>
+
+      <ol class="pasos">
+        <li>
+          <span class="paso-num">1</span>
+          <h3>Limpia la superficie</h3>
+          <p>Que esté seca y sin polvo ni grasa. Un trapo con alcohol funciona muy bien.</p>
+        </li>
+        <li>
+          <span class="paso-num">2</span>
+          <h3>Despega poco a poco</h3>
+          <p>Quita solo una orilla del papel y alinea antes de pegar todo.</p>
+        </li>
+        <li>
+          <span class="paso-num">3</span>
+          <h3>Del centro hacia afuera</h3>
+          <p>Presiona con una tarjeta o espátula mientras sigues quitando el papel.</p>
+        </li>
+        <li>
+          <span class="paso-num">4</span>
+          <h3>¿Quedó una burbuja?</h3>
+          <p>Pícala con un alfiler y aplánala con el dedo.</p>
+        </li>
+      </ol>
+
+      <div class="otros">
+        <p><strong>¿Buscas otro tipo de vinil?</strong> Vinil de corte, esmerilado o microperforado: pregúntanos.</p>
+        <a class="btn-sec wa-otros" href="https://wa.me/5215598788857" target="_blank" rel="noopener noreferrer">Preguntar</a>
+      </div>
+    </section>
+
+    <!-- ===== Planilla de trabajos ===== -->
+    <section class="bloque" id="trabajos" aria-labelledby="tituloTrabajos">
+      <div class="bloque-header">
+        <p class="kicker">Trabajos</p>
+        <h2 id="tituloTrabajos" class="titulo-seccion">Nuestra planilla de stickers</h2>
+        <p class="planilla-resumen" id="planillaResumen" aria-live="polite">Cargando trabajos…</p>
+      </div>
+
+      <div class="planilla" id="planilla" aria-busy="true"></div>
+    </section>
+
+    <!-- ===== Llamado final ===== -->
+    <section class="cta-banda">
+      <div>
+        <h2>¿Aún no tienes el diseño?</h2>
+        <p>Te ayudamos a hacerlo y lo dejamos listo para imprimir.</p>
+      </div>
+      <a class="btn-cta wa-diseno" href="https://wa.me/5215598788857" target="_blank" rel="noopener noreferrer">Quiero mi diseño</a>
     </section>
   </main>
 
-  <!-- VISOR MODAL RETRO -->
-  <div id="mediaModal" class="pixel-modal">
-    <span class="close-modal arcade-sound-btn" id="closeModal">&times;</span>
-    <div class="modal-content-wrapper">
-      <div id="modalBody"></div>
-      <p id="captionModal" class="modal-caption"></p>
+  <!-- ===== Pie ===== -->
+  <footer class="glass-footer">
+    <div class="footer-content">
+      <div class="footer-social">
+        <a href="https://www.facebook.com/PON_AQUI_TU_LINK" target="_blank" rel="noopener noreferrer" aria-label="Facebook de Laser Print">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.5 1.6-1.5h1.7V4.4c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.4H7.7V14h2.7v8h3.1z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/laserprint678/" target="_blank" rel="noopener noreferrer" aria-label="Instagram de Laser Print">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="https://www.tiktok.com/@laserprint2026" target="_blank" rel="noopener noreferrer" aria-label="TikTok de Laser Print">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M16.6 3c.4 2.2 1.9 3.8 4 4v3.1c-1.5 0-2.9-.5-4-1.2V15a6 6 0 1 1-6-6c.3 0 .6 0 .9.1v3.2a2.9 2.9 0 1 0 2 2.7V3h3.1z"/></svg>
+        </a>
+      </div>
+      <div class="footer-contact">
+        <a href="tel:+525598788857">📞 +52 55 9878 8857</a>
+        <span class="footer-separator">|</span>
+        <a href="mailto:laserprint678@gmail.com">✉️ laserprint678@gmail.com</a>
+      </div>
+      <p class="footer-rights">© <span id="year">2026</span> Diseño Laser Print. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- ===== Visor ===== -->
+  <div class="visor" id="visor" role="dialog" aria-modal="true" aria-labelledby="visorTitulo" hidden>
+    <button type="button" class="visor-cerrar" id="visorCerrar" aria-label="Cerrar">✕</button>
+    <button type="button" class="visor-nav visor-prev" id="visorPrev" aria-label="Anterior">‹</button>
+    <button type="button" class="visor-nav visor-next" id="visorNext" aria-label="Siguiente">›</button>
+    <div class="visor-caja">
+      <div class="visor-media" id="visorMedia"></div>
+      <aside class="visor-info">
+        <p class="visor-contador" id="visorContador"></p>
+        <h2 id="visorTitulo"></h2>
+        <p class="visor-precio" id="visorPrecio"></p>
+        <p class="visor-desc" id="visorDesc"></p>
+        <div class="visor-acciones">
+          <a class="btn-cta" id="visorWhatsapp" target="_blank" rel="noopener noreferrer">Quiero uno así</a>
+          <a class="btn-sec" id="visorAbrir" target="_blank" rel="noopener noreferrer" hidden>Abrir PDF</a>
+        </div>
+      </aside>
     </div>
   </div>
 
-  <!-- LÓGICA DE CONTROL -->
-  <script src="vinil.js"></script>
+  <script src="vinil.js?v=1.0" defer></script>
 </body>
 </html>
