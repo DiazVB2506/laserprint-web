@@ -1,116 +1,448 @@
+
+TNUBECARIO02, En suspensión o app cerrada
+Assembling page sections into the final sublimation layout.
+Para Sublimación voy a hacer una página distinta, no una copia de DTF:
+
+Portada dividida: el texto a la izquierda y a la derecha tu trabajo más reciente en grande.
+Galería tipo Pinterest: columnas donde cada foto se ve completa, sin recortar, con el título debajo.
+Cosas útiles que DTF no tiene:
+“¿Qué se puede sublimar?”, con lo que sí y lo que no.
+Una calculadora de precio por medidas.
+Una comparación Sublimación vs DTF para que el cliente elija bien.
+Preguntas frecuentes.
+Antes, convierto dtf.css y dtf.js en archivos compartidos (seccion.css y seccion.js), para que todas las secciones usen el mismo motor y cada una elija su diseño.
+
+Creó un archivo, compartió 4 archivos, y 19 pasos más
+Ya está Sublimación: mismo estilo que el resto del sitio, pero con forma y contenido propios. Sube los 4 archivos a laserprint-web.
+
+Qué tiene la página:
+
+Portada dividida. A la izquierda: “Colores que se vuelven parte de la tela”, los datos clave y los botones. A la derecha, tu trabajo más reciente en grande con su nombre; al tocarlo se abre en el visor. Mientras no haya fotos se ve un arte de tintas CMYK animado.
+¿Qué se puede sublimar? Lo que sí funciona (dry-fit, uniformes, tazas, termos, mousepads…) y lo que no (algodón, prendas oscuras), con un enlace a DTF para esos casos. Esto te ahorra pedidos equivocados.
+Galería tipo Pinterest. Cada foto se ve completa, sin recortes, con el título y el precio debajo: distinta al mosaico de DTF.
+Calculadora “¿Cuánto me sale?”. El cliente pone ancho, alto y piezas y ve el precio al momento ($250/m², mínimo 0.1 m²). El botón “Enviar esta cotización” te manda por WhatsApp las medidas y el total.
+Tabla Sublimación vs DTF. Tela, prendas oscuras, tacto, durabilidad y precio, para que el cliente elija bien.
+Preguntas frecuentes desplegables. Además van marcadas para Google, que puede mostrarlas directo en los resultados de búsqueda.
+Cierre: “¿Uniformes para tu equipo?” con WhatsApp.
+Cambio en los archivos: DTF y Sublimación ahora usan los mismos seccion.css y seccion.js. Por eso te mando también dtf.html actualizado. Ya puedes borrar dtf.css y dtf.js del repo.
+
+Cada página elige su diseño desde el HTML:
+
+data-diseno="revista" → mosaico (DTF)
+data-diseno="columnas" → Pinterest (Sublimación)
+La calculadora también es reutilizable. Para Lona sería solo data-precio-m2="85" data-minimo-m2="1".
+
+Revisa estos textos, porque los redacté yo:
+
+La lista de artículos que se pueden sublimar. Si no manejas alguno, como rompecabezas o gorras, bórralo del HTML.
+En los datos de la portada puse “Full color: fotos y degradados”. Cámbialo si prefieres destacar otra cosa.
+¿Seguimos con Lona? Ahí la calculadora encaja perfecto ($85/m², mínimo 1 m²). Si me dices los tamaños más comunes que vendes y si llevan ojillos o bastilla, armo algo útil con eso.
+
+
+Sublimacion
+Código·HTML 
+
+Dtf
+Código·HTML 
+
+Seccion
+Código·CSS 
+
+Seccion
+JS 
+Texto pegado.txt
+Texto pegado.txt
+TXT
+Texto pegado.txt
+Texto pegado.txt
+TXT
+Texto pegado.txt
+Texto pegado.txt
+TXT
+ahora lona.html, css y js que sean codigos separados, por que ya tengo todo separado y no todoel css en uno solo para todos.
+
+igual ya sabes algo muy diferente a sublimacion y dtf, pero el mismo estilo
+
+Diseñando un simulador visual de medidas para la lona.
+Para Lona voy a hacer algo pensado para gran formato, distinto a las otras dos páginas:
+
+Portada como una lona colgada, con ojillos en las esquinas y tu trabajo más nuevo adentro.
+Simulador de tamaño: el cliente escribe las medidas y ve su lona dibujada a escala junto a una persona de 1.70 m, con los ojillos marcados, el precio y la resolución que necesita su archivo.
+Galería tipo carrete, con desplazamiento horizontal como en una tira de impresión.
+Y los tres archivos van independientes: lona.css y lona.js no dependen de nada más.
+
+Creó 3 archivos, compartió 3 archivos, y 19 pasos más
+Ya está la página de Lona en tres archivos independientes: lona.css y lona.js no dependen de index.css ni de ningún otro archivo. La probé en computadora, en celular y en ambos temas, también sin lonas publicadas y con el servidor caído, y no hubo errores.
+
+Por qué es distinta a DTF y Sublimación:
+
+Portada de lona colgada. Tu lona más reciente aparece dentro de una lona dibujada con cuerdas y ojillos, que se balancea un poco al cargar la página. Al tocarla se abre en grande. Mientras no subas lonas, muestra un ejemplo de “¡GRAN APERTURA!”.
+Simulador a escala, lo más útil de la página. El cliente escribe ancho × alto y ve su lona dibujada junto a una persona de 1.70 m, con medidas y ojillos. Debajo aparecen:
+el precio ($85/m², mínimo 1 m² por pieza);
+cuántos píxeles debe medir su archivo para que salga nítido; esto te ahorra lonas pixeleadas y reclamos;
+un botón que te manda por WhatsApp la medida, las piezas, si lleva ojillos y el total.
+Medidas rápidas (1×1, 2×1, 3×1, roll-up…) y tarjetas de ideas: Fachada, Fiestas, Promociones, Roll-up. Al tocar una, el simulador se ajusta a esa medida.
+Galería tipo carrete: una tira horizontal que se desliza, con flechas, barra de avance y rueda del mouse. Cada foto conserva su forma real.
+“Tu archivo, listo para imprimir”: 4 consejos para que la lona salga bien a la primera.
+Cierre “¿No tienes diseño?” con WhatsApp.
+Revisa estos tres supuestos míos: están en CONFIG, al inicio de lona.js, y cambiarlos es editar un número.
+
+Puse un ojillo aprox. cada 50 cm. Si los colocas a otra distancia, cambia separacionOjillosM.
+La resolución recomendada es 100 ppp, que es lo normal para lona vista a distancia. Se cambia en resolucionPpp.
+La casilla “Con ojillos” no cambia el precio, porque no sé si los cobras aparte. Si tienen costo, dime cuánto y lo sumo.
+Por cierto: DTF y Sublimación quedaron con el CSS y JS compartidos (seccion.css y seccion.js). ¿Quieres que también los separe en dtf.css/dtf.js y sublimacion.css/sublimacion.js para que todo quede igual que Lona?
+
+
+Lona
+Código·HTML 
+
+Lona
+Código·CSS 
+
+Lona
+JS 
+
+
+
+Claude es una IA y puede cometer errores.
+
+
+Lona · HTML
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-MX">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LaserPrint Arcade - LONA</title>
-
-  <!-- FAVICON -->
+  <title>Lona impresa en Atizapán desde $85 el m² | Diseño Laser Print</title>
+ 
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('theme');
+        if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
+ 
+  <meta name="description" content="Lona impresa en Cd. López Mateos, Atizapán: anuncios para negocio, eventos, fiestas y obra. $85 el m². Calcula el tamaño y el precio de tu lona y cotiza por WhatsApp.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0a0a12">
+  <link rel="canonical" href="https://diazvb2506.github.io/laserprint-web/lona.html">
+ 
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_MX">
+  <meta property="og:site_name" content="Diseño Laser Print">
+  <meta property="og:title" content="Lona impresa desde $85 el m² | Diseño Laser Print">
+  <meta property="og:description" content="Mira cómo se ve tu lona a escala y conoce su precio al instante.">
+  <meta property="og:url" content="https://diazvb2506.github.io/laserprint-web/lona.html">
+  <meta property="og:image" content="https://diazvb2506.github.io/laserprint-web/uploads/fotos/LOGOTIPO.png">
+ 
   <link rel="icon" type="image/png" href="uploads/fotos/LOGOTIPO.png">
-
-  <!-- FUENTES RETRO & TECH -->
+  <link rel="apple-touch-icon" href="uploads/fotos/LOGOTIPO.png">
+ 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-
-  <!-- PDF.JS LIBRARY -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-  <script>
-    if (typeof pdfjsLib !== 'undefined') {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    }
-  </script>
-
-  <!-- ESTILOS ARCADE -->
-  <link rel="stylesheet" href="lona.css">
+  <link rel="preconnect" href="https://res.cloudinary.com">
+  <link rel="preconnect" href="https://laserprint-api.onrender.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+ 
+  <link rel="stylesheet" href="lona.css?v=1.0">
 </head>
-<body data-categoria="LONA">
-
-  <!-- ENCABEZADO ESTILO HUD / ARCADE -->
-  <header class="retro-header">
-    <div class="header-logo-container">
-      <a href="index.html">
-        <img src="uploads/fotos/LOGOTIPO.png" alt="LaserPrint Logo" class="logo-img" id="mainLogo">
+<body>
+ 
+  <div class="bg-glow ambient-cyan" aria-hidden="true"></div>
+  <div class="bg-glow ambient-magenta" aria-hidden="true"></div>
+ 
+  <!-- ===== Encabezado ===== -->
+  <header class="glass-header">
+    <nav class="nav-container" aria-label="Menú principal">
+      <a href="index.html" class="logo" aria-label="Diseño Laser Print, ir al inicio">
+        <img src="uploads/fotos/LOGOTIPO.png" alt="Diseño Laser Print" class="logo-img"
+             onerror="this.onerror=null; this.src='https://placehold.co/260x100/111111/00f0ff?text=DISE%C3%91O+LASERPRINT';">
       </a>
-    </div>
-
-    <!-- MENÚ MÓVIL TOGGLE -->
-    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir Menú">
-      <span></span><span></span><span></span>
-    </button>
-
-    <nav id="navLinks">
-      <a href="index.html" class="nav-btn arcade-sound-hover">INICIO</a>
-      <a href="dtf.html" class="nav-btn arcade-sound-hover">DTF TEXTIL / UV</a>
-      <a href="sublimacion.html" class="nav-btn arcade-sound-hover">SUBLIMACIÓN</a>
-      <a href="lona.html" class="nav-btn active arcade-sound-hover">LONA</a>
-      <a href="coroplast.html" class="nav-btn arcade-sound-hover">COROPLAST</a>
-      <a href="cortelaser.html" class="nav-btn arcade-sound-hover">CORTE LÁSER</a>
-      <a href="vinil.html" class="nav-btn arcade-sound-hover">VINIL</a>
+ 
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú" aria-controls="navLinks" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+ 
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html" class="nav-btn">Inicio</a></li>
+        <li><a href="dtf.html" class="nav-btn">DTF TEXTIL / UV</a></li>
+        <li><a href="sublimacion.html" class="nav-btn">SUBLIMACIÓN</a></li>
+        <li><a href="lona.html" class="nav-btn active" aria-current="page">LONA</a></li>
+        <li><a href="coroplast.html" class="nav-btn">COROPLAST</a></li>
+        <li><a href="cortelaser.html" class="nav-btn">CORTE LÁSER</a></li>
+        <li><a href="vinil.html" class="nav-btn">VINIL</a></li>
+        <li><a href="login.html" class="nav-btn btn-admin" rel="nofollow">Iniciar Sesión Admin</a></li>
+        <li><button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Cambiar tema claro u oscuro">🌙</button></li>
+      </ul>
     </nav>
   </header>
-
-  <main class="main-container">
-    <!-- TITULO NEÓN ARCADE -->
-    <section class="hero-section">
-      <h1 class="pixel-title">SELECT CATEGORY: LONA IMPRESA</h1>
-      <p class="pixel-subtitle">STAGE 03 - GRAN FORMATO, BANNER Y PUBLICIDAD EXTERIOR</p>
+ 
+  <main>
+    <!-- ===== Portada: una lona colgada ===== -->
+    <section class="lona-hero">
+      <nav class="migas" aria-label="Ruta">
+        <a href="index.html">Inicio</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">Lona</span>
+      </nav>
+ 
+      <p class="kicker">Gran formato · Publicidad exterior</p>
+      <h1>Que tu negocio se vea <span class="text-gradient">desde la esquina</span></h1>
+      <p class="lead">Lonas impresas a todo color para fachadas, eventos, fiestas y obras. Tú nos dices la medida; nosotros la imprimimos lista para colgar.</p>
+ 
+      <div class="colgada">
+        <span class="cuerda izq" aria-hidden="true"></span>
+        <span class="cuerda der" aria-hidden="true"></span>
+ 
+        <!-- Aquí aparece solo el trabajo de lona más nuevo que subas desde el panel -->
+        <figure class="lona-marco" id="lonaDestacada">
+          <span class="ojillo a" aria-hidden="true"></span>
+          <span class="ojillo b" aria-hidden="true"></span>
+          <span class="ojillo c" aria-hidden="true"></span>
+          <span class="ojillo d" aria-hidden="true"></span>
+          <span class="ojillo e" aria-hidden="true"></span>
+          <span class="ojillo f" aria-hidden="true"></span>
+          <div class="lona-impresion">
+            <div class="demo" aria-hidden="true">
+              <strong>¡GRAN APERTURA!</strong>
+              <span>Tu anuncio aquí · a todo color</span>
+            </div>
+          </div>
+        </figure>
+ 
+        <div class="lona-pie">
+          <span id="lonaDestacadaNombre">Así se verá tu lona.</span>
+          <span id="lonaDestacadaVer" hidden>Toca la lona para verla completa</span>
+        </div>
+      </div>
+ 
+      <ul class="cinta" aria-label="Datos del servicio">
+        <li><strong>$85</strong><span>por m²</span></li>
+        <li><strong>1 m²</strong><span>mínimo por pieza</span></li>
+        <li><strong>A la medida</strong><span>tú eliges el tamaño</span></li>
+        <li><strong>2–3 días</strong><span>hábiles de entrega</span></li>
+      </ul>
+ 
+      <div class="hero-acciones">
+        <a class="btn-cta" href="#simulador">Ver mi lona a escala ↓</a>
+        <a class="btn-sec wa-general" href="https://wa.me/5215598788857" target="_blank" rel="noopener noreferrer">Cotizar por WhatsApp</a>
+      </div>
     </section>
-
-    <!-- PESTAÑAS DE NAVEGACIÓN DIRECTA -->
-    <div class="tabs-container">
-      <button class="tab-btn active arcade-sound-btn" data-tab="imagenes">
-        <span class="tab-icon">🖼️</span> GALERÍA
-      </button>
-      <button class="tab-btn arcade-sound-btn" data-tab="videos">
-        <span class="tab-icon">🎬</span> DEMOS VIDEO
-      </button>
-      <button class="tab-btn arcade-sound-btn" data-tab="pdfs">
-        <span class="tab-icon">📄</span> CATÁLOGOS PDF
-      </button>
+ 
+    <!-- ===== Simulador a escala ===== -->
+    <section class="bloque" id="simulador" aria-labelledby="tituloSim">
+      <div class="bloque-header">
+        <p class="kicker">Simulador</p>
+        <h2 id="tituloSim" class="titulo-seccion">¿De qué tamaño la necesitas?</h2>
+        <p class="sub-seccion">Escribe la medida y mira tu lona dibujada a escala junto a una persona de 1.70 m. Así te das una idea real del tamaño antes de pedirla.</p>
+      </div>
+ 
+      <form class="simulador" id="simForm" novalidate>
+        <div class="sim-controles">
+          <div>
+            <p class="sim-etq" id="etqRapidas">Medidas más pedidas</p>
+            <div class="medidas-rapidas" role="group" aria-labelledby="etqRapidas">
+              <button type="button" class="chip" data-medida="1x1">1 × 1</button>
+              <button type="button" class="chip" data-medida="1.5x1">1.5 × 1</button>
+              <button type="button" class="chip" data-medida="2x1">2 × 1</button>
+              <button type="button" class="chip" data-medida="3x1">3 × 1</button>
+              <button type="button" class="chip" data-medida="3x1.5">3 × 1.5</button>
+              <button type="button" class="chip" data-medida="4x2">4 × 2</button>
+              <button type="button" class="chip" data-medida="0.6x1.6">Roll-up 0.6 × 1.6</button>
+            </div>
+          </div>
+ 
+          <div>
+            <p class="sim-etq">O escribe tu medida</p>
+            <div class="sim-campos">
+              <label>Ancho
+                <span class="campo"><input type="number" id="simAncho" name="ancho" inputmode="decimal" min="0.1" max="50" step="any" value="2"><span class="unidad">m</span></span>
+              </label>
+              <span class="por" aria-hidden="true">×</span>
+              <label>Alto
+                <span class="campo"><input type="number" id="simAlto" name="alto" inputmode="decimal" min="0.1" max="50" step="any" value="1"><span class="unidad">m</span></span>
+              </label>
+            </div>
+          </div>
+ 
+          <div class="sim-piezas">
+            <label>Piezas
+              <span class="campo"><input type="number" id="simPiezas" name="piezas" inputmode="numeric" min="1" max="999" step="1" value="1"><span class="unidad">pzs</span></span>
+            </label>
+            <label class="check">
+              <input type="checkbox" id="simOjillos" checked>
+              Con ojillos
+            </label>
+          </div>
+        </div>
+ 
+        <div class="sim-lienzo">
+          <svg class="sim-svg" id="simSvg" role="img" aria-labelledby="simDescripcion" preserveAspectRatio="xMidYMax meet">
+            <title id="simDescripcion">Vista a escala de la lona junto a una persona</title>
+          </svg>
+ 
+          <div class="sim-resultado" aria-live="polite">
+            <div class="sim-dato">
+              <p class="sim-etq">Área</p>
+              <output id="simArea">—</output>
+            </div>
+            <div class="sim-dato">
+              <p class="sim-etq">Tu archivo</p>
+              <output id="simPx">—</output>
+            </div>
+            <div class="sim-dato total">
+              <p class="sim-etq">Precio estimado</p>
+              <output id="simTotal">—</output>
+            </div>
+            <a class="btn-cta" id="simWhatsapp" href="#" target="_blank" rel="noopener noreferrer">Pedir esta lona</a>
+            <p class="sim-nota" id="simNota"></p>
+          </div>
+        </div>
+      </form>
+    </section>
+ 
+    <!-- ===== Usos ===== -->
+    <section class="bloque" aria-labelledby="tituloUsos">
+      <div class="bloque-header">
+        <p class="kicker">Ideas</p>
+        <h2 id="tituloUsos" class="titulo-seccion">¿Para qué la necesitas?</h2>
+        <p class="sub-seccion">Toca una idea y el simulador se ajusta a una medida típica para ese uso.</p>
+      </div>
+ 
+      <div class="usos">
+        <a class="uso" href="#simulador" data-medida="3x1">
+          <span class="icono" aria-hidden="true">🏪</span>
+          <h3>Fachada de negocio</h3>
+          <p>Tu nombre, logo y teléfono a la vista de todos los que pasan.</p>
+          <span class="medida">Ej. 3 × 1 m</span>
+        </a>
+        <a class="uso" href="#simulador" data-medida="2x1">
+          <span class="icono" aria-hidden="true">🎉</span>
+          <h3>Fiestas y eventos</h3>
+          <p>Cumpleaños, XV años, bodas, graduaciones y fondos para fotos.</p>
+          <span class="medida">Ej. 2 × 1 m</span>
+        </a>
+        <a class="uso" href="#simulador" data-medida="1.5x1">
+          <span class="icono" aria-hidden="true">🏷️</span>
+          <h3>Promociones</h3>
+          <p>"Se renta", "Se vende", ofertas de temporada o avisos.</p>
+          <span class="medida">Ej. 1.5 × 1 m</span>
+        </a>
+        <a class="uso" href="#simulador" data-medida="0.6x1.6">
+          <span class="icono" aria-hidden="true">🧍</span>
+          <h3>Roll-up y expos</h3>
+          <p>Lona vertical para stands, recepciones y puntos de venta.</p>
+          <span class="medida">Ej. 0.6 × 1.6 m</span>
+        </a>
+      </div>
+    </section>
+ 
+    <!-- ===== Carrete de trabajos ===== -->
+    <section class="bloque" id="trabajos" aria-labelledby="tituloTrabajos">
+      <div class="carrete-header">
+        <div>
+          <p class="kicker">Trabajos</p>
+          <h2 id="tituloTrabajos" class="titulo-seccion">Lonas que ya están colgadas</h2>
+          <p class="carrete-resumen" id="carreteResumen" aria-live="polite">Cargando trabajos…</p>
+        </div>
+        <div class="carrete-flechas" id="carreteFlechas" hidden>
+          <button type="button" id="carretePrev" aria-label="Trabajos anteriores">←</button>
+          <button type="button" id="carreteNext" aria-label="Más trabajos">→</button>
+        </div>
+      </div>
+    </section>
+ 
+    <div class="carrete-wrap">
+      <div class="carrete" id="carrete" tabindex="0" aria-label="Trabajos de lona, desplázate hacia los lados" aria-busy="true"></div>
     </div>
-
-    <!-- SECCIÓN IMÁGENES -->
-    <section id="sec-imagenes" class="media-section">
-      <h2 class="section-title"><span>🖼️</span> MUESTRAS DE TRABAJO (GALERÍA)</h2>
-      <div id="gridImagenes" class="pixel-grid"></div>
+    <div class="carrete-barra" id="carreteBarra" hidden><span id="carreteAvance"></span></div>
+ 
+    <!-- ===== Archivo listo ===== -->
+    <section class="bloque" aria-labelledby="tituloArchivo">
+      <div class="bloque-header">
+        <p class="kicker">Antes de enviar</p>
+        <h2 id="tituloArchivo" class="titulo-seccion">Tu archivo, listo para imprimir</h2>
+        <p class="sub-seccion">Cuatro cosas que hacen que tu lona salga nítida y a la primera.</p>
+      </div>
+ 
+      <div class="checklist">
+        <div class="check-item">
+          <h3>Formato correcto</h3>
+          <p>Envíalo en <b>JPG, PDF o AI</b>. Si es un logo, mejor en PDF o AI para que no se pixelee.</p>
+        </div>
+        <div class="check-item">
+          <h3>Tamaño real</h3>
+          <p>Diseña a la medida final de la lona. El simulador te dice cuántos píxeles necesita tu imagen.</p>
+        </div>
+        <div class="check-item">
+          <h3>Textos grandes</h3>
+          <p>Las lonas se leen de lejos: usa letras grandes y pocos textos. Menos es más.</p>
+        </div>
+        <div class="check-item">
+          <h3>Deja margen</h3>
+          <p>No pongas textos pegados a la orilla: ahí van los ojillos.</p>
+        </div>
+      </div>
     </section>
-
-    <!-- SECCIÓN VIDEOS -->
-    <section id="sec-videos" class="media-section" style="display: none;">
-      <h2 class="section-title"><span>🎬</span> PROCESOS Y ACABADOS (VIDEOS)</h2>
-      <div id="gridVideos" class="pixel-grid"></div>
-    </section>
-
-    <!-- SECCIÓN PDFS -->
-    <section id="sec-pdfs" class="media-section" style="display: none;">
-      <h2 class="section-title"><span>📄</span> FICHAS TÉCNICAS Y PLANTILLAS (PDF)</h2>
-      <div id="gridPdfs" class="pixel-grid"></div>
+ 
+    <!-- ===== Llamado final ===== -->
+    <section class="cta-banda">
+      <div>
+        <h2>¿No tienes diseño?</h2>
+        <p>Te lo hacemos nosotros. Cuéntanos qué quieres anunciar y te mandamos una propuesta.</p>
+      </div>
+      <a class="btn-cta wa-diseno" href="https://wa.me/5215598788857" target="_blank" rel="noopener noreferrer">Quiero mi diseño</a>
     </section>
   </main>
-
-  <!-- LIGHTBOX / VISOR MODAL RETRO -->
-  <div id="mediaModal" class="pixel-modal" style="display: none;">
-    <span class="close-modal arcade-sound-btn" id="closeModal">&times;</span>
-    <div class="modal-content-wrapper">
-      <div id="modalBody"></div>
-      <p id="captionModal" class="modal-caption"></p>
+ 
+  <!-- ===== Pie ===== -->
+  <footer class="glass-footer">
+    <div class="footer-content">
+      <div class="footer-social">
+        <a href="https://www.facebook.com/PON_AQUI_TU_LINK" target="_blank" rel="noopener noreferrer" aria-label="Facebook de Laser Print">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.5 1.6-1.5h1.7V4.4c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.4H7.7V14h2.7v8h3.1z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/laserprint678/" target="_blank" rel="noopener noreferrer" aria-label="Instagram de Laser Print">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="https://www.tiktok.com/@laserprint2026" target="_blank" rel="noopener noreferrer" aria-label="TikTok de Laser Print">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M16.6 3c.4 2.2 1.9 3.8 4 4v3.1c-1.5 0-2.9-.5-4-1.2V15a6 6 0 1 1-6-6c.3 0 .6 0 .9.1v3.2a2.9 2.9 0 1 0 2 2.7V3h3.1z"/></svg>
+        </a>
+      </div>
+      <div class="footer-contact">
+        <a href="tel:+525598788857">📞 +52 55 9878 8857</a>
+        <span class="footer-separator">|</span>
+        <a href="mailto:laserprint678@gmail.com">✉️ laserprint678@gmail.com</a>
+      </div>
+      <p class="footer-rights">© <span id="year">2026</span> Diseño Laser Print. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+ 
+  <!-- ===== Visor ===== -->
+  <div class="visor" id="visor" role="dialog" aria-modal="true" aria-labelledby="visorTitulo" hidden>
+    <button type="button" class="visor-cerrar" id="visorCerrar" aria-label="Cerrar">✕</button>
+    <button type="button" class="visor-nav visor-prev" id="visorPrev" aria-label="Anterior">‹</button>
+    <button type="button" class="visor-nav visor-next" id="visorNext" aria-label="Siguiente">›</button>
+    <div class="visor-caja">
+      <div class="visor-media" id="visorMedia"></div>
+      <aside class="visor-info">
+        <p class="visor-contador" id="visorContador"></p>
+        <h2 id="visorTitulo"></h2>
+        <p class="visor-precio" id="visorPrecio"></p>
+        <p class="visor-desc" id="visorDesc"></p>
+        <div class="visor-acciones">
+          <a class="btn-cta" id="visorWhatsapp" target="_blank" rel="noopener noreferrer">Quiero una así</a>
+          <a class="btn-sec" id="visorAbrir" target="_blank" rel="noopener noreferrer" hidden>Abrir PDF</a>
+        </div>
+      </aside>
     </div>
   </div>
-
-  <!-- CONTROL DE FALLBACK PARA LOGO -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const logo = document.getElementById('mainLogo');
-      if (logo) {
-        logo.addEventListener('error', () => {
-          logo.src = 'https://via.placeholder.com/150x50/000/00f0ff?text=LASERPRINT';
-        });
-      }
-    });
-  </script>
-
-  <!-- LÓGICA DE CONTROL -->
-  <script src="lona.js"></script>
+ 
+  <script src="lona.js?v=1.0" defer></script>
 </body>
 </html>
+ 
+Claude terminó la respuesta
