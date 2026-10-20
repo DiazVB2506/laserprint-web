@@ -1,124 +1,174 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-MX">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LaserPrint - Sección</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f9; }
-    header { background: #111; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-    nav { background: #222; padding: 10px; display: flex; gap: 15px; flex-wrap: wrap; }
-    nav a { color: white; text-decoration: none; padding: 8px 12px; border-radius: 4px; }
-    nav a:hover, nav a.active { background: #007bff; }
-    .container { padding: 30px; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-    .card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .card img, .card video { width: 100%; height: 200px; object-fit: cover; border-radius: 4px; }
-    .price { color: #27ae60; font-weight: bold; font-size: 1.2em; }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>LaserPrint</h1>
-    <a href="login.html" style="background:#e74c3c; color:white; padding:8px 15px; text-decoration:none; border-radius:4px; font-weight:bold;">Iniciar Sesión Admin</a>
-  </header>
-
-  <nav>
-    <a href="index.html">Inicio</a>
-    <a href="categoria.html?cat=DTF TEXTIL / UV">DTF TEXTIL / UV</a>
-    <a href="categoria.html?cat=SUBLIMACION">SUBLIMACION</a>
-    <a href="categoria.html?cat=LONA">LONA</a>
-    <a href="categoria.html?cat=COROPLAST">COROPLAST</a>
-    <a href="categoria.html?cat=CORTE LASER">CORTE LASER</a>
-    <a href="categoria.html?cat=VINIL">VINIL</a>
-  </nav>
-
-  <div class="container">
-    <h2 id="tituloArea">Cargando área...</h2>
-    <div id="gridArea" class="grid"></div>
-  </div>
+  <title>Catálogo de trabajos | Diseño Laser Print</title>
 
   <script>
-    // Detectar si está en localhost o producción
-    const BACKEND_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-      ? 'http://localhost:3000'
-      : 'https://laserprint-api.onrender.com';
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const categoria = urlParams.get('cat');
-
-    const titulo = document.getElementById('tituloArea');
-    if (titulo) {
-      titulo.textContent = `Sección: ${categoria || 'General'}`;
-    }
-
-    // Iluminar enlace activo en la navegación
-    document.querySelectorAll('nav a').forEach(link => {
-      if (link.getAttribute('href') === `categoria.html?cat=${encodeURIComponent(categoria || '')}`) {
-        link.classList.add('active');
-      }
-    });
-
-    function escapeText(str) {
-      return str ? String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])) : '';
-    }
-
-    async function cargarContenido() {
-      const grid = document.getElementById('gridArea');
-      if (!grid) return;
-
-      if (!categoria) {
-        grid.innerHTML = '<p>Por favor selecciona una categoría válida.</p>';
-        return;
-      }
-
+    (function () {
       try {
-        const res = await fetch(`${BACKEND_BASE}/api/productos?categoria=${encodeURIComponent(categoria)}`);
-        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
-
-        const data = await res.json();
-        const productos = Array.isArray(data) ? data : (data.productos || []);
-
-        grid.innerHTML = '';
-
-        if (productos.length === 0) {
-          grid.innerHTML = '<p>No hay publicaciones en esta área por el momento.</p>';
-          return;
-        }
-
-        productos.forEach(p => {
-          const card = document.createElement('div');
-          card.className = 'card';
-
-          const tipo = (p.tipoArchivo || '').toLowerCase();
-          let mediaHTML = '';
-
-          if (tipo.includes('image') || tipo.includes('jpg') || tipo.includes('png')) {
-            mediaHTML = `<img src="${escapeText(p.archivoUrl)}" alt="${escapeText(p.nombre)}">`;
-          } else if (tipo.includes('video') || tipo.includes('mp4')) {
-            mediaHTML = `<video controls src="${escapeText(p.archivoUrl)}"></video>`;
-          } else if (tipo.includes('pdf')) {
-            mediaHTML = `<p><a href="${escapeText(p.archivoUrl)}" target="_blank" rel="noopener">📄 Ver Documento PDF</a></p>`;
-          }
-
-          const precioHTML = p.precio ? `<p class="price">$${p.precio}</p>` : '';
-
-          card.innerHTML = `
-            ${mediaHTML}
-            <h3>${escapeText(p.nombre)}</h3>
-            <p>${escapeText(p.descripcion)}</p>
-            ${precioHTML}
-          `;
-
-          grid.appendChild(card);
-        });
-      } catch (err) {
-        console.error('Error al cargar categoría:', err);
-        grid.innerHTML = '<p>Error de conexión al cargar la sección.</p>';
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', cargarContenido);
+        var t = localStorage.getItem('theme');
+        if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
   </script>
+
+  <meta name="description" content="Catálogo de trabajos de Diseño Laser Print en Atizapán: DTF, sublimación, lona, coroplast, corte láser y vinil. Filtra y pide uno igual por WhatsApp.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0a0a12">
+  <link rel="canonical" href="https://diazvb2506.github.io/laserprint-web/categoria.html">
+
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_MX">
+  <meta property="og:site_name" content="Diseño Laser Print">
+  <meta property="og:title" content="Catálogo de trabajos | Diseño Laser Print">
+  <meta property="og:description" content="Todos nuestros trabajos en un solo lugar.">
+  <meta property="og:url" content="https://diazvb2506.github.io/laserprint-web/categoria.html">
+  <meta property="og:image" content="https://diazvb2506.github.io/laserprint-web/uploads/fotos/LOGOTIPO.png">
+
+  <link rel="icon" type="image/png" href="uploads/fotos/LOGOTIPO.png">
+  <link rel="apple-touch-icon" href="uploads/fotos/LOGOTIPO.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://res.cloudinary.com">
+  <link rel="preconnect" href="https://laserprint-api.onrender.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="categoria.css?v=1.0">
+</head>
+<body>
+
+  <div class="bg-glow ambient-cyan" aria-hidden="true"></div>
+  <div class="bg-glow ambient-magenta" aria-hidden="true"></div>
+
+  <!-- ===== Encabezado ===== -->
+  <header class="glass-header">
+    <nav class="nav-container" aria-label="Menú principal">
+      <a href="index.html" class="logo" aria-label="Diseño Laser Print, ir al inicio">
+        <img src="uploads/fotos/LOGOTIPO.png" alt="Diseño Laser Print" class="logo-img"
+             onerror="this.onerror=null; this.src='https://placehold.co/260x100/111111/00f0ff?text=DISE%C3%91O+LASERPRINT';">
+      </a>
+
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú" aria-controls="navLinks" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html" class="nav-btn">Inicio</a></li>
+        <li><a href="dtf.html" class="nav-btn">DTF TEXTIL / UV</a></li>
+        <li><a href="sublimacion.html" class="nav-btn">SUBLIMACIÓN</a></li>
+        <li><a href="lona.html" class="nav-btn">LONA</a></li>
+        <li><a href="coroplast.html" class="nav-btn">COROPLAST</a></li>
+        <li><a href="cortelaser.html" class="nav-btn">CORTE LÁSER</a></li>
+        <li><a href="vinil.html" class="nav-btn">VINIL</a></li>
+        <li><a href="login.html" class="nav-btn btn-admin" rel="nofollow">Iniciar Sesión Admin</a></li>
+        <li><button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Cambiar tema claro u oscuro">🌙</button></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ===== Portada ===== -->
+    <section class="cat-hero">
+      <nav class="migas" aria-label="Ruta">
+        <a href="index.html">Inicio</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">Catálogo</span>
+      </nav>
+      <p class="kicker">Todo lo que hacemos</p>
+      <h1 id="catTitulo">Nuestro <span class="text-gradient">catálogo</span></h1>
+      <p class="lead" id="catLead">Trabajos recientes de todas nuestras áreas. Filtra por lo que buscas y pídenos uno igual por WhatsApp.</p>
+    </section>
+
+    <!-- ===== Filtros ===== -->
+    <section class="bloque filtros-bloque" aria-label="Filtros">
+      <div class="filtros">
+        <div class="chips" id="chips" role="group" aria-label="Categoría"></div>
+
+        <div class="filtros-fila">
+          <label class="buscar">
+            <span aria-hidden="true">🔍</span>
+            <input type="search" id="buscar" placeholder="Buscar… (ej. playera, letrero, llavero)" aria-label="Buscar trabajos" autocomplete="off">
+          </label>
+          <div class="tipos" id="tipos" role="group" aria-label="Tipo de archivo">
+            <button type="button" data-tipo="todos" aria-pressed="true">Todo</button>
+            <button type="button" data-tipo="imagen" aria-pressed="false">Fotos</button>
+            <button type="button" data-tipo="video" aria-pressed="false">Videos</button>
+            <button type="button" data-tipo="pdf" aria-pressed="false">PDF</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="cat-barra">
+        <p class="cat-resumen" id="catResumen" aria-live="polite">Cargando trabajos…</p>
+        <a class="ir-seccion" id="irSeccion" href="#" hidden>Ver la página de esta sección →</a>
+      </div>
+    </section>
+
+    <!-- ===== Resultados ===== -->
+    <section class="bloque resultados-bloque" aria-label="Trabajos">
+      <div class="catalogo" id="catalogo" aria-busy="true"></div>
+      <div class="cat-mas">
+        <button type="button" class="btn-sec" id="verMas" hidden>Ver más trabajos</button>
+      </div>
+    </section>
+
+    <!-- ===== Llamado final ===== -->
+    <section class="cta-banda">
+      <div>
+        <h2>¿No encontraste lo que buscas?</h2>
+        <p>Cuéntanos tu idea y te decimos cómo hacerlo.</p>
+      </div>
+      <a class="btn-cta wa-general" href="https://wa.me/5215598788857" target="_blank" rel="noopener noreferrer">Escribir por WhatsApp</a>
+    </section>
+  </main>
+
+  <!-- ===== Pie ===== -->
+  <footer class="glass-footer">
+    <div class="footer-content">
+      <div class="footer-social">
+        <a href="https://www.facebook.com/PON_AQUI_TU_LINK" target="_blank" rel="noopener noreferrer" aria-label="Facebook de Laser Print">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.5 1.6-1.5h1.7V4.4c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.4H7.7V14h2.7v8h3.1z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/laserprint678/" target="_blank" rel="noopener noreferrer" aria-label="Instagram de Laser Print">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="https://www.tiktok.com/@laserprint2026" target="_blank" rel="noopener noreferrer" aria-label="TikTok de Laser Print">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M16.6 3c.4 2.2 1.9 3.8 4 4v3.1c-1.5 0-2.9-.5-4-1.2V15a6 6 0 1 1-6-6c.3 0 .6 0 .9.1v3.2a2.9 2.9 0 1 0 2 2.7V3h3.1z"/></svg>
+        </a>
+      </div>
+      <div class="footer-contact">
+        <a href="tel:+525598788857">📞 +52 55 9878 8857</a>
+        <span class="footer-separator">|</span>
+        <a href="mailto:laserprint678@gmail.com">✉️ laserprint678@gmail.com</a>
+      </div>
+      <p class="footer-rights">© <span id="year">2026</span> Diseño Laser Print. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- ===== Visor ===== -->
+  <div class="visor" id="visor" role="dialog" aria-modal="true" aria-labelledby="visorTitulo" hidden>
+    <button type="button" class="visor-cerrar" id="visorCerrar" aria-label="Cerrar">✕</button>
+    <button type="button" class="visor-nav visor-prev" id="visorPrev" aria-label="Anterior">‹</button>
+    <button type="button" class="visor-nav visor-next" id="visorNext" aria-label="Siguiente">›</button>
+    <div class="visor-caja">
+      <div class="visor-media" id="visorMedia"></div>
+      <aside class="visor-info">
+        <p class="visor-contador" id="visorContador"></p>
+        <h2 id="visorTitulo"></h2>
+        <p class="visor-precio" id="visorPrecio"></p>
+        <p class="visor-desc" id="visorDesc"></p>
+        <div class="visor-acciones">
+          <a class="btn-cta" id="visorWhatsapp" target="_blank" rel="noopener noreferrer">Quiero uno así</a>
+          <a class="btn-sec" id="visorAbrir" target="_blank" rel="noopener noreferrer" hidden>Abrir PDF</a>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script src="categoria.js?v=1.0" defer></script>
 </body>
 </html>
