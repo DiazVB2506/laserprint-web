@@ -1,6 +1,6 @@
 /**
  * ==============================================================================
- * DISEÑO LASER PRINT — index.js v4.0
+ * DISEÑO LASER PRINT — index.js v4.1 (inicio divertido)
  * Interfaz del sitio + asistente virtual "PIXEL AI"
  * ==============================================================================
  *
@@ -23,9 +23,16 @@
      0. CONFIGURACIÓN Y UTILIDADES
      ========================================================================== */
 
+  // Mismo servidor que usa el panel de admin (admin.js)
+  const API_ORIGEN = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+    ? 'http://localhost:5000'
+    : 'https://laserprint-api.onrender.com';
+
   const CONFIG = {
     whatsapp: '5215598788857',
-    apiProductos: '/api/productos',   // solo existe si corres tu servidor Python
+    apiProductos: API_ORIGEN + '/api/productos',
+    cacheKey: 'lp_carrusel_v1',
+    esperaApiMs: 4000,                // cuánto esperar a la API antes de mostrar las fotos de respaldo
     fotosBase: 'uploads/fotos/',
     totalFotosRespaldo: 5,            // slide1.png ... slide5.png
     autoplayMs: 5000,
@@ -244,6 +251,54 @@
      4. CARRUSEL 3D
      ========================================================================== */
 
+  function esImagen(p) {
+    const tipo = String(p.tipoArchivo || '').toLowerCase();
+    const url = String(p.archivoUrl || '');
+    if (/video|mp4|pdf/.test(tipo)) return false;
+    if (/imag|jpe?g|png|webp|gif|avif/.test(tipo)) return true;
+    if (/\.(jpe?g|png|webp|gif|avif)(\?|#|$)/i.test(url)) return true;
+    return !tipo;   // sin tipo y sin extensión clara: se intenta como imagen
+  }
+
+  /** Convierte la ruta que guarda el servidor en una URL completa */
+  function urlArchivo(ruta) {
+    if (/^https?:\/\//i.test(ruta)) return ruta;
+    return API_ORIGEN + '/' + String(ruta).replace(/^\/+/, '');
+  }
+
+  /** Pide los productos al servidor. Devuelve una lista de fotos o null. */
+  async function pedirFotosAPI(limiteMs) {
+    try {
+      const control = new AbortController();
+      const reloj = setTimeout(function () { control.abort(); }, limiteMs);
+      const res = await fetch(CONFIG.apiProductos + '?limit=500', { signal: control.signal });
+      clearTimeout(reloj);
+      if (!res.ok) return null;
+
+      const data = await res.json();
+      const lista = Array.isArray(data) ? data : (data.productos || []);
+      const fotos = lista
+        .filter(function (p) { return p && p.archivoUrl && esImagen(p); })
+        .map(function (p) {
+          return {
+            url: urlArchivo(p.archivoUrl),
+            alt: p.nombre || 'Trabajo destacado de Diseño Laser Print'
+          };
+        });
+      return fotos;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /**
+   * Estrategia de carga del carrusel:
+   * - Si ya hay fotos guardadas de una visita anterior, se muestran al instante
+   *   y en segundo plano se piden las nuevas para la próxima visita.
+   * - Si no, espera a la API unos segundos. El servidor gratuito de Render se
+   *   "duerme" y puede tardar hasta un minuto en despertar; si no responde a
+   *   tiempo, se muestran las fotos de respaldo (slide1.png...).
+   */
   async function obtenerFotos() {
     const respaldo = [];
     for (let i = 1; i <= CONFIG.totalFotosRespaldo; i++) {
@@ -253,31 +308,25 @@
       });
     }
 
-    // En GitHub Pages no corre Python, así que la API nunca existe ahí:
-    // nos ahorramos una petición que siempre fallaba con error 404.
-    if (location.hostname.endsWith('github.io')) return respaldo;
+    let guardadas = null;
+    try { guardadas = JSON.parse(localStorage.getItem(CONFIG.cacheKey) || 'null'); } catch (e) {}
 
-    try {
-      const control = new AbortController();
-      const limite = setTimeout(function () { control.abort(); }, 3000);
-      const res = await fetch(CONFIG.apiProductos, { signal: control.signal });
-      clearTimeout(limite);
-      if (!res.ok) return respaldo;
+    // Petición larga en segundo plano (da tiempo a que Render despierte)
+    const enVivo = pedirFotosAPI(60000).then(function (fotos) {
+      if (fotos && fotos.length) {
+        try { localStorage.setItem(CONFIG.cacheKey, JSON.stringify(fotos)); } catch (e) {}
+      }
+      return fotos;
+    });
 
-      const data = await res.json();
-      const fotos = (data.productos || [])
-        .filter(function (p) { return p.archivoUrl && (!p.tipoArchivo || p.tipoArchivo === 'imagen'); })
-        .map(function (p) {
-          return {
-            url: p.archivoUrl.replace(/^\//, ''),
-            alt: p.nombre || 'Trabajo destacado de Diseño Laser Print'
-          };
-        });
+    if (Array.isArray(guardadas) && guardadas.length) return guardadas;
 
-      return fotos.length ? fotos : respaldo;
-    } catch (e) {
-      return respaldo;
-    }
+    const rapido = await Promise.race([
+      enVivo,
+      new Promise(function (ok) { setTimeout(function () { ok(null); }, CONFIG.esperaApiMs); })
+    ]);
+
+    return rapido && rapido.length ? rapido : respaldo;
   }
 
   /** Crea las diapositivas con el DOM (antes se armaban como texto y un
@@ -1071,6 +1120,446 @@
   };
 
   /* ==========================================================================
+     8.5 INICIO DIVERTIDO (v1.6)
+     Portada viva, abierto/cerrado, servicios, "¿Qué necesitas?",
+     "Pruébalo con tu nombre" y animaciones al hacer scroll.
+     ========================================================================== */
+
+  function crearEl(tag, clase, texto) {
+    const el = document.createElement(tag);
+    if (clase) el.className = clase;
+    if (texto !== undefined) el.textContent = texto;
+    return el;
+  }
+
+  /* ---------- Palabra que cambia en el título ---------- */
+  function initRotador() {
+    const caja = document.getElementById('rotador');
+    if (!caja) return;
+    const PALABRAS = ['idea', 'playera', 'lona', 'letrero', 'sticker', 'logo', 'negocio', 'evento'];
+    if (reduceMotion) return;
+    let i = 0;
+    setInterval(function () {
+      if (document.hidden) return;
+      const actual = caja.firstElementChild;
+      if (actual) actual.classList.add('sale');
+      setTimeout(function () {
+        i = (i + 1) % PALABRAS.length;
+        const nueva = crearEl('span', 'text-gradient entra', PALABRAS[i]);
+        caja.replaceChildren(nueva);
+      }, 280);
+    }, 2400);
+  }
+
+  /* ---------- Íconos que siguen un poquito al mouse ---------- */
+  function initFlotantes() {
+    const zona = document.getElementById('heroFlotantes');
+    if (!zona || reduceMotion || esTactil) return;
+    const items = zona.querySelectorAll('.flota');
+    const hero = zona.parentElement;
+    hero.addEventListener('pointermove', function (e) {
+      const r = hero.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      items.forEach(function (el, n) {
+        const f = 14 + (n % 3) * 10;
+        el.style.setProperty('--px', (-x * f).toFixed(1) + 'px');
+        el.style.setProperty('--py', (-y * f).toFixed(1) + 'px');
+      });
+    });
+    hero.addEventListener('pointerleave', function () {
+      items.forEach(function (el) { el.style.setProperty('--px', '0px'); el.style.setProperty('--py', '0px'); });
+    });
+  }
+
+  /* ---------- ¿Abierto ahora? (hora de la Ciudad de México) ---------- */
+  const HORARIO = {
+    // 0 = domingo ... 6 = sábado. [abre, cierra] en horas
+    1: [9, 18], 2: [9, 18], 3: [9, 18], 4: [9, 18], 5: [9, 18], 6: [9, 14]
+  };
+  const DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+
+  function horaTexto(h) {
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    return h12 + ':00 ' + (h < 12 ? 'a.m.' : 'p.m.');
+  }
+
+  function horaMexico() {
+    try {
+      const partes = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Mexico_City', weekday: 'short', hour: 'numeric', minute: 'numeric', hour12: false
+      }).formatToParts(new Date());
+      const v = {};
+      partes.forEach(function (p) { v[p.type] = p.value; });
+      const dia = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(v.weekday);
+      return { dia: dia, horas: (parseInt(v.hour, 10) % 24) + parseInt(v.minute, 10) / 60 };
+    } catch (e) {
+      const d = new Date();
+      return { dia: d.getDay(), horas: d.getHours() + d.getMinutes() / 60 };
+    }
+  }
+
+  function estadoTienda() {
+    const ahora = horaMexico();
+    const hoy = HORARIO[ahora.dia];
+    if (hoy && ahora.horas >= hoy[0] && ahora.horas < hoy[1]) {
+      const falta = hoy[1] - ahora.horas;
+      return { abierto: true, texto: falta <= 1 ? 'Abierto · cerramos a las ' + horaTexto(hoy[1]) + ', ¡date prisa!' : 'Abierto ahora · cierra a las ' + horaTexto(hoy[1]) };
+    }
+    if (hoy && ahora.horas < hoy[0]) {
+      return { abierto: false, texto: 'Cerrado · abrimos hoy a las ' + horaTexto(hoy[0]) };
+    }
+    for (let n = 1; n <= 7; n++) {
+      const d = (ahora.dia + n) % 7;
+      if (HORARIO[d]) {
+        return { abierto: false, texto: 'Cerrado · abrimos ' + (n === 1 ? 'mañana' : 'el ' + DIAS[d]) + ' a las ' + horaTexto(HORARIO[d][0]) };
+      }
+    }
+    return { abierto: false, texto: 'Cerrado' };
+  }
+
+  function initEstado() {
+    const pintar = function () {
+      const e = estadoTienda();
+      [['estadoTienda', 'estadoTexto'], ['estadoTienda2', 'estadoTexto2']].forEach(function (ids) {
+        const caja = document.getElementById(ids[0]);
+        if (!caja) return;
+        caja.hidden = false;
+        caja.classList.toggle('abierto', e.abierto);
+        caja.classList.toggle('cerrado', !e.abierto);
+        document.getElementById(ids[1]).textContent = e.texto;
+      });
+    };
+    pintar();
+    setInterval(pintar, 60000);
+  }
+
+  /* ---------- Tarjetas de servicios (inclinación 3D) ---------- */
+  function initServicios() {
+    document.querySelectorAll('.wa-servicio').forEach(function (a) {
+      a.href = linkWhatsApp(a.dataset.msg || 'Hola Laser Print, quiero cotizar un trabajo');
+    });
+    if (reduceMotion || esTactil) return;
+    document.querySelectorAll('.servicio').forEach(function (card) {
+      card.addEventListener('pointermove', function (e) {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+        card.style.setProperty('--ry', (x * 10).toFixed(2) + 'deg');
+        card.style.setProperty('--rx', (-y * 10).toFixed(2) + 'deg');
+      });
+      card.addEventListener('pointerleave', function () {
+        card.style.setProperty('--rx', '0deg');
+        card.style.setProperty('--ry', '0deg');
+      });
+    });
+  }
+
+  /* ---------- ¿Qué necesitas? ---------- */
+  const RECOMENDACIONES = {
+    ropa: {
+      icono: '👕', servicio: 'DTF Textil', pagina: 'dtf.html', color: 'rgba(14, 165, 233, 0.2)',
+      texto: 'Tu diseño a todo color en playeras, sudaderas o gorras, en cualquier color de tela.',
+      tambien: ['sublimacion.html', 'Si es tela clara de poliéster, también puede ser sublimación.'],
+      msg: 'Hola Laser Print, quiero personalizar ropa con mi diseño (DTF)'
+    },
+    anuncio: {
+      icono: '📣', servicio: 'Lona', pagina: 'lona.html', color: 'rgba(245, 158, 11, 0.22)',
+      texto: 'Para fachadas, anuncios grandes y fondos de eventos. Se ve desde lejos y aguanta el sol.',
+      tambien: null,
+      msg: 'Hola Laser Print, quiero un anuncio grande en lona'
+    },
+    letrero: {
+      icono: '🏠', servicio: 'Coroplast', pagina: 'coroplast.html', color: 'rgba(16, 185, 129, 0.22)',
+      texto: 'Letreros ligeros y resistentes para “se vende”, “se renta”, avisos de obra y señalética.',
+      tambien: null,
+      msg: 'Hola Laser Print, quiero letreros de coroplast'
+    },
+    stickers: {
+      icono: '🏷️', servicio: 'Vinil', pagina: 'vinil.html', color: 'rgba(236, 72, 153, 0.2)',
+      texto: 'Stickers para tu marca y etiquetas para tus productos. Se vende por medio metro o por metro.',
+      tambien: null,
+      msg: 'Hola Laser Print, quiero stickers / etiquetas en vinil'
+    },
+    madera: {
+      icono: '🪵', servicio: 'Corte láser CO2', pagina: 'cortelaser.html', color: 'rgba(239, 68, 68, 0.2)',
+      texto: 'Cortamos y grabamos MDF, acrílico, papel cascarón y cartón. En aluminio, grabado.',
+      tambien: null,
+      msg: 'Hola Laser Print, quiero un trabajo de corte / grabado láser'
+    },
+    papel: {
+      icono: '📄', servicio: 'Imprenta', pagina: null, color: 'rgba(15, 76, 129, 0.18)',
+      texto: 'Volantes (carta, media carta y un cuarto), tarjetas de presentación y notas de remisión.',
+      tambien: null,
+      msg: 'Hola Laser Print, quiero cotizar volantes / tarjetas / notas de remisión'
+    }
+  };
+
+  function initNecesitas() {
+    const grupo = document.getElementById('opcionesNecesitas');
+    const resp = document.getElementById('respuestaNecesitas');
+    if (!grupo || !resp) return;
+
+    grupo.addEventListener('click', function (e) {
+      const b = e.target.closest('button[data-n]');
+      if (!b) return;
+      const r = RECOMENDACIONES[b.dataset.n];
+      grupo.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      resp.style.setProperty('--resp-c', r.color);
+
+      const caja = crearEl('div', 'resp');
+      caja.appendChild(crearEl('div', 'resp-icono', r.icono));
+      caja.appendChild(crearEl('p', 'mini-etq', 'Te recomendamos'));
+      caja.appendChild(crearEl('h3', '', r.servicio));
+      caja.appendChild(crearEl('p', '', r.texto));
+      if (r.tambien) {
+        const t = crearEl('p', 'tambien');
+        const a = crearEl('a', '', r.tambien[1]);
+        a.href = r.tambien[0];
+        t.appendChild(a);
+        caja.appendChild(t);
+      }
+      const acciones = crearEl('div', 'inicio-acciones');
+      const wa = crearEl('a', 'hero-cta', '💬 Cotizar');
+      wa.href = linkWhatsApp(r.msg);
+      wa.target = '_blank';
+      wa.rel = 'noopener noreferrer';
+      acciones.appendChild(wa);
+      if (r.pagina) {
+        const ver = crearEl('a', 'hero-sec', 'Ver ' + r.servicio + ' →');
+        ver.href = r.pagina;
+        acciones.appendChild(ver);
+      }
+      caja.appendChild(acciones);
+      resp.replaceChildren(caja);
+
+      // En celular, baja a la respuesta
+      if (window.innerWidth < 900) resp.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
+    });
+  }
+
+  /* ---------- Pruébalo con tu nombre ---------- */
+  const SVGNS = 'http://www.w3.org/2000/svg';
+
+  function svgNodo(tag, attrs, padre) {
+    const el = document.createElementNS(SVGNS, tag);
+    Object.keys(attrs || {}).forEach(function (k) { el.setAttribute(k, attrs[k]); });
+    if (padre) padre.appendChild(el);
+    return el;
+  }
+
+  const COLORES_TEXTO = ['#FFFFFF', '#111111', '#E11D48', '#0F4C81', '#FACC15', '#16A34A', '#C026D3'];
+
+  const FUENTES = {
+    clasica: { familia: "'Playfair Display', Georgia, serif", estilo: 'italic', peso: 600, mayus: false, espacio: 0 },
+    moderna: { familia: "'Inter', Arial, sans-serif", estilo: 'normal', peso: 800, mayus: false, espacio: 0 },
+    bloque:  { familia: "Impact, 'Arial Black', sans-serif", estilo: 'normal', peso: 400, mayus: true, espacio: 2 }
+  };
+
+  // Cada producto: fondos posibles, zona del texto y cómo dibujarlo
+  const PRODUCTOS = {
+    playera: {
+      nombre: 'una playera', fondoEtq: 'Color de la playera', servicio: 'DTF Textil', pagina: 'dtf.html',
+      fondos: ['#111111', '#FFFFFF', '#1E3A8A', '#B91C1C', '#6B7280', '#F5F5F4'],
+      fondoInicial: '#111111', textoInicial: '#FFFFFF',
+      zona: { x: 200, y: 150, ancho: 120, alto: 60 },
+      dibujar: function (svg, fondo) {
+        svgNodo('path', {
+          d: 'M140 40 L110 50 L50 85 L72 140 L105 125 L105 275 Q200 290 295 275 L295 125 L328 140 L350 85 L290 50 L260 40 Q252 70 200 72 Q148 70 140 40 Z',
+          fill: fondo, stroke: 'rgba(0,0,0,.18)', 'stroke-width': 1.5, 'stroke-linejoin': 'round'
+        }, svg);
+        svgNodo('path', { d: 'M140 40 Q148 70 200 72 Q252 70 260 40', fill: 'none', stroke: 'rgba(0,0,0,.25)', 'stroke-width': 3 }, svg);
+        svgNodo('path', { d: 'M105 125 L105 160 M295 125 L295 160', stroke: 'rgba(0,0,0,.12)', 'stroke-width': 2 }, svg);
+      }
+    },
+    lona: {
+      nombre: 'una lona', fondoEtq: 'Color de la lona', servicio: 'Lona', pagina: 'lona.html',
+      fondos: ['#FACC15', '#FFFFFF', '#0F4C81', '#E11D48', '#111111', '#16A34A'],
+      fondoInicial: '#FACC15', textoInicial: '#111111',
+      zona: { x: 200, y: 150, ancho: 290, alto: 90 },
+      dibujar: function (svg, fondo) {
+        svgNodo('rect', { x: 0, y: 30, width: 400, height: 240, rx: 10, fill: '#D6D3D1' }, svg);
+        svgNodo('rect', { x: 30, y: 70, width: 340, height: 160, rx: 3, fill: fondo, stroke: 'rgba(0,0,0,.15)' }, svg);
+        [[42, 82], [358, 82], [42, 218], [358, 218], [200, 82], [200, 218]].forEach(function (p) {
+          svgNodo('circle', { cx: p[0], cy: p[1], r: 5, fill: '#E7E5E4', stroke: '#78716C', 'stroke-width': 2 }, svg);
+        });
+      }
+    },
+    letrero: {
+      nombre: 'un letrero de coroplast', fondoEtq: 'Color del letrero', servicio: 'Coroplast', pagina: 'coroplast.html',
+      fondos: ['#FFFFFF', '#E11D48', '#FACC15', '#0F4C81', '#16A34A', '#111111'],
+      fondoInicial: '#E11D48', textoInicial: '#FFFFFF',
+      zona: { x: 200, y: 120, ancho: 220, alto: 80 },
+      dibujar: function (svg, fondo) {
+        svgNodo('path', { d: 'M150 190 L150 292 M250 190 L250 292', stroke: '#9CA3AF', 'stroke-width': 5, 'stroke-linecap': 'round' }, svg);
+        svgNodo('ellipse', { cx: 200, cy: 294, rx: 120, ry: 6, fill: 'rgba(0,0,0,.12)' }, svg);
+        svgNodo('rect', { x: 60, y: 50, width: 280, height: 140, rx: 6, fill: fondo, stroke: 'rgba(0,0,0,.18)' }, svg);
+        for (let x = 74; x < 340; x += 14) svgNodo('line', { x1: x, y1: 52, x2: x, y2: 188, stroke: 'rgba(0,0,0,.04)', 'stroke-width': 2 }, svg);
+      }
+    },
+    sticker: {
+      nombre: 'un sticker', fondoEtq: 'Color del sticker', servicio: 'Vinil', pagina: 'vinil.html',
+      fondos: ['#C026D3', '#0F4C81', '#FACC15', '#111111', '#16A34A', '#E11D48'],
+      fondoInicial: '#C026D3', textoInicial: '#FFFFFF',
+      zona: { x: 200, y: 150, ancho: 170, alto: 70 },
+      dibujar: function (svg, fondo) {
+        svgNodo('circle', { cx: 200, cy: 150, r: 128, fill: '#FFFFFF', stroke: 'rgba(0,0,0,.08)' }, svg);
+        svgNodo('circle', { cx: 200, cy: 150, r: 116, fill: fondo }, svg);
+        svgNodo('path', { d: 'M150 66 A100 100 0 0 1 250 66', fill: 'none', stroke: 'rgba(255,255,255,.35)', 'stroke-width': 8, 'stroke-linecap': 'round' }, svg);
+        svgNodo('path', { d: 'M290 240 L318 212 Q300 250 290 240 Z', fill: '#E5E5E5' }, svg);
+      }
+    },
+    llavero: {
+      nombre: 'un llavero de MDF', servicio: 'Corte láser', pagina: 'cortelaser.html',
+      fondos: null,
+      fondoInicial: '#C99A6B', textoInicial: '#5A3519',
+      textoFijo: '#5A3519',
+      nota: 'En madera el grabado sale en tono quemado, por eso aquí no cambia de color.',
+      zona: { x: 215, y: 170, ancho: 190, alto: 60 },
+      dibujar: function (svg) {
+        const defs = svgNodo('defs', {}, svg);
+        const g = svgNodo('linearGradient', { id: 'gMadera', x1: 0, y1: 0, x2: 1, y2: 1 }, defs);
+        svgNodo('stop', { offset: 0, 'stop-color': '#D6A878' }, g);
+        svgNodo('stop', { offset: 1, 'stop-color': '#B4824F' }, g);
+        svgNodo('path', { d: 'M70 40 Q60 10 90 8 Q120 6 112 40', fill: 'none', stroke: '#9CA3AF', 'stroke-width': 4 }, svg);
+        svgNodo('circle', { cx: 90, cy: 52, r: 18, fill: 'none', stroke: '#9CA3AF', 'stroke-width': 5 }, svg);
+        svgNodo('rect', { x: 55, y: 110, width: 310, height: 120, rx: 34, fill: 'url(#gMadera)', stroke: '#8B5E34', 'stroke-width': 2 }, svg);
+        for (let y = 120; y < 226; y += 9) svgNodo('path', { d: 'M62 ' + y + ' Q200 ' + (y + 4) + ' 358 ' + y, stroke: 'rgba(110,66,30,.12)', fill: 'none' }, svg);
+        svgNodo('circle', { cx: 90, cy: 140, r: 11, fill: '#F3F4F6', stroke: '#8B5E34', 'stroke-width': 2 }, svg);
+        svgNodo('path', { d: 'M90 70 L90 129', stroke: '#9CA3AF', 'stroke-width': 4 }, svg);
+      }
+    }
+  };
+
+  function initEstudio() {
+    const maqueta = document.getElementById('maqueta');
+    if (!maqueta) return;
+    const input = document.getElementById('pruebaTexto');
+    const est = { producto: 'playera', fuente: 'clasica', texto: null, fondo: null };
+
+    function muestras(cajaId, colores, actual, alElegir) {
+      const caja = document.getElementById(cajaId);
+      caja.innerHTML = '';
+      (colores || []).forEach(function (c) {
+        const b = crearEl('button');
+        b.type = 'button';
+        b.style.background = c;
+        b.setAttribute('aria-label', 'Color ' + c);
+        b.setAttribute('aria-pressed', String(c === actual));
+        b.addEventListener('click', function () { alElegir(c); });
+        caja.appendChild(b);
+      });
+    }
+
+    function pintar() {
+      const p = PRODUCTOS[est.producto];
+      const f = FUENTES[est.fuente];
+      const colorTexto = p.textoFijo || est.texto;
+      let texto = input.value.trim() || 'Tu Negocio';
+      if (f.mayus) texto = texto.toUpperCase();
+
+      const svg = svgNodo('svg', { viewBox: '0 0 400 300', 'aria-hidden': 'true' });
+      p.dibujar(svg, est.fondo);
+
+      const z = p.zona;
+      const t = svgNodo('text', {
+        x: z.x, y: z.y, 'text-anchor': 'middle', 'dominant-baseline': 'central',
+        fill: colorTexto, 'font-family': f.familia, 'font-style': f.estilo, 'font-weight': f.peso,
+        'letter-spacing': f.espacio, 'font-size': z.alto
+      }, svg);
+      t.textContent = texto;
+      if (est.producto === 'llavero') t.setAttribute('opacity', '0.85');
+      maqueta.replaceChildren(svg);
+
+      // Ajusta el tamaño para que quepa a lo ancho
+      try {
+        const largo = t.getComputedTextLength();
+        if (largo > z.ancho) t.setAttribute('font-size', (z.alto * z.ancho / largo).toFixed(1));
+      } catch (e) {}
+
+      maqueta.setAttribute('aria-label', 'Vista previa: ' + p.nombre + ' con el texto ' + texto);
+
+      // Controles según el producto
+      muestras('colorTexto', p.textoFijo ? [] : COLORES_TEXTO, est.texto, function (c) { est.texto = c; pintar(); });
+      muestras('colorFondo', p.fondos, est.fondo, function (c) { est.fondo = c; pintar(); });
+      document.getElementById('colorTexto').previousElementSibling.hidden = !!p.textoFijo;
+      document.getElementById('colorTexto').hidden = !!p.textoFijo;
+      document.getElementById('etqFondo').hidden = !p.fondos;
+      document.getElementById('etqFondo').textContent = p.fondoEtq || 'Color de fondo';
+      document.getElementById('colorFondo').hidden = !p.fondos;
+      document.getElementById('estNota').textContent = p.nota || '';
+
+      document.getElementById('estWhatsapp').href = linkWhatsApp(
+        'Hola Laser Print 👋, probé en su página ' + p.nombre + ' con el texto "' + input.value.trim() + '". ¿Me pueden cotizar algo así?');
+      const ver = document.getElementById('estVer');
+      ver.href = p.pagina;
+      ver.textContent = 'Ver ' + p.servicio + ' →';
+    }
+
+    function elegirProducto(id) {
+      const p = PRODUCTOS[id];
+      est.producto = id;
+      est.fondo = p.fondoInicial;
+      est.texto = p.textoInicial;
+      document.querySelectorAll('#productos button').forEach(function (b) {
+        b.setAttribute('aria-selected', String(b.dataset.p === id));
+      });
+      pintar();
+    }
+
+    document.getElementById('productos').addEventListener('click', function (e) {
+      const b = e.target.closest('button[data-p]');
+      if (b) elegirProducto(b.dataset.p);
+    });
+    document.getElementById('estLetras').addEventListener('click', function (e) {
+      const b = e.target.closest('button[data-f]');
+      if (!b) return;
+      est.fuente = b.dataset.f;
+      document.querySelectorAll('#estLetras button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      pintar();
+    });
+    input.addEventListener('input', pintar);
+
+    elegirProducto('playera');
+    // Cuando terminen de cargar las fuentes, vuelve a medir el texto
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(pintar);
+  }
+
+  /* ---------- Aparecer al hacer scroll ---------- */
+  function initRevelar() {
+    const items = document.querySelectorAll('.revelar');
+    const grupos = new Map();
+    items.forEach(function (el) {
+      const padre = el.parentElement;
+      const n = grupos.get(padre) || 0;
+      el.style.setProperty('--orden', n);
+      grupos.set(padre, n + 1);
+    });
+    if (reduceMotion || !('IntersectionObserver' in window)) {
+      items.forEach(function (el) { el.classList.add('visible'); });
+      return;
+    }
+    const obs = new IntersectionObserver(function (ents) {
+      ents.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add('visible');
+        obs.unobserve(en.target);
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    items.forEach(function (el) { obs.observe(el); });
+  }
+
+  function initInicio() {
+    initRotador();
+    initFlotantes();
+    initEstado();
+    initServicios();
+    initNecesitas();
+    initEstudio();
+    initRevelar();
+  }
+
+  /* ==========================================================================
      9. ARRANQUE
      ========================================================================== */
 
@@ -1081,6 +1570,7 @@
     cargarCarrusel();
     initLightbox();
     Pixel.init();
+    initInicio();
   }
 
   if (document.readyState === 'loading') {
