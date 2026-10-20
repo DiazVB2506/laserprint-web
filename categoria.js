@@ -1,6 +1,6 @@
 /**
  * ==============================================================================
- * DISEÑO LASER PRINT — coroplast.js (v1.0)
+ * DISEÑO LASER PRINT — coroplast.js (v1.1)
  * Archivo independiente de la página de Coroplast.
  *
  *  1. Tema, menú y detalles
@@ -21,7 +21,10 @@
   const CONFIG = {
     categoria: 'COROPLAST',      // exactamente como en el panel
     titulo: 'Coroplast',
-    whatsapp: '5215598788857'
+    whatsapp: '5215598788857',
+    hojaAncho: 240,              // cm
+    hojaAlto: 118,               // cm
+    precioHoja: null             // $ por hoja. Ponlo (ej. 450) y la página mostrará el precio estimado
   };
 
   const API_ORIGEN = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
@@ -182,18 +185,64 @@
      5. ARMADOR DE PEDIDO
      ========================================================================== */
 
+  /**
+   * Acomodo de piezas en la hoja: prueba el letrero derecho y girado,
+   * y se queda con la forma en que caben más.
+   */
+  function acomodar(ancho, alto) {
+    const W = CONFIG.hojaAncho;
+    const H = CONFIG.hojaAlto;
+    const eps = 1e-6;
+    const opciones = [
+      { w: ancho, h: alto, girado: false },
+      { w: alto, h: ancho, girado: true }
+    ].map(function (o) {
+      o.cols = Math.floor(W / o.w + eps);
+      o.filas = Math.floor(H / o.h + eps);
+      o.total = o.cols * o.filas;
+      return o;
+    });
+    opciones.sort(function (a, b) { return b.total - a.total || (a.girado ? 1 : -1); });
+    return opciones[0];
+  }
+
+  /** Si sobra material, la medida más grande que da el mismo número de piezas */
+  function medidaSugerida(a) {
+    if (!a.total) return null;
+    const w = Math.floor(CONFIG.hojaAncho / a.cols * 2) / 2;   // redondeo a medio cm
+    const h = Math.floor(CONFIG.hojaAlto / a.filas * 2) / 2;
+    const crece = (w * h) / (a.w * a.h);
+    if (crece < 1.08) return null;                             // casi no hay desperdicio
+    return a.girado ? { ancho: h, alto: w } : { ancho: w, alto: h };
+  }
+
+  function cm(n) {
+    return (Math.round(n * 10) / 10).toLocaleString('es-MX');
+  }
+
   const Armador = {
     init: function () {
       const form = $('armadorForm');
       if (!form) return;
       const self = this;
       form.addEventListener('input', function () { self.actualizar(); });
-      form.addEventListener('change', function () { self.actualizar(); });
+      // 'change' solo para selector, casillas y opciones: en los campos de texto ya se
+      // calculó con 'input', y recalcular al salir del campo borraría el botón de sugerencia
+      // justo cuando el cliente lo va a tocar.
+      form.addEventListener('change', function (e) {
+        if (e.target.matches('select, input[type="radio"], input[type="checkbox"]')) self.actualizar();
+      });
       form.addEventListener('submit', function (e) { e.preventDefault(); });
 
       $('armMedidas').addEventListener('click', function (e) {
         const c = e.target.closest('[data-medida]');
         if (c) self.poner({ medida: c.dataset.medida });
+      });
+
+      // Botón "usar esta medida" de la sugerencia
+      $('tipHoja').addEventListener('click', function (e) {
+        const b = e.target.closest('[data-medida]');
+        if (b) self.poner({ medida: b.dataset.medida });
       });
 
       // La estaca solo tiene sentido para letreros con estaca: se marca sola al cambiar el tipo
@@ -223,6 +272,48 @@
       return isFinite(v) && v > 0 ? v : 0;
     },
 
+    dibujarHoja: function (a, piezasUltimaHoja) {
+      const svg = $('hojaSvg');
+      Array.from(svg.childNodes).forEach(function (n) { if (n.nodeName !== 'title') n.remove(); });
+      const NS = 'http://www.w3.org/2000/svg';
+      const el = function (tag, attrs) {
+        const n = document.createElementNS(NS, tag);
+        Object.keys(attrs).forEach(function (k) { n.setAttribute(k, attrs[k]); });
+        svg.appendChild(n);
+        return n;
+      };
+
+      // Hoja con canales
+      el('rect', { class: 'h-hoja', x: 0, y: 0, width: CONFIG.hojaAncho, height: CONFIG.hojaAlto, rx: 1.5 });
+      if (!a || !a.total) return;
+
+      // Piezas (las que se usan en una hoja llena; las sobrantes en gris)
+      let n = 0;
+      for (let f = 0; f < a.filas; f++) {
+        for (let c = 0; c < a.cols; c++) {
+          const usada = n < piezasUltimaHoja;
+          el('rect', {
+            class: usada ? 'h-pieza' : 'h-pieza libre',
+            x: c * a.w + 0.6, y: f * a.h + 0.6,
+            width: Math.max(0.5, a.w - 1.2), height: Math.max(0.5, a.h - 1.2), rx: 1
+          });
+          n++;
+        }
+      }
+
+      // Desperdicio (derecha y abajo)
+      const usadoW = a.cols * a.w;
+      const usadoH = a.filas * a.h;
+      if (CONFIG.hojaAncho - usadoW > 0.5) el('rect', { class: 'h-sobra', x: usadoW, y: 0, width: CONFIG.hojaAncho - usadoW, height: CONFIG.hojaAlto });
+      if (CONFIG.hojaAlto - usadoH > 0.5) el('rect', { class: 'h-sobra', x: 0, y: usadoH, width: usadoW, height: CONFIG.hojaAlto - usadoH });
+
+      // Medida dentro de la primera pieza si cabe el texto
+      if (a.w >= 26 && a.h >= 12) {
+        const t = el('text', { class: 'h-texto', x: a.w / 2, y: a.h / 2 + 2.5, 'text-anchor': 'middle' });
+        t.textContent = cm(a.w) + '×' + cm(a.h);
+      }
+    },
+
     actualizar: function () {
       const tipo = $('armTipo').value;
       const ancho = this.num('armAncho');
@@ -232,37 +323,97 @@
       const estaca = $('armEstaca').checked;
       const notas = $('armNotas').value.trim();
 
-      // Chips de medida activos
       document.querySelectorAll('#armMedidas .chip').forEach(function (c) {
         const p = c.dataset.medida.split('x').map(Number);
         c.classList.toggle('activo', p[0] === ancho && p[1] === alto);
       });
 
-      // Mini letrero a escala
-      const mini = $('miniLetrero');
-      if (ancho && alto) {
-        const max = 150;
-        const k = max / Math.max(ancho, alto);
-        mini.style.width = Math.max(24, ancho * k) + 'px';
-        mini.style.height = Math.max(24, alto * k) + 'px';
-      }
-      mini.classList.toggle('con-estaca', estaca);
+      const tip = $('tipHoja');
+      tip.hidden = true;
+      tip.textContent = '';
 
-      const medidaTxt = ancho && alto ? ancho + ' × ' + alto + ' cm' : 'Por definir';
+      let a = null;
+      let hojas = 0;
+      let uso = 0;
+      let medidaTxt = 'Por definir';
+      let resumenCalculo = '';
+
+      if (ancho && alto) {
+        medidaTxt = cm(ancho) + ' × ' + cm(alto) + ' cm';
+        a = acomodar(ancho, alto);
+
+        if (a.total > 0) {
+          hojas = Math.ceil(cantidad / a.total);
+          uso = Math.round(a.total * a.w * a.h / (CONFIG.hojaAncho * CONFIG.hojaAlto) * 100);
+          const ultima = cantidad - (hojas - 1) * a.total;   // piezas en la última hoja
+          this.dibujarHoja(a, hojas === 1 ? ultima : a.total);
+
+          $('tkPorHoja').textContent = a.total;
+          $('tkHojas').textContent = hojas;
+          $('hojaPorHoja').textContent = a.total + (a.total === 1 ? ' pieza' : ' piezas') + (a.girado ? ' (girados)' : '');
+          $('tkUso').textContent = uso + '% de la hoja';
+
+          const sobrantes = hojas * a.total - cantidad;
+          const partes = [];
+          if (sobrantes > 0) {
+            partes.push('Con ' + hojas + (hojas === 1 ? ' hoja' : ' hojas') + ' te alcanza para ' + (hojas * a.total) + ' letreros: te sobran ' + sobrantes + '.');
+          }
+          const sug = medidaSugerida(a);
+          if (sug) {
+            partes.push('Sobra material: con la misma hoja puedes hacerlos de ' + cm(sug.ancho) + ' × ' + cm(sug.alto) + ' cm.');
+          }
+          if (partes.length) {
+            tip.hidden = false;
+            tip.appendChild(document.createTextNode('💡 ' + partes.join(' ') + ' '));
+            if (sug) {
+              const b = document.createElement('button');
+              b.type = 'button';
+              b.dataset.medida = sug.ancho + 'x' + sug.alto;
+              b.textContent = 'Usar ' + cm(sug.ancho) + ' × ' + cm(sug.alto);
+              tip.appendChild(b);
+            }
+          }
+          resumenCalculo = a.total + ' por hoja → ' + hojas + (hojas === 1 ? ' hoja' : ' hojas');
+        } else {
+          // Más grande que la hoja
+          this.dibujarHoja(null, 0);
+          $('tkPorHoja').textContent = '—';
+          $('tkHojas').textContent = '—';
+          $('hojaPorHoja').textContent = 'No cabe en una hoja';
+          $('tkUso').textContent = '—';
+          tip.hidden = false;
+          tip.textContent = '📐 Esa medida es más grande que una hoja (240 × 118 cm). Se puede armar uniendo varias hojas: escríbenos y te decimos cómo.';
+          resumenCalculo = 'más grande que una hoja';
+        }
+      } else {
+        this.dibujarHoja(null, 0);
+        $('tkPorHoja').textContent = '—';
+        $('tkHojas').textContent = '—';
+        $('hojaPorHoja').textContent = '';
+        $('tkUso').textContent = '—';
+      }
+
       $('tkTipo').textContent = tipo;
       $('tkMedida').textContent = medidaTxt;
+      $('tkCantidad').textContent = cantidad + (cantidad === 1 ? ' letrero' : ' letreros');
       $('tkCaras').textContent = caras === 2 ? 'Por los 2 lados' : 'De 1 lado';
-      $('tkCantidad').textContent = cantidad + (cantidad === 1 ? ' pieza' : ' piezas');
       $('tkExtras').textContent = estaca ? 'Con estaca' : 'Sin extras';
+
+      // Precio (solo si configuraste el precio por hoja)
+      const filaPrecio = $('tkPrecioFila');
+      const hayPrecio = typeof CONFIG.precioHoja === 'number' && CONFIG.precioHoja > 0 && hojas > 0;
+      filaPrecio.hidden = !hayPrecio;
+      if (hayPrecio) $('tkPrecio').textContent = formatoMXN.format(hojas * CONFIG.precioHoja);
 
       const lineas = [
         'Hola Laser Print, quiero cotizar letreros de coroplast:',
         '• Tipo: ' + tipo,
         '• Medida: ' + medidaTxt,
+        '• Cantidad: ' + cantidad + ' letreros' + (resumenCalculo ? ' (' + resumenCalculo + ')' : ''),
         '• Impresión: ' + (caras === 2 ? 'por los 2 lados' : 'de 1 lado'),
-        '• Cantidad: ' + cantidad,
         '• ' + (estaca ? 'Con estaca' : 'Sin estaca')
       ];
+      if (hayPrecio) lineas.push('• Precio estimado: ' + formatoMXN.format(hojas * CONFIG.precioHoja));
       if (notas) lineas.push('• Notas: ' + notas);
       $('armWhatsapp').href = linkWhatsApp(lineas.join('\n'));
     }
