@@ -1,116 +1,363 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-MX">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LaserPrint Arcade - CORTE LÁSER</title>
+  <title>Corte y grabado láser CO2 en Atizapán | Diseño Laser Print</title>
 
-  <!-- FAVICON -->
-  <link rel="icon" type="image/png" href="uploads/fotos/LOGOTIPO.png">
-
-  <!-- FUENTES RETRO & TECH -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
-
-  <!-- PDF.JS LIBRARY -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>
-    if (typeof pdfjsLib !== 'undefined') {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    }
+    (function () {
+      try {
+        var t = localStorage.getItem('theme');
+        if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
   </script>
 
-  <!-- ESTILOS ARCADE -->
-  <link rel="stylesheet" href="cortelaser.css">
+  <meta name="description" content="Corte y grabado con láser CO2 en Cd. López Mateos, Atizapán: MDF, acrílico, papel cascarón, cartón y grabado en aluminio. Revisa si tu archivo sirve para láser y cotiza por WhatsApp.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#0a0a12">
+  <link rel="canonical" href="https://diazvb2506.github.io/laserprint-web/cortelaser.html">
+
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_MX">
+  <meta property="og:site_name" content="Diseño Laser Print">
+  <meta property="og:title" content="Corte y grabado láser CO2 | Diseño Laser Print">
+  <meta property="og:description" content="MDF, acrílico, cascarón y más. Sube tu archivo y mira cómo lo cortaría el láser.">
+  <meta property="og:url" content="https://diazvb2506.github.io/laserprint-web/cortelaser.html">
+  <meta property="og:image" content="https://diazvb2506.github.io/laserprint-web/uploads/fotos/LOGOTIPO.png">
+
+  <link rel="icon" type="image/png" href="uploads/fotos/LOGOTIPO.png">
+  <link rel="apple-touch-icon" href="uploads/fotos/LOGOTIPO.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://res.cloudinary.com">
+  <link rel="preconnect" href="https://laserprint-api.onrender.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="cortelaser.css?v=1.0">
 </head>
-<body data-categoria="CORTE LASER">
+<body>
 
-  <!-- ENCABEZADO HUD / ARCADE -->
-  <header class="retro-header">
-    <div class="header-logo-container">
-      <a href="index.html">
-        <img src="uploads/fotos/LOGOTIPO.png" alt="LaserPrint Logo" class="logo-img" id="mainLogo">
+  <div class="bg-glow ambient-cyan" aria-hidden="true"></div>
+  <div class="bg-glow ambient-magenta" aria-hidden="true"></div>
+
+  <!-- ===== Encabezado ===== -->
+  <header class="glass-header">
+    <nav class="nav-container" aria-label="Menú principal">
+      <a href="index.html" class="logo" aria-label="Diseño Laser Print, ir al inicio">
+        <img src="uploads/fotos/LOGOTIPO.png" alt="Diseño Laser Print" class="logo-img"
+             onerror="this.onerror=null; this.src='https://placehold.co/260x100/111111/00f0ff?text=DISE%C3%91O+LASERPRINT';">
       </a>
-    </div>
 
-    <!-- MENÚ MÓVIL TOGGLE -->
-    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir Menú">
-      <span></span><span></span><span></span>
-    </button>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Abrir menú" aria-controls="navLinks" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
 
-    <nav id="navLinks">
-      <a href="index.html" class="nav-btn arcade-sound-hover">INICIO</a>
-      <a href="dtf.html" class="nav-btn arcade-sound-hover">DTF TEXTIL / UV</a>
-      <a href="sublimacion.html" class="nav-btn arcade-sound-hover">SUBLIMACIÓN</a>
-      <a href="lona.html" class="nav-btn arcade-sound-hover">LONA</a>
-      <a href="coroplast.html" class="nav-btn arcade-sound-hover">COROPLAST</a>
-      <a href="cortelaser.html" class="nav-btn active arcade-sound-hover">CORTE LÁSER</a>
-      <a href="vinil.html" class="nav-btn arcade-sound-hover">VINIL</a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html" class="nav-btn">Inicio</a></li>
+        <li><a href="dtf.html" class="nav-btn">DTF TEXTIL / UV</a></li>
+        <li><a href="sublimacion.html" class="nav-btn">SUBLIMACIÓN</a></li>
+        <li><a href="lona.html" class="nav-btn">LONA</a></li>
+        <li><a href="coroplast.html" class="nav-btn">COROPLAST</a></li>
+        <li><a href="cortelaser.html" class="nav-btn active" aria-current="page">CORTE LÁSER</a></li>
+        <li><a href="vinil.html" class="nav-btn">VINIL</a></li>
+        <li><a href="login.html" class="nav-btn btn-admin" rel="nofollow">Iniciar Sesión Admin</a></li>
+        <li><button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Cambiar tema claro u oscuro">🌙</button></li>
+      </ul>
     </nav>
   </header>
 
-  <main class="main-container">
-    <!-- TÍTULO NEÓN ARCADE -->
-    <section class="hero-section">
-      <h1 class="pixel-title">SELECT CATEGORY: CORTE Y GRABADO LÁSER</h1>
-      <p class="pixel-subtitle">STAGE 05 - ACRÍLICO, MDF, MADERA Y VECTORIZADOS DE ALTA PRECISIÓN</p>
+  <main>
+    <!-- ===== Portada: texto + láser dibujando ===== -->
+    <section class="laser-hero">
+      <div>
+        <nav class="migas" aria-label="Ruta">
+          <a href="index.html">Inicio</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">Corte láser</span>
+        </nav>
+
+        <p class="kicker">Láser CO2 · Corte y grabado</p>
+        <h1>Precisión que se corta con <span class="rayo">luz</span></h1>
+        <p class="lead">Cortamos y grabamos con láser CO2: letreros, llaveros, invitaciones, cajas, piezas para maquetas y detalles personalizados en MDF, acrílico, papel cascarón y cartón. En aluminio, grabado.</p>
+
+        <ul class="specs" aria-label="Lo que hacemos">
+          <li><strong>Corte</strong><span>piezas con cualquier forma</span></li>
+          <li><strong>Grabado</strong><span>textos, logos y fotos</span></li>
+          <li><strong>5</strong><span>materiales</span></li>
+        </ul>
+
+        <div class="hero-acciones">
+          <a class="btn-cta" href="#revisor">Revisar mi archivo ↓</a>
+          <a class="btn-sec wa-general" href="https://wa.me/5215598788857" target="_blank" rel="noopener noreferrer">Cotizar por WhatsApp</a>
+        </div>
+      </div>
+
+      <div class="cama" aria-hidden="true">
+        <div class="cama-etq"><span class="led"></span> LÁSER CO2 · CORTANDO</div>
+        <svg class="cama-svg" id="camaSvg" viewBox="0 0 400 300">
+          <!-- Guías (lo que falta por cortar) -->
+          <g class="guias">
+            <path class="guia" d="M40 30 H300 a40 40 0 0 1 40 40 V230 a40 40 0 0 1 -40 40 H40 a20 20 0 0 1 -20 -20 V50 a20 20 0 0 1 20 -20 Z"/>
+            <path class="guia" d="M316 70 a16 16 0 1 0 -32 0 a16 16 0 1 0 32 0 Z"/>
+            <path class="guia" d="M120 90 L134 128 L174 128 L142 152 L154 190 L120 167 L86 190 L98 152 L66 128 L106 128 Z"/>
+            <path class="guia" d="M210 120 C230 100 260 100 280 120 S 310 160 290 185 L250 225 L210 185 C190 160 190 140 210 120 Z"/>
+            <path class="guia" d="M60 235 Q90 210 120 235 T 180 235 T 240 235 T 300 235"/>
+          </g>
+          <!-- Cortes (se dibujan con el láser) -->
+          <g class="cortes"></g>
+          <g class="chispas"></g>
+          <circle class="cabezal" r="3.4" cx="-20" cy="-20"/>
+        </svg>
+        <div class="cama-pie"><span id="camaCoord">X 0.0  Y 0.0</span><span id="camaProgreso">0%</span></div>
+      </div>
     </section>
 
-    <!-- PESTAÑAS DE NAVEGACIÓN DIRECTA -->
-    <div class="tabs-container">
-      <button class="tab-btn active arcade-sound-btn" data-tab="imagenes">
-        <span class="tab-icon">🖼️</span> GALERÍA
-      </button>
-      <button class="tab-btn arcade-sound-btn" data-tab="videos">
-        <span class="tab-icon">🎬</span> DEMOS VIDEO
-      </button>
-      <button class="tab-btn arcade-sound-btn" data-tab="pdfs">
-        <span class="tab-icon">📄</span> CATÁLOGOS PDF
-      </button>
-    </div>
+    <!-- ===== ¿Tu archivo sirve? ===== -->
+    <section class="bloque" id="revisor" aria-labelledby="tituloRevisor">
+      <div class="bloque-header">
+        <p class="kicker">Antes de enviarlo</p>
+        <h2 id="tituloRevisor" class="titulo-seccion">¿Tu archivo sirve para láser?</h2>
+        <p class="sub-seccion">Súbelo aquí y te decimos al momento si está listo, cuánto mide y cómo lo recorrería el láser.</p>
+      </div>
 
-    <!-- SECCIÓN IMÁGENES -->
-    <section id="sec-imagenes" class="media-section">
-      <h2 class="section-title"><span>🖼️</span> MUESTRAS DE TRABAJO (GALERÍA)</h2>
-      <div id="gridImagenes" class="pixel-grid"></div>
+      <div class="revisor">
+        <label class="soltar" id="soltar">
+          <input type="file" id="archivoLaser" accept=".svg,.dxf,.pdf,.ai,.eps,.cdr,.png,.jpg,.jpeg,.webp,image/svg+xml,application/pdf,image/png,image/jpeg,image/webp" aria-describedby="soltarAyuda">
+          <span class="icono" aria-hidden="true">📐</span>
+          <strong>Arrastra tu archivo o toca para elegirlo</strong>
+          <ul class="formatos" aria-label="Formatos">
+            <li>SVG</li><li>DXF</li><li>AI</li><li>PDF</li><li>CDR</li><li>PNG</li><li>JPG</li>
+          </ul>
+          <p id="soltarAyuda" class="privado">🔒 Se revisa en tu teléfono o computadora: no se sube a ningún lado.</p>
+        </label>
+
+        <div class="diagnostico" id="diagnostico" aria-live="polite">
+          <div class="diag-vacio">
+            <h3>Esto es lo que revisamos</h3>
+            <ul>
+              <li><span aria-hidden="true">✂️</span> Si tiene líneas de corte (vector) o es una imagen.</li>
+              <li><span aria-hidden="true">📏</span> Cuánto mide tu diseño en centímetros.</li>
+              <li><span aria-hidden="true">🔥</span> Una simulación del láser recorriendo tus líneas (SVG y DXF).</li>
+              <li><span aria-hidden="true">💬</span> Y te dejamos el mensaje listo para cotizar.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- SECCIÓN VIDEOS -->
-    <section id="sec-videos" class="media-section" style="display: none;">
-      <h2 class="section-title"><span>🎬</span> PROCESOS DE CORTE Y GRABADO (VIDEOS)</h2>
-      <div id="gridVideos" class="pixel-grid"></div>
+    <!-- ===== Corte vs grabado ===== -->
+    <section class="bloque" aria-labelledby="tituloCvg">
+      <div class="cvg">
+        <div class="cvg-texto">
+          <p class="kicker">La diferencia</p>
+          <h2 id="tituloCvg" class="titulo-seccion">¿Corte, grabado o los dos?</h2>
+          <div class="selector" role="group" aria-label="Ver ejemplo" style="margin-top:22px">
+            <button type="button" data-modo="corte" aria-pressed="true">Corte</button>
+            <button type="button" data-modo="grabado" aria-pressed="false">Grabado</button>
+            <button type="button" data-modo="ambos" aria-pressed="false">Los dos</button>
+          </div>
+          <div id="cvgTexto">
+            <h3>Corte</h3>
+            <p>El láser atraviesa el material siguiendo una línea y saca la pieza con la forma exacta: letras sueltas, llaveros, figuras, piezas para armar.</p>
+            <span class="archivo-ideal"><span aria-hidden="true">📁</span> Necesita archivo en <b>vector</b>: DXF, AI, PDF o SVG.</span>
+          </div>
+        </div>
+
+        <div class="muestra" id="muestra" data-modo="corte" role="img" aria-label="Ejemplo de llavero de MDF cortado y grabado">
+          <svg viewBox="0 0 400 300" aria-hidden="true">
+            <!-- Agujero del llavero (se ve oscuro cuando se corta) -->
+            <circle class="m-hueco" cx="88" cy="150" r="14"/>
+            <!-- Grabado -->
+            <text class="m-grabado" x="230" y="142" text-anchor="middle" font-family="Georgia, serif" font-size="40" font-weight="700">LASER</text>
+            <text class="m-grabado" x="230" y="184" text-anchor="middle" font-family="Georgia, serif" font-size="22" letter-spacing="6">PRINT</text>
+            <path class="m-grabado" d="M230 205 c-6 -8 -18 -6 -18 4 c0 8 18 18 18 18 s18 -10 18 -18 c0 -10 -12 -12 -18 -4 z"/>
+            <!-- Línea de corte -->
+            <path class="m-corte" d="M60 80 H330 a30 30 0 0 1 30 30 V190 a30 30 0 0 1 -30 30 H60 a30 30 0 0 1 -30 -30 V110 a30 30 0 0 1 30 -30 Z"/>
+            <circle class="m-corte" cx="88" cy="150" r="14" style="stroke-dasharray:90;stroke-dashoffset:90"/>
+          </svg>
+        </div>
+      </div>
     </section>
 
-    <!-- SECCIÓN PDFS -->
-    <section id="sec-pdfs" class="media-section" style="display: none;">
-      <h2 class="section-title"><span>📄</span> GUÍAS Y CATÁLOGOS DE MATERIALES (PDF)</h2>
-      <div id="gridPdfs" class="pixel-grid"></div>
+    <!-- ===== Materiales ===== -->
+    <section class="bloque" aria-labelledby="tituloMateriales">
+      <div class="bloque-header">
+        <p class="kicker">Materiales</p>
+        <h2 id="tituloMateriales" class="titulo-seccion">¿En qué lo hacemos?</h2>
+        <p class="sub-seccion">Con láser CO2 cortamos y grabamos materiales no metálicos. El aluminio solo se graba.</p>
+      </div>
+
+      <div class="materiales">
+        <article class="material">
+          <div class="textura mdf" aria-hidden="true"></div>
+          <div class="material-info">
+            <h3>MDF</h3>
+            <p>Madera prensada. Letreros, cajas, llaveros, decoración y maquetas.</p>
+            <div class="puede"><span class="si">Corte</span><span class="si">Grabado</span></div>
+          </div>
+        </article>
+        <article class="material">
+          <div class="textura acrilico" aria-hidden="true"></div>
+          <div class="material-info">
+            <h3>Acrílico</h3>
+            <p>Brillante y de colores. Letreros, displays, trofeos y letras 3D.</p>
+            <div class="puede"><span class="si">Corte</span><span class="si">Grabado</span></div>
+          </div>
+        </article>
+        <article class="material">
+          <div class="textura cascaron" aria-hidden="true"></div>
+          <div class="material-info">
+            <h3>Papel cascarón</h3>
+            <p>Ligero y rígido. Maquetas, letras para eventos y escenografía.</p>
+            <div class="puede"><span class="si">Corte</span><span class="si">Grabado</span></div>
+          </div>
+        </article>
+        <article class="material">
+          <div class="textura carton" aria-hidden="true"></div>
+          <div class="material-info">
+            <h3>Cartón</h3>
+            <p>Prototipos, empaques, plantillas y manualidades.</p>
+            <div class="puede"><span class="si">Corte</span><span class="si">Grabado</span></div>
+          </div>
+        </article>
+        <article class="material">
+          <div class="textura aluminio" aria-hidden="true"></div>
+          <div class="material-info">
+            <h3>Aluminio</h3>
+            <p>Placas, termos y piezas metálicas personalizadas.</p>
+            <div class="puede"><span class="no">Corte</span><span class="si">Grabado</span></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===== Cotizador ===== -->
+    <section class="bloque" id="cotizar" aria-labelledby="tituloCotizar">
+      <div class="bloque-header">
+        <p class="kicker">Cotiza</p>
+        <h2 id="tituloCotizar" class="titulo-seccion">Cuéntanos qué necesitas</h2>
+        <p class="sub-seccion">Elige las opciones y te dejamos el mensaje listo. Al abrir WhatsApp, adjunta tu archivo en el chat.</p>
+      </div>
+
+      <form class="cotizador" id="cotForm" novalidate>
+        <div class="cot-campos">
+          <fieldset>
+            <legend>Material</legend>
+            <div class="opciones">
+              <label class="opcion"><input type="radio" name="material" value="MDF" checked><span>MDF</span></label>
+              <label class="opcion"><input type="radio" name="material" value="Acrílico"><span>Acrílico</span></label>
+              <label class="opcion"><input type="radio" name="material" value="Papel cascarón"><span>Cascarón</span></label>
+              <label class="opcion"><input type="radio" name="material" value="Cartón"><span>Cartón</span></label>
+              <label class="opcion"><input type="radio" name="material" value="Aluminio"><span>Aluminio</span></label>
+              <label class="opcion"><input type="radio" name="material" value="No sé, recomiéndenme"><span>No sé</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Servicio</legend>
+            <div class="opciones">
+              <label class="opcion"><input type="radio" name="servicio" value="Corte" checked><span>✂️ Corte</span></label>
+              <label class="opcion"><input type="radio" name="servicio" value="Grabado"><span>🔥 Grabado</span></label>
+              <label class="opcion"><input type="radio" name="servicio" value="Corte y grabado"><span>Los dos</span></label>
+            </div>
+          </fieldset>
+
+          <div>
+            <span class="cot-etq">Medida aproximada y cantidad</span>
+            <div class="cot-fila">
+              <label class="campo"><input type="number" id="cotAncho" inputmode="decimal" min="0.1" step="any" placeholder="Ancho" aria-label="Ancho en centímetros"><span class="unidad">cm</span></label>
+              <span class="por" aria-hidden="true">×</span>
+              <label class="campo"><input type="number" id="cotAlto" inputmode="decimal" min="0.1" step="any" placeholder="Alto" aria-label="Alto en centímetros"><span class="unidad">cm</span></label>
+              <label class="campo"><input type="number" id="cotCantidad" inputmode="numeric" min="1" step="1" value="1" aria-label="Cantidad de piezas"><span class="unidad">pzs</span></label>
+            </div>
+          </div>
+
+          <div>
+            <label class="cot-etq" for="cotNotas">Detalles <span style="text-transform:none;letter-spacing:0;font-weight:400">(opcional)</span></label>
+            <textarea class="cot-notas" id="cotNotas" maxlength="400" placeholder="Ej. Grosor 3 mm · Acrílico negro · Lo necesito para una boda el sábado"></textarea>
+          </div>
+        </div>
+
+        <aside class="cot-resumen">
+          <span class="cot-etq">Tu mensaje</span>
+          <p class="mensaje-prev" id="mensajePrev"></p>
+          <a class="btn-cta" id="cotWhatsapp" href="#" target="_blank" rel="noopener noreferrer">Abrir WhatsApp</a>
+          <p class="cot-letra">📎 No olvides adjuntar tu archivo en el chat. El diseño o vectorizado tiene costo extra según la complejidad.</p>
+        </aside>
+      </form>
+    </section>
+
+    <!-- ===== Vitrina de trabajos ===== -->
+    <section class="bloque" id="trabajos" aria-labelledby="tituloTrabajos">
+      <div class="bloque-header">
+        <p class="kicker">Trabajos</p>
+        <h2 id="tituloTrabajos" class="titulo-seccion">Recién salidos del láser</h2>
+        <p class="vitrina-resumen" id="vitrinaResumen" aria-live="polite">Cargando trabajos…</p>
+      </div>
+
+      <div class="vitrina" id="vitrina">
+        <div class="escaparate cargando" id="escaparate" aria-hidden="true"></div>
+        <div class="miniaturas" id="miniaturas" role="group" aria-label="Elegir trabajo"></div>
+      </div>
+    </section>
+
+    <!-- ===== Llamado final ===== -->
+    <section class="cta-banda">
+      <div>
+        <h2>¿Solo tienes una foto o un dibujo?</h2>
+        <p>Lo pasamos a vector para que el láser lo pueda cortar.</p>
+      </div>
+      <a class="btn-cta wa-vector" href="https://wa.me/5215598788857" target="_blank" rel="noopener noreferrer">Vectorizar mi diseño</a>
     </section>
   </main>
 
-  <!-- VISOR MODAL RETRO -->
-  <div id="mediaModal" class="pixel-modal" style="display: none;">
-    <span class="close-modal arcade-sound-btn" id="closeModal">&times;</span>
-    <div class="modal-content-wrapper">
-      <div id="modalBody"></div>
-      <p id="captionModal" class="modal-caption"></p>
+  <!-- ===== Pie ===== -->
+  <footer class="glass-footer">
+    <div class="footer-content">
+      <div class="footer-social">
+        <a href="https://www.facebook.com/PON_AQUI_TU_LINK" target="_blank" rel="noopener noreferrer" aria-label="Facebook de Laser Print">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.5 1.6-1.5h1.7V4.4c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1v2.4H7.7V14h2.7v8h3.1z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/laserprint678/" target="_blank" rel="noopener noreferrer" aria-label="Instagram de Laser Print">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="https://www.tiktok.com/@laserprint2026" target="_blank" rel="noopener noreferrer" aria-label="TikTok de Laser Print">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M16.6 3c.4 2.2 1.9 3.8 4 4v3.1c-1.5 0-2.9-.5-4-1.2V15a6 6 0 1 1-6-6c.3 0 .6 0 .9.1v3.2a2.9 2.9 0 1 0 2 2.7V3h3.1z"/></svg>
+        </a>
+      </div>
+      <div class="footer-contact">
+        <a href="tel:+525598788857">📞 +52 55 9878 8857</a>
+        <span class="footer-separator">|</span>
+        <a href="mailto:laserprint678@gmail.com">✉️ laserprint678@gmail.com</a>
+      </div>
+      <p class="footer-rights">© <span id="year">2026</span> Diseño Laser Print. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- ===== Visor ===== -->
+  <div class="visor" id="visor" role="dialog" aria-modal="true" aria-labelledby="visorTitulo" hidden>
+    <button type="button" class="visor-cerrar" id="visorCerrar" aria-label="Cerrar">✕</button>
+    <button type="button" class="visor-nav visor-prev" id="visorPrev" aria-label="Anterior">‹</button>
+    <button type="button" class="visor-nav visor-next" id="visorNext" aria-label="Siguiente">›</button>
+    <div class="visor-caja">
+      <div class="visor-media" id="visorMedia"></div>
+      <aside class="visor-info">
+        <p class="visor-contador" id="visorContador"></p>
+        <h2 id="visorTitulo"></h2>
+        <p class="visor-precio" id="visorPrecio"></p>
+        <p class="visor-desc" id="visorDesc"></p>
+        <div class="visor-acciones">
+          <a class="btn-cta" id="visorWhatsapp" target="_blank" rel="noopener noreferrer">Quiero uno así</a>
+          <a class="btn-sec" id="visorAbrir" target="_blank" rel="noopener noreferrer" hidden>Abrir PDF</a>
+        </div>
+      </aside>
     </div>
   </div>
 
-  <!-- CONTROL DE FALLBACK PARA LOGO -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const logo = document.getElementById('mainLogo');
-      if (logo) {
-        logo.addEventListener('error', () => {
-          logo.src = 'https://via.placeholder.com/150x50/000/00f0ff?text=LASERPRINT';
-        });
-      }
-    });
-  </script>
-
-  <!-- LÓGICA DE CONTROL -->
-  <script src="cortelaser.js"></script>
+  <script src="cortelaser.js?v=1.0" defer></script>
 </body>
 </html>
